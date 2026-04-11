@@ -5918,4 +5918,57 @@ function closeChapterSelectPopup(){
     <button onclick="closeChapterSelectPopup()" ontouchend="event.preventDefault();closeChapterSelectPopup()" style="width:100%;padding:11px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:12px;cursor:pointer;touch-action:manipulation;letter-spacing:2px">ANNULER</button>
   </div>
 </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+    function initFirebase(){
+      try{
+        if(typeof firebase === 'undefined'){ console.log('Firebase SDK not loaded'); return; }
+        var cfg = {
+          apiKey: "AIzaSyCi1WIbNFa3rhLSxDr43NJpOYbotkl6hLI",
+          authDomain: "virusclicker.firebaseapp.com",
+          projectId: "virusclicker",
+          storageBucket: "virusclicker.firebasestorage.app",
+          messagingSenderId: "781476455979",
+          appId: "1:781476455979:web:93d20c6b832b4996282c6e"
+        };
+        if(!firebase.apps.length) firebase.initializeApp(cfg);
+        var db = firebase.firestore();
+
+        window.fbSaveScore = async function(pseudo, data){
+          try{
+            var key = pseudo.replace(/[^a-zA-Z0-9_-]/g,'_');
+            await db.collection('leaderboard').doc(key).set({
+              pseudo:pseudo, score:data.score||0,
+              chapitre:data.chapitre||0, skins:data.skins||0,
+              victoires:data.victoires||0, succes:data.succes||0,
+              srBest:data.srBest||null, srDiff:data.srDiff||null,
+              lootStd:data.lootStd||0, lootPrem:data.lootPrem||0,
+              date:new Date().toISOString().slice(0,10),
+              updatedAt:Date.now()
+            });
+            console.log('Firebase OK: score sauvegarde', pseudo, data.score);
+          }catch(e){ console.log('Firebase save error:', e.message); }
+        };
+
+        window.fbGetLeaderboard = async function(){
+          try{
+            var snap = await db.collection('leaderboard').orderBy('score','desc').limit(200).get();
+            var res = [];
+            snap.forEach(function(d){ res.push(Object.assign({},d.data(),{fake:false})); });
+            console.log('Firebase: charge', res.length, 'joueurs reels');
+            return res;
+          }catch(e){ console.log('Firebase get error:', e.message); return []; }
+        };
+
+        window.firebaseReady = true;
+        window.dispatchEvent(new Event('firebaseReady'));
+        console.log('Firebase pret !');
+      }catch(e){ console.log('Firebase init error:', e.message); }
+    }
+    window.addEventListener('load', initFirebase);
+  </script>
+
 </body></html>
