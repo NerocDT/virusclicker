@@ -453,64 +453,7 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
 }
 </style>
 
-  <!-- Firebase SDK -->
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-    import { getFirestore, collection, doc, setDoc, getDocs, orderBy, query, limit } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCi1WIbNFa3rhLSxDr43NJpOYbotkl6hLI",
-      authDomain: "virusclicker.firebaseapp.com",
-      projectId: "virusclicker",
-      storageBucket: "virusclicker.firebasestorage.app",
-      messagingSenderId: "781476455979",
-      appId: "1:781476455979:web:93d20c6b832b4996282c6e"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    // Exposer les fonctions Firebase globalement
-    window.fbSaveScore = async function(pseudo, scoreData) {
-      try {
-        const key = pseudo.replace(/[^a-zA-Z0-9_-]/g, '_');
-        await setDoc(doc(db, 'leaderboard', key), {
-          pseudo: pseudo,
-          score: scoreData.score,
-          chapitre: scoreData.chapitre || 0,
-          skins: scoreData.skins || 0,
-          victoires: scoreData.victoires || 0,
-          succes: scoreData.succes || 0,
-          srBest: scoreData.srBest || null,
-          srDiff: scoreData.srDiff || null,
-          lootStd: scoreData.lootStd || 0,
-          lootPrem: scoreData.lootPrem || 0,
-          date: new Date().toISOString().slice(0,10),
-          updatedAt: Date.now()
-        });
-        return true;
-      } catch(e) {
-        console.log('Firebase save error:', e);
-        return false;
-      }
-    };
-
-    window.fbGetLeaderboard = async function() {
-      try {
-        const q = query(collection(db, 'leaderboard'), orderBy('score', 'desc'), limit(200));
-        const snap = await getDocs(q);
-        return snap.docs.map(d => ({ ...d.data(), fake: false }));
-      } catch(e) {
-        console.log('Firebase get error:', e);
-        return [];
-      }
-    };
-
-    window.firebaseReady = true;
-    console.log('Firebase initialized');
-    // Déclencher un event pour signaler que Firebase est prêt
-    window.dispatchEvent(new Event('firebaseReady'));
-  </script>
 
 </head>
 
