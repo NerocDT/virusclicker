@@ -508,6 +508,8 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
 
     window.firebaseReady = true;
     console.log('Firebase initialized');
+    // Déclencher un event pour signaler que Firebase est prêt
+    window.dispatchEvent(new Event('firebaseReady'));
   </script>
 
 </head>
@@ -5420,6 +5422,13 @@ function closeClassement(){
 async function submitScore(){
   try{
     if(!playerPseudo) return;
+    // Attendre Firebase si pas encore prêt
+    if(!window.firebaseReady){
+      await new Promise(function(resolve){
+        var timeout=setTimeout(resolve, 5000);
+        window.addEventListener('firebaseReady', function(){ clearTimeout(timeout); resolve(); }, {once:true});
+      });
+    }
     var det=computeScoreDetails();
     // Meilleur speedrun
     var bestSR=null, bestSRDiff=null;
@@ -5590,6 +5599,13 @@ function toggleExactDetail(){
 async function loadLeaderboard(){
   var el=document.getElementById('db-leaderboard'); if(!el) return;
   el.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-faint);font-size:11px">Chargement...</div>';
+  // Attendre Firebase si pas encore prêt (max 5 secondes)
+  if(!window.firebaseReady){
+    await new Promise(function(resolve){
+      var timeout=setTimeout(resolve, 5000);
+      window.addEventListener('firebaseReady', function(){ clearTimeout(timeout); resolve(); }, {once:true});
+    });
+  }
   var entries=buildFakeLeaderboard();
   // Charger les vrais joueurs depuis Firebase
   try{
