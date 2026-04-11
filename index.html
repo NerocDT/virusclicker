@@ -452,6 +452,64 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
   to  { opacity:1; transform:translateY(0); }
 }
 </style>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+    import { getFirestore, collection, doc, setDoc, getDocs, orderBy, query, limit } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCi1WIbNFa3rhLSxDr43NJpOYbotkl6hLI",
+      authDomain: "virusclicker.firebaseapp.com",
+      projectId: "virusclicker",
+      storageBucket: "virusclicker.firebasestorage.app",
+      messagingSenderId: "781476455979",
+      appId: "1:781476455979:web:93d20c6b832b4996282c6e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Exposer les fonctions Firebase globalement
+    window.fbSaveScore = async function(pseudo, scoreData) {
+      try {
+        const key = pseudo.replace(/[^a-zA-Z0-9_-]/g, '_');
+        await setDoc(doc(db, 'leaderboard', key), {
+          pseudo: pseudo,
+          score: scoreData.score,
+          chapitre: scoreData.chapitre || 0,
+          skins: scoreData.skins || 0,
+          victoires: scoreData.victoires || 0,
+          succes: scoreData.succes || 0,
+          srBest: scoreData.srBest || null,
+          srDiff: scoreData.srDiff || null,
+          lootStd: scoreData.lootStd || 0,
+          lootPrem: scoreData.lootPrem || 0,
+          date: new Date().toISOString().slice(0,10),
+          updatedAt: Date.now()
+        });
+        return true;
+      } catch(e) {
+        console.log('Firebase save error:', e);
+        return false;
+      }
+    };
+
+    window.fbGetLeaderboard = async function() {
+      try {
+        const q = query(collection(db, 'leaderboard'), orderBy('score', 'desc'), limit(200));
+        const snap = await getDocs(q);
+        return snap.docs.map(d => ({ ...d.data(), fake: false }));
+      } catch(e) {
+        console.log('Firebase get error:', e);
+        return [];
+      }
+    };
+
+    window.firebaseReady = true;
+    console.log('Firebase initialized');
+  </script>
+
 </head>
 
 <body style="background-image: radial-gradient(at 50% 0%, rgb(13, 32, 21) 0%, rgb(6, 13, 8) 65%);">
@@ -5361,21 +5419,28 @@ function closeClassement(){
 
 async function submitScore(){
   try{
-    if(!playerPseudo||!window.storage||typeof window.storage.set!=='function') return;
+    if(!playerPseudo) return;
     var det=computeScoreDetails();
-    var key='lb:'+playerPseudo.replace(/[^a-zA-Z0-9_-]/g,'_');
-    setTimeout(async function(){
-      try{
-        await window.storage.set(key,JSON.stringify({
-          pseudo:playerPseudo,score:det.total,
-          date:new Date().toISOString().slice(0,10),
-          victoires:(globalStats.totalWinsStory||0)+(globalStats.totalWinsSpeed||0),
-          skins:achievementStats.totalSkinsUnlocked||0,
-          succes:Object.keys(achievementsUnlocked).length,
-          chapitre:achievementStats.maxChapterCompleted||0
-        }),true);
-      }catch(e){}
-    },100);
+    // Meilleur speedrun
+    var bestSR=null, bestSRDiff=null;
+    SR_TARGETS.forEach(function(sr){
+      var t=bestTimes[sr.key];
+      if(t&&(!bestSR||t<bestSR)){bestSR=Math.round(t/1000);bestSRDiff=sr.diff;}
+    });
+    var scoreData={
+      score:det.total,
+      chapitre:achievementStats.maxChapterCompleted||0,
+      skins:achievementStats.totalSkinsUnlocked||0,
+      victoires:(globalStats.totalWinsStory||0)+(globalStats.totalWinsSpeed||0),
+      succes:Object.keys(achievementsUnlocked).length,
+      srBest:bestSR,
+      srDiff:bestSRDiff,
+      lootStd:achievementStats.totalLootboxesStd||0,
+      lootPrem:achievementStats.totalLootboxesPremium||0
+    };
+    if(window.fbSaveScore){
+      window.fbSaveScore(playerPseudo, scoreData);
+    }
   }catch(e){}
 }
 
@@ -5526,30 +5591,26 @@ async function loadLeaderboard(){
   var el=document.getElementById('db-leaderboard'); if(!el) return;
   el.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-faint);font-size:11px">Chargement...</div>';
   var entries=buildFakeLeaderboard();
+  // Charger les vrais joueurs depuis Firebase
+  try{
+    if(window.fbGetLeaderboard){
+      var realPlayers=await window.fbGetLeaderboard();
+      realPlayers.forEach(function(real){
+        if(real.pseudo && !FAKE_PLAYERS.find(function(f){return f.pseudo===real.pseudo;})){
+          entries=entries.filter(function(e){return e.pseudo!==real.pseudo;});
+          entries.push(real);
+        }
+      });
+    }
+  }catch(e){ console.log('Firebase load error:',e); }
+  // Ajouter/mettre à jour le joueur actuel
   if(playerPseudo){
     var det=computeScoreDetails();
+    var bestSR=null,bestSRDiff=null;
+    SR_TARGETS.forEach(function(sr){var t=bestTimes[sr.key];if(t&&(!bestSR||t<bestSR)){bestSR=Math.round(t/1000);bestSRDiff=sr.diff;}});
     entries=entries.filter(function(e){return e.pseudo!==playerPseudo;});
-    entries.push({pseudo:playerPseudo,score:det.total,skins:achievementStats.totalSkinsUnlocked||0,victoires:(globalStats.totalWinsStory||0)+(globalStats.totalWinsSpeed||0),chapitre:achievementStats.maxChapterCompleted||0,date:new Date().toISOString().slice(0,10),fake:false});
+    entries.push({pseudo:playerPseudo,score:det.total,skins:achievementStats.totalSkinsUnlocked||0,victoires:(globalStats.totalWinsStory||0)+(globalStats.totalWinsSpeed||0),chapitre:achievementStats.maxChapterCompleted||0,date:new Date().toISOString().slice(0,10),fake:false,srBest:bestSR,srDiff:bestSRDiff,succes:Object.keys(achievementsUnlocked).length,lootStd:achievementStats.totalLootboxesStd||0,lootPrem:achievementStats.totalLootboxesPremium||0});
   }
-  try{
-    if(window.storage&&typeof window.storage.list==='function'){
-      var result=await window.storage.list('lb:',true);
-      if(result&&result.keys&&result.keys.length>0){
-        for(var i=0;i<result.keys.length;i++){
-          try{
-            var r=await window.storage.get(result.keys[i],true);
-            if(r&&r.value){
-              var real=JSON.parse(r.value);
-              if(!FAKE_PLAYERS.find(function(f){return f.pseudo===real.pseudo;})){
-                entries=entries.filter(function(e){return e.pseudo!==real.pseudo;});
-                entries.push(real);
-              }
-            }
-          }catch(e){}
-        }
-      }
-    }
-  }catch(e){}
   entries.sort(function(a,b){return b.score-a.score;});
   window._lbEntries=entries;
 
