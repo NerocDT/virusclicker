@@ -5925,7 +5925,7 @@ function closeChapterSelectPopup(){
   <script>
     function initFirebase(){
       try{
-        if(typeof firebase === 'undefined'){ console.log('Firebase SDK not loaded'); return; }
+        if(typeof firebase === 'undefined'){ console.log('Firebase SDK pas encore charge, retry...'); setTimeout(initFirebase, 1000); return; }
         var cfg = {
           apiKey: "AIzaSyCi1WIbNFa3rhLSxDr43NJpOYbotkl6hLI",
           authDomain: "virusclicker.firebaseapp.com",
@@ -5968,7 +5968,9 @@ function closeChapterSelectPopup(){
         console.log('Firebase pret !');
       }catch(e){ console.log('Firebase init error:', e.message); }
     }
-    window.addEventListener('load', initFirebase);
+    // Appel immédiat ET sur load pour couvrir tous les cas
+try{ initFirebase(); }catch(e){}
+window.addEventListener('load', function(){ if(!window.firebaseReady) initFirebase(); });
   </script>
 
 </body></html>
