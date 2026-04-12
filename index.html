@@ -5920,9 +5920,9 @@ function closeChapterSelectPopup(){
   </div>
 </div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <!-- Firebase SDK - version compatible Safari iOS -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script>
     function initFirebase(){
       try{
@@ -5937,6 +5937,8 @@ function closeChapterSelectPopup(){
         };
         if(!firebase.apps.length) firebase.initializeApp(cfg);
         var db = firebase.firestore();
+        // Activer la persistance pour Safari iOS
+        db.settings({ experimentalForceLongPolling: true, merge: true });
 
         window.fbSaveScore = async function(pseudo, data){
           try{
