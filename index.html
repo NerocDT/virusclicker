@@ -3548,25 +3548,7 @@ function closeClassement(){
   document.getElementById('dashboard-screen').style.display = 'none';
 }
 
-async function submitScore(){
-  const pseudo = playerPseudo || 'Anonyme';
-  const score = computeScore();
-  const key = 'lb:' + pseudo.replace(/[^a-zA-Z0-9_\-]/g,'_');
-  try {
-    await window.storage.set(key, JSON.stringify({
-      pseudo, score,
-      date: new Date().toISOString().slice(0,10),
-      infectes: achievementStats.totalInfected || 0,
-      victoires: globalStats.totalWins || 0,
-      skins: achievementStats.totalSkinsUnlocked || 0,
-      succes: Object.keys(achievementsUnlocked).length
-    }), true); // shared = true
-    showFusionToast('Score publié ! ' + fmtScore(score) + ' pts', 'var(--yellow)');
-    await loadLeaderboard();
-  } catch(e) {
-    showFusionToast('Erreur de publication', 'var(--red)');
-  }
-}
+
 
 async function loadLeaderboard(){
   const el = document.getElementById('db-leaderboard'); if(!el) return;
@@ -3855,25 +3837,7 @@ function closeClassement(){
   document.getElementById('dashboard-screen').style.display = 'none';
 }
 
-async function submitScore(){
-  const pseudo = playerPseudo || 'Anonyme';
-  const score = computeScore();
-  const key = 'lb:' + pseudo.replace(/[^a-zA-Z0-9_\-]/g,'_');
-  try {
-    await window.storage.set(key, JSON.stringify({
-      pseudo, score,
-      date: new Date().toISOString().slice(0,10),
-      infectes: achievementStats.totalInfected || 0,
-      victoires: globalStats.totalWins || 0,
-      skins: achievementStats.totalSkinsUnlocked || 0,
-      succes: Object.keys(achievementsUnlocked).length
-    }), true); // shared = true
-    showFusionToast('Score publié ! ' + fmtScore(score) + ' pts', 'var(--yellow)');
-    await loadLeaderboard();
-  } catch(e) {
-    showFusionToast('Erreur de publication', 'var(--red)');
-  }
-}
+
 
 async function loadLeaderboard(){
   const el = document.getElementById('db-leaderboard'); if(!el) return;
