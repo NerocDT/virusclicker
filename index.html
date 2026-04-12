@@ -5365,13 +5365,13 @@ function closeClassement(){
 async function submitScore(){
   try{
     if(!playerPseudo) return;
-    // Attendre Firebase si pas encore prêt
-    if(!window.firebaseReady){
-      await new Promise(function(resolve){
-        var timeout=setTimeout(resolve, 5000);
-        window.addEventListener('firebaseReady', function(){ clearTimeout(timeout); resolve(); }, {once:true});
-      });
+    // Attendre Firebase si pas encore prêt (max 8 secondes)
+    var waited = 0;
+    while(!window.firebaseReady && waited < 8000){
+      await new Promise(function(r){ setTimeout(r, 200); });
+      waited += 200;
     }
+    if(!window.fbSaveScore){ console.log('fbSaveScore non disponible'); return; }
     var det=computeScoreDetails();
     // Meilleur speedrun
     var bestSR=null, bestSRDiff=null;
