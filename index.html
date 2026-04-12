@@ -5392,7 +5392,7 @@ async function submitScore(){
       lootPrem:achievementStats.totalLootboxesPremium||0
     };
     if(window.fbSaveScore){
-      window.fbSaveScore(playerPseudo, scoreData);
+      await window.fbSaveScore(playerPseudo, scoreData);
     }
   }catch(e){}
 }
