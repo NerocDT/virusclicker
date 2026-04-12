@@ -6,7 +6,7 @@
   <title>☣ PATHOGEN-X</title>
   <script>
   // ══ AUTO-UPDATE — changer ce numéro à chaque mise à jour ══
-  var APP_VERSION = '1.2';
+  var APP_VERSION = '1.3';
   (function(){
     var storedVersion = localStorage.getItem('pathogenx_version');
     if(storedVersion && storedVersion !== APP_VERSION){
@@ -563,6 +563,7 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
       <button onclick="toggleBurgerMenu()" id="burger-btn" style="padding:6px 12px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.5);color:rgba(255,255,255,0.9);font-family:'Share Tech Mono',monospace;font-size:16px;cursor:pointer;touch-action:manipulation;line-height:1;box-shadow:0 0 12px rgba(255,255,255,0.15),inset 0 0 8px rgba(255,255,255,0.04)">☰</button>
       <div id="burger-menu" style="display: none; position: fixed; top: 56px; left: 770px; background: rgb(6, 13, 16); border: 1px solid rgba(255, 255, 255, 0.15); z-index: 500; min-width: 180px; flex-direction: column; box-shadow: rgba(0, 0, 0, 0.5) 0px 8px 24px;" class="">
         <button ontouchend="event.preventDefault();openClassement()" onclick="openClassement()" style="display:block;width:100%;padding:12px 16px;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,0.06);color:var(--yellow);font-family:&#39;Share Tech Mono&#39;,monospace;font-size:11px;cursor:pointer;text-align:left;touch-action:manipulation">🏆 CLASSEMENT</button>
+        <button ontouchend="event.preventDefault();openDailyChallenges()" onclick="openDailyChallenges()" style="display:block;width:100%;padding:12px 16px;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,0.06);color:#ff8800;font-family:&#39;Share Tech Mono&#39;,monospace;font-size:11px;cursor:pointer;text-align:left;touch-action:manipulation">🔥 DÉFI QUOTIDIEN</button>
         <button ontouchend="event.preventDefault();openStats()" onclick="openStats()" style="display:block;width:100%;padding:12px 16px;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,0.06);color:var(--text-dim);font-family:&#39;Share Tech Mono&#39;,monospace;font-size:11px;cursor:pointer;text-align:left;touch-action:manipulation">📊 STATS</button>
         <button ontouchend="event.preventDefault();showMenuTab(&#39;achievements&#39;)" onclick="showMenuTab(&#39;achievements&#39;)" style="display:block;width:100%;padding:12px 16px;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,0.12);color:var(--text-dim);font-family:&#39;Share Tech Mono&#39;,monospace;font-size:11px;cursor:pointer;text-align:left;touch-action:manipulation">🎖 SUCCÈS</button>
         <button ontouchend="event.preventDefault();openSettings()" onclick="openSettings()" style="display:block;width:100%;padding:12px 16px;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,0.06);color:var(--text-dim);font-family:&#39;Share Tech Mono&#39;,monospace;font-size:11px;cursor:pointer;text-align:left;touch-action:manipulation">⚙ PARAMÈTRES</button>
@@ -799,9 +800,18 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
       </div>
     </div>
 
-    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.2</div>
+    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.3</div>
 
   </div>
+</div>
+
+<!-- ══ DÉFIS QUOTIDIENS ══ -->
+<div id="daily-screen" style="display:none;position:fixed;inset:0;z-index:650;background:#040a06;flex-direction:column;">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid rgba(255,136,0,0.25);background:#040a06;flex-shrink:0">
+    <div style="font-family:'Orbitron','Futura','Century Gothic','Trebuchet MS',sans-serif;font-size:18px;font-weight:900;color:#ff8800;letter-spacing:3px;text-shadow:0 0 14px rgba(255,136,0,0.4)">DÉFIS QUOTIDIENS</div>
+    <button onclick="closeDailyChallenges()" ontouchend="event.preventDefault();closeDailyChallenges()" style="padding:7px 16px;background:transparent;border:1px solid rgba(255,136,0,0.3);color:#ff8800;font-family:'Share Tech Mono',monospace;font-size:12px;cursor:pointer;touch-action:manipulation">✕ FERMER</button>
+  </div>
+  <div id="daily-content" style="flex:1;overflow-y:auto;padding:16px 18px 40px;max-width:440px;margin:0 auto;width:100%;-webkit-overflow-scrolling:touch"></div>
 </div>
 
 <!-- ══ GAME ══ -->
@@ -1397,6 +1407,7 @@ function saveGame(){
       skinCollection, skinLevels, skinTrees, treeState,
       bestTimes, globalStats,
       heritageData,
+      dailyChallengeState,
     };
     localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     const el = document.getElementById('save-indicator');
@@ -1429,6 +1440,7 @@ function loadGame(){
     if(d.bestTimes)       bestTimes = d.bestTimes;
     if(d.globalStats)     globalStats = { ...globalStats, ...d.globalStats };
     if(d.heritageData)    heritageData = d.heritageData;
+    if(d.dailyChallengeState) dailyChallengeState = {...dailyChallengeState, ...d.dailyChallengeState};
     recalcTreeState();
     updateSouchesDisplay();
     renderVirusDisplay();
@@ -1462,6 +1474,7 @@ function resetSave(){
   globalStats = {totalRunsStory:0,totalWinsStory:0,totalRunsSpeed:0,totalWinsSpeed:0,chaptersCompleted:0,totalWins:0,totalClicsAll:0,totalInfectedAll:0,totalLootboxes:0};
   playerPseudo = '';
   heritageData = null;
+  dailyChallengeState = { date:null, challengeIds:[], progress:{}, claimed:{}, clicksToday:0, winsToday:0, speedrunsToday:0, chaptersToday:0, lootboxToday:0, equipsToday:0, upgradeSkinsToday:0 };
 
   // 3. Sauvegarder l'état vide immédiatement
   saveGame();
@@ -1954,6 +1967,7 @@ function startRun(){
   const ch = getChapter();
   runTarget = ch.target;
   infected=0; totalClicks=0;
+  dailyOnRunStart();
   clickPower = 1 * (permanentState.gainMult || 1);
   passive=0;
   vaccine=0; vaccineSpeed=0; vaxMilestonesHit=new Set(); vaxMilestoneMult=1; vaxShopMult=1; gameOver=false;
@@ -2118,6 +2132,7 @@ function initClickZone(){
     const total = effective * count;
     totalClicks += count;
     achievementStats.totalClicks += count;
+    dailyOnClick(count);
     infected = Math.min(infected + total, runTarget);
     achievementStats.totalInfected += total;
     const b=document.getElementById('vbtn');
@@ -2139,6 +2154,7 @@ function registerClick(x, y){
   const chTapMult=(currentMode==='story')?(getChapter().tapMult||1):1; const effective = clickPower * skinB.tap * tb.tapMult * chTapMult;
   totalClicks++;
   achievementStats.totalClicks++;
+  dailyOnClick(1);
   infected=Math.min(infected+effective, runTarget);
   achievementStats.totalInfected=Math.min(achievementStats.totalInfected+effective, achievementStats.totalInfected+effective);
   const b=document.getElementById('vbtn');
@@ -2256,6 +2272,7 @@ function buyUpgrade(id){
   const cost=shopCost(u);
   if(cost===Infinity||infected<cost) return;
   infected-=cost; u.count++; u.effect();
+  dailyOnBuyUpgrade();
   showShopPopup(u,cost);
   updateUI(); renderShop();
 }
@@ -2935,7 +2952,7 @@ function sellLootboxSkin(){
   saveGame();
 }
 
-function showLootboxResult(skin){ globalStats.totalLootboxes++; achievementStats.totalLootboxes++;
+function showLootboxResult(skin){ globalStats.totalLootboxes++; achievementStats.totalLootboxes++; dailyOnLootbox();
   var rc=document.getElementById('lb-reel-container'); if(rc) rc.style.display='none';
   if(currentLootboxType==='premium') achievementStats.totalLootboxesPremium++; else achievementStats.totalLootboxesStd++;
   currentLootboxType='standard'; saveGame();
@@ -3062,6 +3079,7 @@ function fuseToHigher(id){
   if(!(skinCollection[won.id] > 0)) delete skinLevels[won.id]; // premier exemplaire = niveau 0
   skinCollection[won.id] = (skinCollection[won.id]||0) + 1;
   showFusionToast(''+(s.name)+' → '+(won.name)+' !', skinColor(won.rarity));
+  dailyOnUpgradeSkin();
   if(!equippedSkin){ equippedSkin=won.id; updateEquippedUI(won); }
   renderSkins();
 }
@@ -3077,6 +3095,7 @@ function upgradeLevel(id){
   if(count < needed + 1) return; // besoin de needed+1 au total
   skinCollection[id] -= needed; // on consomme les doublons, le virus de base reste
   skinLevels[id] = lvl + 1;
+  dailyOnUpgradeSkin();
   saveGame();
   showFusionToast(''+(s.name)+' → Niveau '+(lvl+1)+' !', skinColor(s.rarity));
   renderSkins();
@@ -3507,6 +3526,7 @@ function setupSkinBioModal(){
 function equipSkin(id){
   if(!(skinCollection[id]>0)) return;
   equippedSkin = id;
+  dailyOnEquip();
   const s = SKINS.find(x=>x.id===id);
   if(s) updateEquippedUI(s);
   recalcTreeState();
@@ -4376,7 +4396,8 @@ function endRun(win){
     if(srK&&(!bestTimes[srK.key]||elapsed<bestTimes[srK.key])){ bestTimes[srK.key]=elapsed; }
     globalStats.totalWinsSpeed++;
     achievementStats.totalSpeedrunWins=(achievementStats.totalSpeedrunWins||0)+1;
-  } if(currentMode==='story'&&win) globalStats.totalWinsStory++;
+    dailyOnWin(true, elapsed);
+  } if(currentMode==='story'&&win){ globalStats.totalWinsStory++; dailyOnWin(false, elapsed); }
 
   // Check if it's the FINAL win (chapitre 5 = 8 milliards)
   var maxChapterId=CHAPTER_DATA.reduce(function(m,x){return x.id>m?x.id:m;},0);
@@ -4385,6 +4406,7 @@ function endRun(win){
   // Défaite en mode histoire
   if(!win && currentMode==='story'){
     const pct=(infected/runTarget)*100;
+    dailyOnLose(pct);
     setTimeout(()=>grantSouchesReward(pct, false), 300);
     setTimeout(()=>showDefeatScreen(), 450);
     return;
@@ -5082,6 +5104,331 @@ function tryVibrate(ms){
 }
 
 
+// ══════════════════════════════════════════
+//  DÉFIS QUOTIDIENS
+// ══════════════════════════════════════════
+const DAILY_CHALLENGES = [
+  // ── CLICS ──
+  { id:'dc1',  icon:'👆', name:'Tapoteur',           desc:'Faire 500 clics en une session',         type:'clicks_session',  target:500,      reward:{souches:15, frags:1} },
+  { id:'dc2',  icon:'👆', name:'Frénésie',           desc:'Faire 2 000 clics en une session',       type:'clicks_session',  target:2000,     reward:{souches:30, frags:2} },
+  { id:'dc3',  icon:'👆', name:'Doigts de Feu',      desc:'Faire 5 000 clics en une session',       type:'clicks_session',  target:5000,     reward:{souches:50, frags:3} },
+  { id:'dc4',  icon:'🔥', name:'Turbo Tap',          desc:'Faire 10 000 clics aujourd\'hui (cumulé)', type:'clicks_today',  target:10000,    reward:{souches:80, frags:4} },
+
+  // ── INFECTÉS ──
+  { id:'dc5',  icon:'🦠', name:'Premier Contact',    desc:'Infecter 100 000 personnes en une run',  type:'infected_run',    target:100000,   reward:{souches:15, frags:1} },
+  { id:'dc6',  icon:'🦠', name:'Super Spreader',     desc:'Infecter 1 000 000 en une run',          type:'infected_run',    target:1000000,  reward:{souches:25, frags:2} },
+  { id:'dc7',  icon:'🌍', name:'Pandémie Express',   desc:'Infecter 10 000 000 en une run',         type:'infected_run',    target:10000000, reward:{souches:50, frags:3} },
+  { id:'dc8',  icon:'💀', name:'Apocalypse',         desc:'Infecter 100 000 000 en une run',        type:'infected_run',    target:100000000,reward:{souches:80, frags:5} },
+
+  // ── VICTOIRES ──
+  { id:'dc9',  icon:'✅', name:'Première Victoire',   desc:'Gagner 1 run (histoire ou speedrun)',    type:'wins_today',      target:1,        reward:{souches:20, frags:1} },
+  { id:'dc10', icon:'✅', name:'Doublé',              desc:'Gagner 2 runs aujourd\'hui',             type:'wins_today',      target:2,        reward:{souches:40, frags:2} },
+  { id:'dc11', icon:'✅', name:'Hat-trick',           desc:'Gagner 3 runs aujourd\'hui',             type:'wins_today',      target:3,        reward:{souches:70, frags:4} },
+
+  // ── SPEEDRUN ──
+  { id:'dc12', icon:'⚡', name:'Speedrunner',         desc:'Terminer un speedrun',                   type:'speedrun_today',  target:1,        reward:{souches:25, frags:2} },
+  { id:'dc13', icon:'⚡', name:'Contre la Montre',    desc:'Finir un speedrun en moins de 5 min',    type:'speedrun_time',   target:300000,   reward:{souches:50, frags:3} },
+  { id:'dc14', icon:'⚡', name:'Éclair',              desc:'Finir un speedrun en moins de 3 min',    type:'speedrun_time',   target:180000,   reward:{souches:80, frags:5} },
+  { id:'dc15', icon:'⚡', name:'Double Sprint',       desc:'Terminer 2 speedruns aujourd\'hui',      type:'speedrun_today',  target:2,        reward:{souches:40, frags:2} },
+
+  // ── CHAPITRES ──
+  { id:'dc16', icon:'📖', name:'Lecteur Assidu',      desc:'Terminer un chapitre en mode histoire',  type:'chapter_today',   target:1,        reward:{souches:30, frags:2} },
+  { id:'dc17', icon:'📖', name:'Marathonien',         desc:'Terminer 2 chapitres aujourd\'hui',      type:'chapter_today',   target:2,        reward:{souches:60, frags:4} },
+
+  // ── UPGRADES ──
+  { id:'dc18', icon:'⚗', name:'Investisseur',         desc:'Acheter 5 upgrades en une run',          type:'upgrades_run',    target:5,        reward:{souches:15, frags:1} },
+  { id:'dc19', icon:'⚗', name:'Magnat',               desc:'Acheter 15 upgrades en une run',         type:'upgrades_run',    target:15,       reward:{souches:35, frags:2} },
+  { id:'dc20', icon:'⚗', name:'Collectionneur',       desc:'Acheter 30 upgrades en une run',         type:'upgrades_run',    target:30,       reward:{souches:60, frags:4} },
+
+  // ── LOOTBOX ──
+  { id:'dc21', icon:'🎁', name:'Chanceux',            desc:'Ouvrir 1 lootbox aujourd\'hui',          type:'lootbox_today',   target:1,        reward:{souches:10, frags:1} },
+  { id:'dc22', icon:'🎁', name:'Addicted',            desc:'Ouvrir 3 lootboxes aujourd\'hui',        type:'lootbox_today',   target:3,        reward:{souches:30, frags:2} },
+
+  // ── VACCIN ──
+  { id:'dc23', icon:'💉', name:'Survivant',           desc:'Gagner avec le vaccin au-dessus de 80%', type:'win_high_vax',    target:80,       reward:{souches:40, frags:3} },
+  { id:'dc24', icon:'💉', name:'In Extremis',         desc:'Gagner avec le vaccin au-dessus de 90%', type:'win_high_vax',    target:90,       reward:{souches:70, frags:5} },
+
+  // ── SOUCHES ──
+  { id:'dc25', icon:'🧫', name:'Économe',             desc:'Accumuler 200 souches (sans dépenser)',   type:'souches_hold',    target:200,      reward:{souches:20, frags:1} },
+  { id:'dc26', icon:'🧫', name:'Banquier',            desc:'Accumuler 500 souches (sans dépenser)',   type:'souches_hold',    target:500,      reward:{souches:40, frags:2} },
+
+  // ── SKINS ──
+  { id:'dc27', icon:'🎨', name:'Équipé',              desc:'Changer de virus équipé 1 fois',         type:'equip_today',     target:1,        reward:{souches:10, frags:1} },
+  { id:'dc28', icon:'🔬', name:'Scientifique',        desc:'Améliorer un virus (fusion/level up)',    type:'upgrade_skin_today', target:1,     reward:{souches:30, frags:2} },
+
+  // ── DÉFAITE ──
+  { id:'dc29', icon:'🧬', name:'Résilient',           desc:'Perdre une run avec +50% d\'infectés',   type:'lose_high_pct',   target:50,       reward:{souches:20, frags:1} },
+  { id:'dc30', icon:'🧬', name:'Presque',             desc:'Perdre une run avec +90% d\'infectés',   type:'lose_high_pct',   target:90,       reward:{souches:50, frags:3} },
+];
+
+// State des défis
+let dailyChallengeState = {
+  date: null,           // "2026-04-12" — la date du jour
+  challengeIds: [],     // les 3 IDs sélectionnés
+  progress: {},         // { dc1: 350, dc5: 90000 } — progression actuelle
+  claimed: {},          // { dc1: true } — déjà réclamé
+  // Compteurs du jour
+  clicksToday: 0,
+  winsToday: 0,
+  speedrunsToday: 0,
+  chaptersToday: 0,
+  lootboxToday: 0,
+  equipsToday: 0,
+  upgradeSkinsToday: 0,
+};
+
+// Compteurs de session (reset à chaque run)
+let dailySessionClicks = 0;
+let dailySessionUpgrades = 0;
+
+function getTodayStr(){
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+function getDailyChallengeIds(dateStr){
+  // Hash simple de la date pour obtenir 3 défis déterministes
+  let hash = 0;
+  for(let i=0; i<dateStr.length; i++){
+    hash = ((hash << 5) - hash) + dateStr.charCodeAt(i);
+    hash = hash & hash;
+  }
+  hash = Math.abs(hash);
+  const ids = [];
+  const pool = [...DAILY_CHALLENGES];
+  for(let i=0; i<3; i++){
+    const idx = (hash + i*7 + i*i*13) % pool.length;
+    ids.push(pool[idx].id);
+    pool.splice(idx, 1); // pas de doublons
+  }
+  return ids;
+}
+
+function initDailyChallenges(){
+  const today = getTodayStr();
+  if(dailyChallengeState.date !== today){
+    // Nouveau jour → reset
+    dailyChallengeState.date = today;
+    dailyChallengeState.challengeIds = getDailyChallengeIds(today);
+    dailyChallengeState.progress = {};
+    dailyChallengeState.claimed = {};
+    dailyChallengeState.clicksToday = 0;
+    dailyChallengeState.winsToday = 0;
+    dailyChallengeState.speedrunsToday = 0;
+    dailyChallengeState.chaptersToday = 0;
+    dailyChallengeState.lootboxToday = 0;
+    dailyChallengeState.equipsToday = 0;
+    dailyChallengeState.upgradeSkinsToday = 0;
+    saveGame();
+  }
+}
+
+function getDailyChallengeProgress(ch){
+  const s = dailyChallengeState;
+  switch(ch.type){
+    case 'clicks_session':    return dailySessionClicks;
+    case 'clicks_today':      return s.clicksToday;
+    case 'infected_run':      return infected || 0;
+    case 'wins_today':        return s.winsToday;
+    case 'speedrun_today':    return s.speedrunsToday;
+    case 'speedrun_time':     return -1; // spécial: vérifié à la fin du speedrun
+    case 'chapter_today':     return s.chaptersToday;
+    case 'upgrades_run':      return dailySessionUpgrades;
+    case 'lootbox_today':     return s.lootboxToday;
+    case 'win_high_vax':      return -1; // spécial: vérifié à la victoire
+    case 'souches_hold':      return souches;
+    case 'equip_today':       return s.equipsToday;
+    case 'upgrade_skin_today':return s.upgradeSkinsToday;
+    case 'lose_high_pct':     return -1; // spécial: vérifié à la défaite
+    default: return 0;
+  }
+}
+
+function checkDailyChallengeCompletion(ch, extraData){
+  const s = dailyChallengeState;
+  if(s.claimed[ch.id]) return false;
+
+  switch(ch.type){
+    case 'speedrun_time':
+      // extraData = elapsed en ms, on vérifie si c'est sous la cible
+      return extraData && extraData <= ch.target;
+    case 'win_high_vax':
+      // extraData = vaccine %
+      return extraData && extraData >= ch.target;
+    case 'lose_high_pct':
+      // extraData = % infecté
+      return extraData && extraData >= ch.target;
+    default:
+      return getDailyChallengeProgress(ch) >= ch.target;
+  }
+}
+
+// Appelé après chaque action pertinente
+function updateDailyChallenges(eventType, extraData){
+  initDailyChallenges();
+  const today = getTodayStr();
+  if(dailyChallengeState.date !== today) return;
+
+  const activeIds = dailyChallengeState.challengeIds;
+  activeIds.forEach(id => {
+    const ch = DAILY_CHALLENGES.find(c=>c.id===id);
+    if(!ch || dailyChallengeState.claimed[id]) return;
+
+    // Pour les types spéciaux, ne check que sur le bon événement
+    if(ch.type === 'speedrun_time'){
+      if(eventType === 'speedrun_win' && extraData && extraData <= ch.target){
+        dailyChallengeState.progress[id] = ch.target;
+      }
+      return;
+    }
+    if(ch.type === 'win_high_vax'){
+      if(eventType === 'chapter_win' && extraData && extraData >= ch.target){
+        dailyChallengeState.progress[id] = ch.target;
+      }
+      return;
+    }
+    if(ch.type === 'lose_high_pct'){
+      if(eventType === 'lose' && extraData && extraData >= ch.target){
+        dailyChallengeState.progress[id] = ch.target;
+      }
+      return;
+    }
+
+    // Types normaux — mettre à jour la progression
+    const prog = getDailyChallengeProgress(ch);
+    if(prog >= 0) dailyChallengeState.progress[id] = prog;
+  });
+}
+
+// Hooks dans le jeu — appeler ces fonctions aux bons moments
+function dailyOnClick(count){
+  dailySessionClicks += (count||1);
+  dailyChallengeState.clicksToday += (count||1);
+  updateDailyChallenges('click');
+}
+function dailyOnWin(isSpeedrun, elapsed){
+  dailyChallengeState.winsToday++;
+  if(isSpeedrun){
+    dailyChallengeState.speedrunsToday++;
+    updateDailyChallenges('speedrun_win', elapsed);
+  } else {
+    dailyChallengeState.chaptersToday++;
+    updateDailyChallenges('chapter_win', vaccine);
+  }
+  saveGame();
+}
+function dailyOnLose(pct){
+  updateDailyChallenges('lose', pct);
+}
+function dailyOnLootbox(){
+  dailyChallengeState.lootboxToday++;
+  updateDailyChallenges('lootbox');
+}
+function dailyOnEquip(){
+  dailyChallengeState.equipsToday++;
+  updateDailyChallenges('equip');
+}
+function dailyOnUpgradeSkin(){
+  dailyChallengeState.upgradeSkinsToday++;
+  updateDailyChallenges('upgrade_skin');
+}
+function dailyOnBuyUpgrade(){
+  dailySessionUpgrades++;
+  updateDailyChallenges('buy_upgrade');
+}
+function dailyOnRunStart(){
+  dailySessionClicks = 0;
+  dailySessionUpgrades = 0;
+}
+
+function claimDailyReward(id){
+  const ch = DAILY_CHALLENGES.find(c=>c.id===id);
+  if(!ch || dailyChallengeState.claimed[id]) return;
+  const prog = dailyChallengeState.progress[id] || 0;
+  if(prog < ch.target) return;
+  dailyChallengeState.claimed[id] = true;
+  if(ch.reward.souches){ souches += ch.reward.souches; updateSouchesDisplay(); }
+  if(ch.reward.frags){ skinFragments += ch.reward.frags; }
+  showFusionToast('🔥 '+ch.name+' — +'+(ch.reward.souches||0)+' 🧫 +'+(ch.reward.frags||0)+' 🧩', '#ff8800');
+  saveGame();
+  renderDailyChallenges();
+}
+
+function openDailyChallenges(){
+  closeBurger(true);
+  initDailyChallenges();
+  renderDailyChallenges();
+  document.getElementById('daily-screen').style.display = 'flex';
+}
+function closeDailyChallenges(){
+  document.getElementById('daily-screen').style.display = 'none';
+}
+
+function renderDailyChallenges(){
+  const el = document.getElementById('daily-content'); if(!el) return;
+  initDailyChallenges();
+  const activeIds = dailyChallengeState.challengeIds;
+  const totalDone = activeIds.filter(id=>dailyChallengeState.claimed[id]).length;
+
+  // Timer jusqu'à minuit
+  const now = new Date();
+  const midnight = new Date(now); midnight.setHours(24,0,0,0);
+  const diff = midnight - now;
+  const h = Math.floor(diff/3600000);
+  const m = Math.floor((diff%3600000)/60000);
+  const timerTxt = h+'h '+String(m).padStart(2,'0')+'min';
+
+  let html = '<div style="text-align:center;margin-bottom:16px">';
+  html += '<div style="font-size:11px;color:var(--text-faint);letter-spacing:2px;margin-bottom:6px">RENOUVELLEMENT DANS</div>';
+  html += '<div style="font-family:\'Orbitron\',sans-serif;font-size:20px;font-weight:900;color:#ff8800;letter-spacing:3px;text-shadow:0 0 12px rgba(255,136,0,0.4)">'+timerTxt+'</div>';
+  html += '<div style="font-size:10px;color:var(--text-faint);margin-top:6px">'+totalDone+'/3 complétés</div>';
+  html += '</div>';
+
+  activeIds.forEach(id => {
+    const ch = DAILY_CHALLENGES.find(c=>c.id===id);
+    if(!ch) return;
+    const claimed = !!dailyChallengeState.claimed[id];
+    const prog = dailyChallengeState.progress[id] || 0;
+    const done = claimed || prog >= ch.target;
+    const pct = Math.min(100, Math.round((prog/ch.target)*100));
+
+    const rewardTxt = [ch.reward.souches?'+'+ch.reward.souches+' 🧫':'', ch.reward.frags?'+'+ch.reward.frags+' 🧩':''].filter(Boolean).join(' · ');
+
+    const borderCol = claimed ? 'rgba(255,136,0,0.2)' : done ? 'rgba(255,136,0,0.6)' : 'rgba(255,255,255,0.08)';
+    const bgCol = claimed ? 'rgba(255,136,0,0.03)' : done ? 'rgba(255,136,0,0.08)' : 'rgba(0,0,0,0.2)';
+
+    html += '<div style="border:1px solid '+borderCol+';background:'+bgCol+';padding:14px;margin-bottom:10px;'+(claimed?'opacity:0.5':'')+'">';
+    html += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">';
+    html += '<div style="font-size:24px;flex-shrink:0">'+ch.icon+'</div>';
+    html += '<div style="flex:1">';
+    html += '<div style="font-family:\'Orbitron\',sans-serif;font-size:12px;font-weight:600;color:'+(done?'#ff8800':'var(--text-dim)')+';letter-spacing:1px;margin-bottom:3px">'+ch.name+'</div>';
+    html += '<div style="font-size:11px;color:var(--text-faint);line-height:1.5">'+ch.desc+'</div>';
+    html += '</div>';
+    html += '<div style="text-align:right;font-size:10px;color:var(--text-faint);min-width:50px">'+rewardTxt+'</div>';
+    html += '</div>';
+
+    // Barre de progression
+    html += '<div style="background:rgba(255,255,255,0.06);height:6px;margin-bottom:8px">';
+    html += '<div style="height:100%;background:'+(done?'linear-gradient(90deg,#cc6600,#ff8800)':'rgba(255,136,0,0.3)')+';width:'+pct+'%;transition:width 0.3s;box-shadow:'+(done?'0 0 8px rgba(255,136,0,0.4)':'none')+'"></div>';
+    html += '</div>';
+
+    html += '<div style="display:flex;justify-content:space-between;align-items:center">';
+    html += '<div style="font-size:10px;color:'+(done?'#ff8800':'var(--text-faint)')+'">'+fmt(prog)+' / '+fmt(ch.target)+'</div>';
+
+    if(claimed){
+      html += '<div style="font-size:10px;color:rgba(255,136,0,0.4);letter-spacing:2px">✓ RÉCLAMÉ</div>';
+    } else if(done){
+      html += '<button onclick="claimDailyReward(\''+id+'\')" ontouchend="event.preventDefault();claimDailyReward(\''+id+'\')" style="padding:6px 14px;background:rgba(255,136,0,0.15);border:2px solid #ff8800;color:#ff8800;font-family:\'Share Tech Mono\',monospace;font-size:11px;font-weight:bold;cursor:pointer;touch-action:manipulation;box-shadow:0 0 12px rgba(255,136,0,0.3)">RÉCLAMER</button>';
+    } else {
+      html += '<div style="font-size:10px;color:var(--text-faint)">'+pct+'%</div>';
+    }
+    html += '</div></div>';
+  });
+
+  el.innerHTML = html;
+}
+
+
 function _init(){
   initLoadingScreen();
   setTimeout(function(){
@@ -5098,6 +5445,7 @@ function _init(){
     patchParticles();
     updateClassement();
     updateStoryContinueButton();
+    initDailyChallenges();
     setupSkinBioModal();
   }, 300);
 }
