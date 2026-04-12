@@ -3524,25 +3524,7 @@ function fmtScore(n){
   return n.toString();
 }
 
-async function openClassement(){
-  closeBurger(true);
-  const screen = document.getElementById('dashboard-screen');
-  screen.style.display = 'flex';
 
-  // Afficher mon score local
-  const score = computeScore();
-  const pseudo = playerPseudo || 'Anonyme';
-  document.getElementById('db-pseudo-display').textContent = pseudo;
-  document.getElementById('db-score-display').textContent = fmtScore(score);
-  document.getElementById('db-score-details').innerHTML =
-    '☣ ' + fmtScore((achievementStats.totalInfected||0)*0.001) + ' pts infectés &nbsp;·&nbsp; ' +
-    '🏆 ' + fmtScore((globalStats.totalWins||0)*500000) + ' pts victoires<br>' +
-    '🦠 ' + fmtScore((achievementStats.totalSkinsUnlocked||0)*100000) + ' pts collection &nbsp;·&nbsp; ' +
-    '🎖 ' + fmtScore(Object.keys(achievementsUnlocked).length*50000) + ' pts succès';
-
-  // Charger le classement
-  await loadLeaderboard();
-}
 
 function closeClassement(){
   document.getElementById('dashboard-screen').style.display = 'none';
@@ -3813,25 +3795,7 @@ function fmtScore(n){
   return n.toString();
 }
 
-async function openClassement(){
-  closeBurger(true);
-  const screen = document.getElementById('dashboard-screen');
-  screen.style.display = 'flex';
 
-  // Afficher mon score local
-  const score = computeScore();
-  const pseudo = playerPseudo || 'Anonyme';
-  document.getElementById('db-pseudo-display').textContent = pseudo;
-  document.getElementById('db-score-display').textContent = fmtScore(score);
-  document.getElementById('db-score-details').innerHTML =
-    '☣ ' + fmtScore((achievementStats.totalInfected||0)*0.001) + ' pts infectés &nbsp;·&nbsp; ' +
-    '🏆 ' + fmtScore((globalStats.totalWins||0)*500000) + ' pts victoires<br>' +
-    '🦠 ' + fmtScore((achievementStats.totalSkinsUnlocked||0)*100000) + ' pts collection &nbsp;·&nbsp; ' +
-    '🎖 ' + fmtScore(Object.keys(achievementsUnlocked).length*50000) + ' pts succès';
-
-  // Charger le classement
-  await loadLeaderboard();
-}
 
 function closeClassement(){
   document.getElementById('dashboard-screen').style.display = 'none';
@@ -5260,6 +5224,7 @@ async function openClassement(){
   closeBurger(true);
   var screen=document.getElementById('dashboard-screen');
   screen.style.display='flex';
+  submitScore();
   var detEl=document.getElementById('db-score-details');
   var detBtn=document.getElementById('db-detail-btn');
   if(detEl) detEl.style.display='none';
