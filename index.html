@@ -5880,7 +5880,7 @@ function initFirebase(){
 
         window.fbSaveScore = async function(pseudo, data){
           try{
-            var key = getDeviceId(); // clé unique par appareil, indépendante du pseudo
+            var key = pseudo.replace(/[^a-zA-Z0-9_-]/g, '_'); // clé = pseudo
             await db.collection('leaderboard').doc(key).set({
               pseudo:pseudo, score:data.score||0,
               chapitre:data.chapitre||0, skins:data.skins||0,
@@ -5890,7 +5890,7 @@ function initFirebase(){
               date:new Date().toISOString().slice(0,10),
               updatedAt:Date.now()
             });
-            console.log('Firebase OK: score sauvegarde', pseudo, data.score); showFusionToast('Score sync !', 'var(--green)');
+            console.log('Firebase OK: score sauvegarde', pseudo, data.score);
           }catch(e){ console.log('Firebase save error:', e.message); }
         };
 
