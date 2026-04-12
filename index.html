@@ -5372,6 +5372,7 @@ async function submitScore(){
       waited += 200;
     }
     if(!window.fbSaveScore){ console.log('fbSaveScore non disponible'); return; }
+    console.log('submitScore appelé, pseudo:', playerPseudo);
     var det=computeScoreDetails();
     // Meilleur speedrun
     var bestSR=null, bestSRDiff=null;
@@ -5949,7 +5950,7 @@ function closeChapterSelectPopup(){
               date:new Date().toISOString().slice(0,10),
               updatedAt:Date.now()
             });
-            console.log('Firebase OK: score sauvegarde', pseudo, data.score);
+            console.log('Firebase OK: score sauvegarde', pseudo, data.score); showFusionToast('Score sync !', 'var(--green)');
           }catch(e){ console.log('Firebase save error:', e.message); }
         };
 
