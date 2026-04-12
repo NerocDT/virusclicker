@@ -6,7 +6,7 @@
   <title>☣ PATHOGEN-X</title>
   <script>
   // ══ AUTO-UPDATE — changer ce numéro à chaque mise à jour ══
-  var APP_VERSION = '1.3';
+  var APP_VERSION = '1.4';
   (function(){
     var storedVersion = localStorage.getItem('pathogenx_version');
     if(storedVersion && storedVersion !== APP_VERSION){
@@ -800,7 +800,7 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
       </div>
     </div>
 
-    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.3</div>
+    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.4</div>
 
   </div>
 </div>
@@ -811,8 +811,25 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
     <div style="font-family:'Orbitron','Futura','Century Gothic','Trebuchet MS',sans-serif;font-size:18px;font-weight:900;color:#ff8800;letter-spacing:3px;text-shadow:0 0 14px rgba(255,136,0,0.4)">DÉFIS QUOTIDIENS</div>
     <button onclick="closeDailyChallenges()" ontouchend="event.preventDefault();closeDailyChallenges()" style="padding:7px 16px;background:transparent;border:1px solid rgba(255,136,0,0.3);color:#ff8800;font-family:'Share Tech Mono',monospace;font-size:12px;cursor:pointer;touch-action:manipulation">✕ FERMER</button>
   </div>
-  <div id="daily-content" style="flex:1;overflow-y:auto;padding:16px 18px 40px;max-width:440px;margin:0 auto;width:100%;-webkit-overflow-scrolling:touch"></div>
+  <div id="daily-content" style="flex:1;overflow-y:auto;padding:16px 18px 40px;max-width:440px;margin:0 auto;width:100%;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;justify-content:center"></div>
 </div>
+
+<!-- ══ EVENT POPUP ══ -->
+<div id="event-popup" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:550;width:90%;max-width:340px;padding:0;animation:popIn 0.3s ease-out">
+  <div id="event-popup-inner" style="border:2px solid;padding:20px 18px;background:#060d08;text-align:center">
+    <div id="event-icon" style="font-size:40px;margin-bottom:8px"></div>
+    <div id="event-type-label" style="font-size:9px;letter-spacing:4px;margin-bottom:6px"></div>
+    <div id="event-name" style="font-family:'Orbitron','Futura','Century Gothic','Trebuchet MS',sans-serif;font-size:16px;font-weight:900;margin-bottom:6px;letter-spacing:2px"></div>
+    <div id="event-desc" style="font-size:12px;color:var(--text-dim);margin-bottom:4px;line-height:1.6"></div>
+    <div id="event-duration" style="font-size:10px;color:var(--text-faint);margin-bottom:16px;letter-spacing:2px"></div>
+    <button id="event-accept-btn" onclick="acceptEvent()" ontouchend="event.preventDefault();acceptEvent()" style="width:100%;padding:14px;font-family:'Share Tech Mono',monospace;font-size:14px;letter-spacing:3px;cursor:pointer;touch-action:manipulation;font-weight:bold"></button>
+    <div id="event-timer-bar" style="margin-top:10px;background:rgba(255,255,255,0.06);height:3px"><div id="event-timer-fill" style="height:100%;width:100%;transition:width linear"></div></div>
+    <div style="font-size:9px;color:var(--text-faint);margin-top:6px;letter-spacing:1px" id="event-expire-txt">Disparaît dans 8s</div>
+  </div>
+</div>
+
+<!-- ══ ACTIVE EVENT BANNER ══ -->
+<div id="active-event-banner" style="display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:500;padding:8px 18px;border:1px solid;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;text-align:center;white-space:nowrap;animation:popIn 0.3s ease-out;pointer-events:none"></div>
 
 <!-- ══ GAME ══ -->
 <div id="game" style="display: none;">
@@ -859,9 +876,8 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
     </div>
 
     <!-- Timer (speedrun) -->
-    <div class="timer-box" id="timer-box" style="display:none">
-      <div><div class="tlbl">⚡ CHRONO</div><div class="tval" id="tval">00:00.0</div></div>
-      <div style="text-align:right"><div class="tlbl">MEILLEUR</div><div class="tbest" id="tbest">--:--.--</div></div>
+    <div class="timer-box" id="timer-box" style="display:none;justify-content:center;text-align:center">
+      <div><div class="tval" id="tval">00:00.0</div></div>
     </div>
 
     <!-- Infected -->
@@ -933,6 +949,19 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
         <div class="sbox"><div class="slbl">PAR TAP</div><div class="sval" id="s-tap">+1</div></div>
         <div class="sbox"><div class="slbl">AUTO/SEC</div><div class="sval" id="s-auto">+0</div></div>
         <div class="sbox" id="sbox3"><div class="slbl" id="slbl3">VACCIN</div><div class="sval" id="s-third" style="color:var(--red)">0%</div></div>
+      </div>
+      <!-- Speedrun records (visible only in speedrun mode) -->
+      <div id="sr-records-box" style="display:none;border:1px solid rgba(255,215,0,0.2);background:rgba(255,215,0,0.03);padding:12px 14px;margin-top:8px">
+        <div style="font-size:10px;color:rgba(255,215,0,0.5);letter-spacing:3px;margin-bottom:10px">🏆 RECORDS</div>
+        <div id="sr-record-perso" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:11px;color:var(--text-faint)">Mon record</span>
+          <span style="font-family:'Orbitron',sans-serif;font-size:13px;color:var(--yellow);font-weight:bold" id="sr-perso-time">--:--.--</span>
+        </div>
+        <div style="height:1px;background:rgba(255,215,0,0.1);margin-bottom:6px"></div>
+        <div id="sr-record-world" style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:11px;color:var(--text-faint)">Record monde</span>
+          <span style="font-family:'Orbitron',sans-serif;font-size:13px;color:#ff8800;font-weight:bold" id="sr-world-time">--:--.--</span>
+        </div>
       </div>
       <!-- Chapters toggle -->
       <div id="ch-wrap" style="display:none;margin-top:4px">
@@ -1474,7 +1503,7 @@ function resetSave(){
   globalStats = {totalRunsStory:0,totalWinsStory:0,totalRunsSpeed:0,totalWinsSpeed:0,chaptersCompleted:0,totalWins:0,totalClicsAll:0,totalInfectedAll:0,totalLootboxes:0};
   playerPseudo = '';
   heritageData = null;
-  dailyChallengeState = { date:null, challengeIds:[], progress:{}, claimed:{}, clicksToday:0, winsToday:0, speedrunsToday:0, chaptersToday:0, lootboxToday:0, equipsToday:0, upgradeSkinsToday:0 };
+  dailyChallengeState = { date:null, challengeIds:[], progress:{}, claimed:{}, clicksToday:0, winsToday:0, speedrunsToday:0, chaptersToday:0, lootboxToday:0, equipsToday:0, upgradeSkinsToday:0, rerolled:false };
 
   // 3. Sauvegarder l'état vide immédiatement
   saveGame();
@@ -1983,7 +2012,7 @@ function startRun(){
     shopDiscountMult = (permanentState.shopDiscount||1) * ch.shopDiscount;
   }
 
-  startTime=Date.now();
+  startTime = (currentMode==='speedrun') ? 0 : Date.now();
 
   // Mettre à jour le titre au-dessus du compteur immédiatement
   var vssup=document.getElementById('vs-sup');
@@ -2004,25 +2033,29 @@ function startRun(){
     document.getElementById('slbl3').textContent='CLICS';
     document.getElementById('s-third').style.color='var(--green)';
     document.getElementById('ch-wrap').style.display='none';
-    // Show best time for this specific target
     const srKey = SR_TARGETS.find(s=>s.target===currentSpeedrunTarget);
-    const bestT = srKey ? bestTimes[srKey.key] : null;
-    document.getElementById('tbest').textContent=bestT?fmtChrono(bestT):'--:--.--';
     if(timerInterval) clearInterval(timerInterval);
-    timerInterval=setInterval(()=>{ if(!gameOver) document.getElementById('tval').textContent=fmtChrono(Date.now()-startTime); },100);
+    speedrunStarted = false;
+    document.getElementById('tval').textContent='00:00.0';
+    // Le timer démarre au premier clic — voir registerClick / touchend
     runTarget = currentSpeedrunTarget;
+    // Afficher records et charger record monde
+    updateSpeedrunRecordsUI();
+    if(srKey) loadWorldRecord(srKey.key).then(()=>updateSpeedrunRecordsUI());
   } else {
     document.getElementById('vax-section').style.display='block';
     document.getElementById('timer-box').style.display='none';
     document.getElementById('slbl3').textContent='VACCIN';
     document.getElementById('s-third').style.color='var(--red)';
     document.getElementById('ch-wrap').style.display='block';
+    document.getElementById('sr-records-box').style.display='none';
     vaccineSlowMult = permanentState.vaccineBonus || 1;
     if(timerInterval){ clearInterval(timerInterval); timerInterval=null; }
   }
   switchTab('virus');
   initClickZone();
   if(currentMode==='story') startGlobuleSystem();
+  if(currentMode==='story') startEventSystem();
   renderVirusDisplay();
   renderChapters();
   updateUI();
@@ -2106,6 +2139,7 @@ function devLose(){
 //  CLICK ZONE — initialisé une seule fois
 // ══════════════════════════════════════════
 let clickZoneReady = false;
+let speedrunStarted = false;
 function initClickZone(){
   if(clickZoneReady) return; // Ne pas réattacher les listeners à chaque run
   const zone=document.getElementById('click-zone');
@@ -2125,10 +2159,11 @@ function initClickZone(){
   zone.addEventListener('touchend', e=>{
     if(gameOver || zone._tapMoved) return;
     e.preventDefault();
+    startSpeedrunTimer();
     const count = e.changedTouches.length;
     const t = e.changedTouches[0];
     const skinB = getEquippedBonus();
-    const tb = getTreeBonus(); const chTapMult=(currentMode==='story')?(getChapter().tapMult||1):1; const effective = clickPower * skinB.tap * tb.tapMult * chTapMult;
+    const tb = getTreeBonus(); const chTapMult=(currentMode==='story')?(getChapter().tapMult||1):1; const effective = clickPower * skinB.tap * tb.tapMult * chTapMult * eventTapMult;
     const total = effective * count;
     totalClicks += count;
     achievementStats.totalClicks += count;
@@ -2148,10 +2183,244 @@ function initClickZone(){
   });
 }
 
+// ══════════════════════════════════════════
+//  ÉVÉNEMENTS ALÉATOIRES — MODE HISTOIRE
+// ══════════════════════════════════════════
+const RANDOM_EVENTS = [
+  // ── BONUS ──
+  { id:'ev1',  type:'bonus',  icon:'🧬', name:'Mutation Express',      desc:'×2 par tap',                    duration:20, effect:'tapMult',   value:2 },
+  { id:'ev2',  type:'bonus',  icon:'⚡', name:'Super Propagation',     desc:'×5 auto/sec',                   duration:15, effect:'autoMult',  value:5 },
+  { id:'ev3',  type:'bonus',  icon:'🔥', name:'Fièvre Virale',         desc:'×3 par tap',                    duration:15, effect:'tapMult',   value:3 },
+  { id:'ev4',  type:'bonus',  icon:'🏥', name:'Hôpital Débordé',       desc:'×3 auto/sec',                   duration:20, effect:'autoMult',  value:3 },
+  { id:'ev5',  type:'bonus',  icon:'🛡️', name:'Vaccin Saboté',        desc:'Vaccin ralenti de 80%',          duration:25, effect:'vaxSlow',   value:0.2 },
+  { id:'ev6',  type:'bonus',  icon:'✈️', name:'Vol Contaminé',         desc:'Infectés instantanés massifs',   duration:0,  effect:'instant',   value:'infected' },
+  { id:'ev7',  type:'bonus',  icon:'🧫', name:'Bonus Souches',         desc:'+15 souches instantanément',     duration:0,  effect:'instant',   value:'souches' },
+  { id:'ev8',  type:'bonus',  icon:'🌍', name:'Frontières Ouvertes',   desc:'×2 tap ET ×2 auto',             duration:12, effect:'allMult',   value:2 },
+  { id:'ev9',  type:'bonus',  icon:'💀', name:'Nécrose Accélérée',     desc:'×10 par tap',                   duration:8,  effect:'tapMult',   value:10 },
+  { id:'ev10', type:'bonus',  icon:'🧩', name:'Fragment Trouvé',       desc:'+2 fragments instantanément',    duration:0,  effect:'instant',   value:'frags' },
+  // ── MALUS ──
+  { id:'ev11', type:'malus',  icon:'💉', name:'Vaccin Accéléré',       desc:'Vaccin ×3 vitesse',              duration:15, effect:'vaxBoost',  value:3 },
+  { id:'ev12', type:'malus',  icon:'🏗️', name:'Quarantaine',          desc:'Auto/sec réduit de 70%',         duration:20, effect:'autoMult',  value:0.3 },
+  { id:'ev13', type:'malus',  icon:'🔬', name:'Anticorps Détectés',    desc:'Tap réduit de 50%',              duration:15, effect:'tapMult',   value:0.5 },
+  { id:'ev14', type:'malus',  icon:'🚧', name:'Confinement Mondial',   desc:'Tap et auto réduits de 40%',     duration:18, effect:'allMult',   value:0.6 },
+  { id:'ev15', type:'malus',  icon:'💉', name:'Dose de Rappel',        desc:'Vaccin ×2 vitesse',              duration:20, effect:'vaxBoost',  value:2 },
+  { id:'ev16', type:'malus',  icon:'🧊', name:'Gel des Recherches',    desc:'Aucun achat possible',           duration:12, effect:'shopFreeze',value:1 },
+];
+
+let eventInterval = null;     // setInterval pour déclencher les events
+let eventExpireTO = null;     // setTimeout pour expiration de la popup
+let activeEvent = null;       // événement actuellement actif (avec effet en cours)
+let activeEventTO = null;     // setTimeout pour fin de l'effet actif
+let eventPopupVisible = false;
+let pendingEvent = null;      // événement affiché dans la popup, en attente d'acceptation
+let eventTapMult = 1;         // multiplicateur temporaire de tap
+let eventAutoMult = 1;        // multiplicateur temporaire d'auto
+let eventVaxMult = 1;         // multiplicateur temporaire de vaccin
+let eventShopFrozen = false;  // shop gelé ?
+
+function startEventSystem(){
+  stopEventSystem();
+  if(currentMode !== 'story') return;
+  scheduleNextEvent();
+}
+
+function stopEventSystem(){
+  if(eventInterval){ clearTimeout(eventInterval); eventInterval = null; }
+  if(eventExpireTO){ clearTimeout(eventExpireTO); eventExpireTO = null; }
+  if(activeEventTO){ clearTimeout(activeEventTO); activeEventTO = null; }
+  hideEventPopup();
+  clearActiveEvent();
+}
+
+function scheduleNextEvent(){
+  if(currentMode !== 'story' || gameOver) return;
+  // Intervalle aléatoire entre 45s et 2min
+  const delay = 45000 + Math.random() * 75000;
+  eventInterval = setTimeout(()=>{
+    if(gameOver || currentMode !== 'story') return;
+    triggerRandomEvent();
+    scheduleNextEvent();
+  }, delay);
+}
+
+function triggerRandomEvent(){
+  if(eventPopupVisible || gameOver) return;
+  const ev = RANDOM_EVENTS[Math.floor(Math.random() * RANDOM_EVENTS.length)];
+  pendingEvent = ev;
+  showEventPopup(ev);
+}
+
+function showEventPopup(ev){
+  eventPopupVisible = true;
+  const isBonus = ev.type === 'bonus';
+  const col = isBonus ? 'var(--green)' : 'var(--red)';
+  const borderCol = isBonus ? 'rgba(0,255,136,0.5)' : 'rgba(255,58,58,0.5)';
+  const bgCol = isBonus ? '#060d08' : '#0d0606';
+  const btnBg = isBonus ? 'rgba(0,255,136,0.12)' : 'rgba(255,58,58,0.12)';
+  const btnBorder = isBonus ? 'var(--green)' : 'var(--red)';
+
+  const inner = document.getElementById('event-popup-inner');
+  inner.style.borderColor = borderCol;
+  inner.style.background = bgCol;
+
+  document.getElementById('event-icon').textContent = ev.icon;
+  document.getElementById('event-type-label').textContent = isBonus ? 'BONUS' : 'MALUS';
+  document.getElementById('event-type-label').style.color = col;
+  document.getElementById('event-name').textContent = ev.name;
+  document.getElementById('event-name').style.color = col;
+  document.getElementById('event-desc').textContent = ev.desc;
+  document.getElementById('event-duration').textContent = ev.duration > 0 ? 'Durée : ' + ev.duration + 's' : 'Effet immédiat';
+
+  const btn = document.getElementById('event-accept-btn');
+  btn.style.background = btnBg;
+  btn.style.border = '2px solid ' + btnBorder;
+  btn.style.color = col;
+
+  if(isBonus){
+    btn.textContent = 'ACCEPTER';
+    btn.style.display = 'block';
+  } else {
+    btn.style.display = 'none';
+  }
+
+  const fill = document.getElementById('event-timer-fill');
+  fill.style.background = col;
+  fill.style.width = '100%';
+  fill.style.transition = 'none';
+
+  if(isBonus){
+    setTimeout(()=>{
+      fill.style.transition = 'width 8s linear';
+      fill.style.width = '0%';
+    }, 50);
+    document.getElementById('event-expire-txt').textContent = 'Disparaît dans 8s';
+    document.getElementById('event-timer-bar').style.display = 'block';
+  } else {
+    document.getElementById('event-expire-txt').textContent = 'Appliqué dans 3s...';
+    document.getElementById('event-timer-bar').style.display = 'block';
+    setTimeout(()=>{
+      fill.style.transition = 'width 3s linear';
+      fill.style.width = '0%';
+    }, 50);
+  }
+
+  document.getElementById('event-popup').style.display = 'block';
+
+  // Auto-expire après 8s (bonus) ou auto-apply après 3s (malus)
+  if(eventExpireTO) clearTimeout(eventExpireTO);
+  if(isBonus){
+    eventExpireTO = setTimeout(()=>{
+      if(eventPopupVisible) hideEventPopup();
+    }, 8000);
+  } else {
+    eventExpireTO = setTimeout(()=>{
+      if(eventPopupVisible) acceptEvent();
+    }, 3000);
+  }
+}
+
+function hideEventPopup(){
+  eventPopupVisible = false;
+  pendingEvent = null;
+  document.getElementById('event-popup').style.display = 'none';
+  if(eventExpireTO){ clearTimeout(eventExpireTO); eventExpireTO = null; }
+}
+
+function acceptEvent(){
+  if(!pendingEvent) return;
+  const ev = pendingEvent;
+  hideEventPopup();
+  applyEvent(ev);
+}
+
+function applyEvent(ev){
+  const isBonus = ev.type === 'bonus';
+  const col = isBonus ? 'var(--green)' : 'var(--red)';
+  const ch = getChapter();
+  const scale = ch ? ch.scale : 1;
+
+  // Effets instantanés
+  if(ev.effect === 'instant'){
+    if(ev.value === 'infected'){
+      const amount = Math.floor(500000 * scale);
+      infected = Math.min(infected + amount, runTarget);
+      showFusionToast(ev.icon + ' +' + fmt(amount) + ' infectés !', 'var(--green)');
+      updateUI();
+    } else if(ev.value === 'souches'){
+      souches += 15;
+      updateSouchesDisplay();
+      showFusionToast(ev.icon + ' +15 🧫 souches !', 'var(--green)');
+    } else if(ev.value === 'frags'){
+      skinFragments += 2;
+      showFusionToast(ev.icon + ' +2 🧩 fragments !', 'var(--green)');
+    }
+    saveGame();
+    return;
+  }
+
+  // Effets avec durée
+  clearActiveEvent();
+  activeEvent = ev;
+
+  if(ev.effect === 'tapMult')   eventTapMult = ev.value;
+  if(ev.effect === 'autoMult')  eventAutoMult = ev.value;
+  if(ev.effect === 'allMult')   { eventTapMult = ev.value; eventAutoMult = ev.value; }
+  if(ev.effect === 'vaxSlow')   eventVaxMult = ev.value;
+  if(ev.effect === 'vaxBoost')  eventVaxMult = ev.value;
+  if(ev.effect === 'shopFreeze') eventShopFrozen = true;
+
+  // Afficher la bannière active
+  const banner = document.getElementById('active-event-banner');
+  if(banner){
+    banner.style.display = 'block';
+    banner.style.borderColor = isBonus ? 'rgba(0,255,136,0.4)' : 'rgba(255,58,58,0.4)';
+    banner.style.background = isBonus ? 'rgba(0,255,136,0.08)' : 'rgba(255,58,58,0.08)';
+    banner.style.color = col;
+    banner.textContent = ev.icon + ' ' + ev.name + ' — ' + ev.duration + 's';
+    // Countdown
+    let remaining = ev.duration;
+    const bannerInterval = setInterval(()=>{
+      remaining--;
+      if(remaining <= 0 || !activeEvent){
+        clearInterval(bannerInterval);
+        return;
+      }
+      banner.textContent = ev.icon + ' ' + ev.name + ' — ' + remaining + 's';
+    }, 1000);
+  }
+
+  // Timer pour fin de l'effet
+  activeEventTO = setTimeout(()=>{
+    clearActiveEvent();
+  }, ev.duration * 1000);
+
+  updateUI();
+  if(ev.effect === 'shopFreeze') renderShop();
+}
+
+function clearActiveEvent(){
+  activeEvent = null;
+  eventTapMult = 1;
+  eventAutoMult = 1;
+  eventVaxMult = 1;
+  eventShopFrozen = false;
+  if(activeEventTO){ clearTimeout(activeEventTO); activeEventTO = null; }
+  const banner = document.getElementById('active-event-banner');
+  if(banner) banner.style.display = 'none';
+}
+
+function startSpeedrunTimer(){
+  if(speedrunStarted || currentMode!=='speedrun') return;
+  speedrunStarted = true;
+  startTime = Date.now();
+  timerInterval = setInterval(()=>{ if(!gameOver) document.getElementById('tval').textContent=fmtChrono(Date.now()-startTime); },100);
+}
+
 function registerClick(x, y){
+  startSpeedrunTimer();
   const skinB = getEquippedBonus();
   const tb = getTreeBonus();
-  const chTapMult=(currentMode==='story')?(getChapter().tapMult||1):1; const effective = clickPower * skinB.tap * tb.tapMult * chTapMult;
+  const chTapMult=(currentMode==='story')?(getChapter().tapMult||1):1; const effective = clickPower * skinB.tap * tb.tapMult * chTapMult * eventTapMult;
   totalClicks++;
   achievementStats.totalClicks++;
   dailyOnClick(1);
@@ -2191,11 +2460,11 @@ function spawnParticle(x,y){
 
 // Paliers d'accélération : % de l'objectif du run atteint → multiplicateur cumulé
 const VAX_MILESTONES = [
-  { pct: 5,   mult: 1.4,  label: "Épidémie détectée"     },  // +40% à 5% de l'objectif
-  { pct: 15,  mult: 1.5,  label: "Alerte nationale"       },  // +50% à 15%
-  { pct: 35,  mult: 1.6,  label: "Pandémie déclarée"      },  // +60% à 35%
-  { pct: 60,  mult: 1.8,  label: "Recherche intensive"    },  // +80% à 60%
-  { pct: 85,  mult: 2.0,  label: "Vaccin en phase finale" },  // ×2 à 85%
+  { pct: 5,   mult: 1.32, label: "Épidémie détectée"     },  // +32% à 5% de l'objectif
+  { pct: 15,  mult: 1.40, label: "Alerte nationale"       },  // +40% à 15%
+  { pct: 35,  mult: 1.48, label: "Pandémie déclarée"      },  // +48% à 35%
+  { pct: 60,  mult: 1.64, label: "Recherche intensive"    },  // +64% à 60%
+  { pct: 85,  mult: 1.80, label: "Vaccin en phase finale" },  // +80% à 85%
 ];
 
 // Paliers déjà déclenchés ce run (pour ne pas les appliquer deux fois)
@@ -2211,7 +2480,7 @@ let silentVaxSlowdown = 1;
 
 function getEffectiveVaxSpeed(){
   const skinB=getEquippedBonus(); const tb=getTreeBonus();
-  const speed = getChapter().vaccineSpeed * vaxMilestoneMult * vaxShopMult * (vaccineSlowMult||1) * silentVaxSlowdown * skinB.vaxMult * tb.vaxResist;
+  const speed = getChapter().vaccineSpeed * vaxMilestoneMult * vaxShopMult * (vaccineSlowMult||1) * silentVaxSlowdown * skinB.vaxMult * tb.vaxResist * eventVaxMult;
   return Math.max(0.001, speed); // jamais négatif ni zéro
 }
 
@@ -2268,6 +2537,7 @@ function safeTap(fn){
 //  SHOP
 // ══════════════════════════════════════════
 function buyUpgrade(id){
+  if(eventShopFrozen){ showFusionToast('🧊 Shop gelé !', 'var(--red)'); return; }
   const u=shop.find(x=>x.id===id); if(!u) return;
   const cost=shopCost(u);
   if(cost===Infinity||infected<cost) return;
@@ -4390,6 +4660,7 @@ function endRun(win){
   clearRunInProgress(); // La run est terminée, plus besoin de la sauvegarder
   if(timerInterval){ clearInterval(timerInterval); timerInterval=null; }
   stopGlobuleSystem();
+  stopEventSystem();
   const elapsed=Date.now()-startTime;
   if(currentMode==='speedrun'&&win){
     const srK=SR_TARGETS.find(s=>s.target===currentSpeedrunTarget);
@@ -4397,6 +4668,8 @@ function endRun(win){
     globalStats.totalWinsSpeed++;
     achievementStats.totalSpeedrunWins=(achievementStats.totalSpeedrunWins||0)+1;
     dailyOnWin(true, elapsed);
+    // Soumettre le record sur Firebase
+    if(srK) submitSpeedrunRecord(srK.key, elapsed);
   } if(currentMode==='story'&&win){ globalStats.totalWinsStory++; dailyOnWin(false, elapsed); }
 
   // Check if it's the FINAL win (chapitre 5 = 8 milliards)
@@ -4559,14 +4832,26 @@ function updateUI(){
   el.textContent=fmt(infected); el.style.color=s.color; el.style.textShadow='0 0 18px '+(s.color)+'80';
   const lbl=document.getElementById('inf-lbl');
   if(lbl){
-    var chap=getChapter();
-    lbl.textContent = (currentMode==='story'&&chap&&chap.title) ? chap.title.toUpperCase() : s.label;
+    if(currentMode==='speedrun'){
+      lbl.style.display = 'none';
+    } else {
+      lbl.style.display = '';
+      var chap=getChapter();
+      lbl.textContent = (chap&&chap.title) ? chap.title.toUpperCase() : s.label;
+    }
   }
 
   const pct=Math.min((infected/runTarget)*100,100);
   const bg=document.getElementById('bar-green'); if(bg) bg.style.width=pct+'%';
   const pl=document.getElementById('pct-lbl'); if(pl) pl.textContent=pct.toFixed(2)+'%';
-  const it=document.getElementById('inf-target'); if(it) it.textContent='Chapitre '+(getChapter().id)+' — Objectif : '+(fmt(runTarget))+'';
+  const it=document.getElementById('inf-target');
+  if(it){
+    if(currentMode==='speedrun'){
+      it.textContent='Objectif : '+(fmt(runTarget));
+    } else {
+      it.textContent='Chapitre '+(getChapter().id)+' — Objectif : '+(fmt(runTarget));
+    }
+  }
   const vssup=document.getElementById('vs-sup');
   if(vssup){
     if(currentMode==='story') vssup.textContent='CHAPITRE '+getChapter().id+' — '+getChapter().title.toUpperCase();
@@ -4589,14 +4874,14 @@ function updateUI(){
   if(tap){
     var _skinB=getEquippedBonus(); var _tb=getTreeBonus();
     var _chTapMult=(currentMode==='story')?(getChapter().tapMult||1):1;
-    var _eff=clickPower*_skinB.tap*_tb.tapMult*_chTapMult;
+    var _eff=clickPower*_skinB.tap*_tb.tapMult*_chTapMult*eventTapMult;
     tap.textContent='+'+fmt(_eff);
   }
   const aut=document.getElementById('s-auto');
   if(aut){
     var _sb=getEquippedBonus(); var _tb=getTreeBonus();
     var _chAutoMult=(currentMode==='story')?(getChapter().autoMult||1):1;
-    var _effAuto=Math.floor(passive*_sb.auto*_tb.autoMult*_chAutoMult);
+    var _effAuto=Math.floor(passive*_sb.auto*_tb.autoMult*_chAutoMult*eventAutoMult);
     aut.textContent='+'+fmt(_effAuto);
   }
   renderVirusDisplay();
@@ -4614,6 +4899,7 @@ function goMenu(){
   }
   gameOver=true;
   stopGlobuleSystem();
+  stopEventSystem();
   // Reset runtime defeat state mais garder heritageData pour persistance
   defeatBonusState = {gainMult:1, shopDiscount:1, vaccineBonus:1};
   permanentState.gainMult = 1;
@@ -4748,6 +5034,7 @@ function resumeRun(){
   switchTab('virus');
   initClickZone();
   startGlobuleSystem();
+  startEventSystem();
   renderVirusDisplay();
   updateUI();
   updateStoryContinueButton();
@@ -4781,7 +5068,7 @@ setInterval(()=>{
   const skinB = getEquippedBonus();
   const tb = getTreeBonus();
   const chAutoMult = (currentMode==='story') ? (getChapter().autoMult||1) : 1;
-  const effective = Math.floor(passive * skinB.auto * tb.autoMult * chAutoMult);
+  const effective = Math.floor(passive * skinB.auto * tb.autoMult * chAutoMult * eventAutoMult);
   infected=Math.min(infected+effective,runTarget);
   if(infected>=runTarget) endRun(true);
   else updateUI();
@@ -5219,6 +5506,7 @@ function initDailyChallenges(){
     dailyChallengeState.lootboxToday = 0;
     dailyChallengeState.equipsToday = 0;
     dailyChallengeState.upgradeSkinsToday = 0;
+    dailyChallengeState.rerolled = false;
     saveGame();
   }
 }
@@ -5354,6 +5642,31 @@ function claimDailyReward(id){
   renderDailyChallenges();
 }
 
+function rerollDailyChallenges(){
+  if(dailyChallengeState.rerolled) return;
+  if(souches < 20){ showFusionToast('Pas assez de souches (20 🧫 requis)', 'var(--red)'); return; }
+  souches -= 20;
+  dailyChallengeState.rerolled = true;
+  // Générer 3 nouveaux défis différents des actuels
+  const oldIds = new Set(dailyChallengeState.challengeIds);
+  const pool = DAILY_CHALLENGES.filter(c => !oldIds.has(c.id));
+  const newIds = [];
+  let hash = Date.now();
+  for(let i=0; i<3; i++){
+    hash = Math.abs(((hash << 5) - hash) + i*17) & 0x7fffffff;
+    const idx = hash % pool.length;
+    newIds.push(pool[idx].id);
+    pool.splice(idx, 1);
+  }
+  dailyChallengeState.challengeIds = newIds;
+  dailyChallengeState.progress = {};
+  dailyChallengeState.claimed = {};
+  updateSouchesDisplay();
+  showFusionToast('🔄 Nouveaux défis ! -20 🧫', '#ff8800');
+  saveGame();
+  renderDailyChallenges();
+}
+
 function openDailyChallenges(){
   closeBurger(true);
   initDailyChallenges();
@@ -5378,10 +5691,10 @@ function renderDailyChallenges(){
   const m = Math.floor((diff%3600000)/60000);
   const timerTxt = h+'h '+String(m).padStart(2,'0')+'min';
 
-  let html = '<div style="text-align:center;margin-bottom:16px">';
-  html += '<div style="font-size:11px;color:var(--text-faint);letter-spacing:2px;margin-bottom:6px">RENOUVELLEMENT DANS</div>';
-  html += '<div style="font-family:\'Orbitron\',sans-serif;font-size:20px;font-weight:900;color:#ff8800;letter-spacing:3px;text-shadow:0 0 12px rgba(255,136,0,0.4)">'+timerTxt+'</div>';
-  html += '<div style="font-size:10px;color:var(--text-faint);margin-top:6px">'+totalDone+'/3 complétés</div>';
+  let html = '<div style="text-align:center;margin-bottom:40px;padding:6px 0 24px;border-bottom:1px solid rgba(255,136,0,0.12)">';
+  html += '<div style="font-size:13px;color:var(--text-faint);letter-spacing:3px;margin-bottom:10px">RENOUVELLEMENT DANS</div>';
+  html += '<div style="font-family:\'Orbitron\',sans-serif;font-size:28px;font-weight:900;color:#ff8800;letter-spacing:4px;text-shadow:0 0 16px rgba(255,136,0,0.5);margin-bottom:10px">'+timerTxt+'</div>';
+  html += '<div style="font-size:12px;color:var(--text-faint);margin-top:4px">'+totalDone+'/3 complétés</div>';
   html += '</div>';
 
   activeIds.forEach(id => {
@@ -5425,9 +5738,67 @@ function renderDailyChallenges(){
     html += '</div></div>';
   });
 
+  // Bouton reroll en bas
+  if(!dailyChallengeState.rerolled){
+    html += '<button onclick="rerollDailyChallenges()" ontouchend="event.preventDefault();rerollDailyChallenges()" style="width:100%;padding:11px;background:rgba(255,136,0,0.06);border:1px solid rgba(255,136,0,0.35);color:#ff8800;font-family:\'Share Tech Mono\',monospace;font-size:12px;cursor:pointer;touch-action:manipulation;margin-top:24px;letter-spacing:1px">🔄 CHANGER LES DÉFIS — 20 🧫</button>';
+  } else {
+    html += '<div style="width:100%;padding:11px;border:1px solid rgba(255,255,255,0.06);color:var(--text-faint);font-family:\'Share Tech Mono\',monospace;font-size:11px;text-align:center;margin-top:24px;opacity:0.4">🔄 Déjà changé aujourd\'hui</div>';
+  }
+
   el.innerHTML = html;
 }
 
+
+// ══════════════════════════════════════════
+//  SPEEDRUN RECORDS — affichage en jeu
+// ══════════════════════════════════════════
+let cachedWorldRecords = {}; // { '5m': { pseudo:'xxx', timeMs:12345 }, ... }
+
+async function loadWorldRecord(srKey){
+  if(!window.fbGetSpeedrunRecord) return;
+  try {
+    const data = await window.fbGetSpeedrunRecord(srKey);
+    if(data) cachedWorldRecords[srKey] = data;
+  } catch(e){}
+}
+
+function updateSpeedrunRecordsUI(){
+  const box = document.getElementById('sr-records-box');
+  if(!box) return;
+  if(currentMode !== 'speedrun'){ box.style.display = 'none'; return; }
+  box.style.display = 'block';
+
+  const srK = SR_TARGETS.find(s => s.target === currentSpeedrunTarget);
+  if(!srK) return;
+
+  // Record perso
+  const persoEl = document.getElementById('sr-perso-time');
+  const myBest = bestTimes[srK.key];
+  if(persoEl) persoEl.textContent = myBest ? fmtChrono(myBest) : '--:--.--';
+
+  // Record monde
+  const worldEl = document.getElementById('sr-world-time');
+  const wr = cachedWorldRecords[srK.key];
+  if(worldEl){
+    if(wr){
+      worldEl.innerHTML = '<span style="color:var(--text-faint);font-family:\'Share Tech Mono\',monospace;font-size:11px;font-weight:normal">' + wr.pseudo + '</span> &nbsp; <span style="color:#ff8800">' + fmtChrono(wr.timeMs) + '</span>';
+    } else {
+      worldEl.textContent = '--:--.--';
+    }
+  }
+}
+
+async function submitSpeedrunRecord(srKey, elapsed){
+  if(!playerPseudo || !window.fbSaveSpeedrunRecord) return;
+  try {
+    const isNewWR = await window.fbSaveSpeedrunRecord(srKey, playerPseudo, elapsed);
+    if(isNewWR){
+      cachedWorldRecords[srKey] = { pseudo: playerPseudo, timeMs: elapsed };
+      showFusionToast('🌍 NOUVEAU RECORD DU MONDE !', '#ff8800');
+    }
+    updateSpeedrunRecordsUI();
+  } catch(e){}
+}
 
 function _init(){
   initLoadingScreen();
@@ -6332,6 +6703,28 @@ function initFirebase(){
             console.log('Firebase: charge', res.length, 'joueurs reels');
             return res;
           }catch(e){ console.log('Firebase get error:', e.message); return []; }
+        };
+
+        // ══ SPEEDRUN RECORDS ══
+        window.fbSaveSpeedrunRecord = async function(category, pseudo, timeMs){
+          try{
+            var docRef = db.collection('speedrun_records').doc(category);
+            var snap = await docRef.get();
+            if(!snap.exists || timeMs < snap.data().timeMs){
+              await docRef.set({ pseudo:pseudo, timeMs:timeMs, date:new Date().toISOString().slice(0,10) });
+              console.log('Firebase: nouveau record monde', category, pseudo, timeMs);
+              return true;
+            }
+            return false;
+          }catch(e){ console.log('Firebase SR save error:', e.message); return false; }
+        };
+
+        window.fbGetSpeedrunRecord = async function(category){
+          try{
+            var snap = await db.collection('speedrun_records').doc(category).get();
+            if(snap.exists) return snap.data();
+            return null;
+          }catch(e){ console.log('Firebase SR get error:', e.message); return null; }
         };
 
         window.firebaseReady = true;
