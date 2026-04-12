@@ -791,7 +791,7 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
         <button onclick="openSkinsPanel()" ontouchend="safeTap(()=&gt;openSkinsPanel())" style="padding:5px 10px;background:rgba(204,136,255,0.22);border:2px solid rgba(204,136,255,0.9);color:var(--purple);font-family:&#39;Share Tech Mono&#39;,&#39;Courier New&#39;,monospace;font-size:11px;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;gap:4px;box-shadow:0 0 14px rgba(204,136,255,0.4);text-shadow:0 0 8px rgba(204,136,255,0.8);font-weight:bold">LABO</button>
         <button onclick="openLootboxShop()" ontouchend="safeTap(()=&gt;openLootboxShop())" style="padding:5px 10px;background:rgba(136,221,255,0.22);border:2px solid rgba(136,221,255,0.9);color:#88ddff;font-family:&#39;Share Tech Mono&#39;,&#39;Courier New&#39;,monospace;font-size:11px;cursor:pointer;touch-action:manipulation;box-shadow:0 0 14px rgba(136,221,255,0.4);text-shadow:0 0 8px rgba(136,221,255,0.8);font-weight:bold">SHOP</button>
         <button class="hdr-back" onclick="goMenu()">← Menu</button>
-        <!-- <button onclick="toggleDev()" style="padding:4px 8px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);color:rgba(255,215,0,0.6);font-family:monospace;font-size:10px;cursor:pointer;touch-action:manipulation">DEV</button> -->
+        <button onclick="toggleDev()" ontouchend="event.preventDefault();toggleDev()" style="padding:4px 8px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);color:rgba(255,215,0,0.6);font-family:monospace;font-size:10px;cursor:pointer;touch-action:manipulation">DEV</button>
       </div>
     </div>
 
@@ -997,7 +997,7 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
       <div style="font-family:&#39;Orbitron&#39;,&#39;Futura&#39;,&#39;Century Gothic&#39;,&#39;Trebuchet MS&#39;,sans-serif;font-size:15px;color:var(--purple);margin-bottom:4px">Lootbox Premium</div>
       <div style="font-size:20px;font-weight:900;color:#88ddff;font-family:&#39;Orbitron&#39;,&#39;Futura&#39;,&#39;Century Gothic&#39;,&#39;Trebuchet MS&#39;,sans-serif;margin-bottom:10px;text-shadow:0 0 16px rgba(136,221,255,0.6)">250 🧫</div>
       <div style="font-size:10px;color:var(--text-dim);margin-bottom:12px;line-height:1.8">
-        Commun <span style="color:var(--green)">15%</span> · Rare <span style="color:#58aaff">38%</span> · Épique <span style="color:var(--purple)">30%</span> · Légendaire <span style="color:var(--yellow)">10%</span> · Mythique <span style="color:#ff3333">1%</span>
+        Commun <span style="color:var(--green)">16.5%</span> · Rare <span style="color:#58aaff">39%</span> · Épique <span style="color:var(--purple)">31%</span> · Légendaire <span style="color:var(--yellow)">13%</span> · Mythique <span style="color:#ff3333">0.5%</span>
       </div>
       <div style="display:flex;gap:8px"><button onclick="buyLootbox('premium',1)" ontouchend="safeTap(()=>buyLootbox('premium',1))" style="flex:1;padding:12px;background:rgba(204,136,255,0.15);border:2px solid rgba(204,136,255,0.85);color:var(--purple);font-family:'Share Tech Mono',monospace;font-size:13px;letter-spacing:1px;cursor:pointer;touch-action:manipulation;font-weight:bold;box-shadow:0 0 16px rgba(204,136,255,0.35);text-shadow:0 0 8px rgba(204,136,255,0.7)">ACHETER</button><button onclick="buyLootbox('premium',3)" ontouchend="safeTap(()=>buyLootbox('premium',3))" style="flex:1;padding:12px;background:rgba(204,136,255,0.15);border:2px solid rgba(204,136,255,0.85);color:var(--purple);font-family:'Share Tech Mono',monospace;font-size:13px;letter-spacing:1px;cursor:pointer;touch-action:manipulation;font-weight:bold;box-shadow:0 0 16px rgba(204,136,255,0.35);text-shadow:0 0 8px rgba(204,136,255,0.7)">ACHETER ×3</button></div>
     </div>
@@ -1307,9 +1307,9 @@ function makeShop(){
     { id:'c3', cat:'click', icon:'🧫', name:'Multiplication Forcée', desc:'+'+(30*s)+'/tap',  baseCost:Math.floor(15000*cs),   basePower:30*s,  count:0, unlockAt:10000*s,       cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.80,this.count)); }, effect(){ clickPower+=this.basePower*(permanentState.shopPowerMult||1); } },
     { id:'c4', cat:'click', icon:'💀', name:'Souche Xénomorphe',     desc:'+'+(120*s)+'/tap', baseCost:Math.floor(200000*cs),  basePower:120*s, count:0, unlockAt:80000*s,       cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.85,this.count)); }, effect(){ clickPower+=this.basePower*(permanentState.shopPowerMult||1); } },
     // RESIST — scalent aussi avec le chapitre
-    { id:'v1', cat:'resist', icon:'🛡️', name:'Membrane Renforcée',     desc:'Vaccin -15%', baseCost:Math.floor(2000*cs),    basePower:0, count:0, unlockAt:0,           maxCount:1, cost(m){ return this.count>=1?Infinity:Math.floor(this.baseCost*m); }, effect(){ vaxShopMult*=0.85; } },
-    { id:'v2', cat:'resist', icon:'🔬', name:'Camouflage Immunitaire', desc:'Vaccin -20%', baseCost:Math.floor(25000*cs),   basePower:0, count:0, unlockAt:10000*s,     maxCount:1, cost(m){ return this.count>=1?Infinity:Math.floor(this.baseCost*m); }, effect(){ vaxShopMult*=0.80; } },
-    { id:'v3', cat:'resist', icon:'🌑', name:'Mutation Fantôme',       desc:'Vaccin -30%', baseCost:Math.floor(200000*cs),  basePower:0, count:0, unlockAt:100000*s,    maxCount:1, cost(m){ return this.count>=1?Infinity:Math.floor(this.baseCost*m); }, effect(){ vaxShopMult*=0.70; } },
+    { id:'v1', cat:'resist', icon:'🛡️', name:'Membrane Renforcée',     desc:'Vitesse vaccin -15%', baseCost:Math.floor(2000*cs),    basePower:0, count:0, unlockAt:0,           maxCount:1, cost(m){ return this.count>=1?Infinity:Math.floor(this.baseCost*m); }, effect(){ vaxShopMult*=0.85; } },
+    { id:'v2', cat:'resist', icon:'🔬', name:'Camouflage Immunitaire', desc:'Vitesse vaccin -20%', baseCost:Math.floor(25000*cs),   basePower:0, count:0, unlockAt:10000*s,     maxCount:1, cost(m){ return this.count>=1?Infinity:Math.floor(this.baseCost*m); }, effect(){ vaxShopMult*=0.80; } },
+    { id:'v3', cat:'resist', icon:'🌑', name:'Mutation Fantôme',       desc:'Vitesse vaccin -30%', baseCost:Math.floor(200000*cs),  basePower:0, count:0, unlockAt:100000*s,    maxCount:1, cost(m){ return this.count>=1?Infinity:Math.floor(this.baseCost*m); }, effect(){ vaxShopMult*=0.70; } },
   ];
 }
 
@@ -1374,6 +1374,7 @@ function saveGame(){
       souches, skinFragments, equippedSkin, totalWins, maxChapter, pity, pityPrem, achievementsUnlocked, achievementStats,
       skinCollection, skinLevels, skinTrees, treeState,
       bestTimes, globalStats,
+      heritageData,
     };
     localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     const el = document.getElementById('save-indicator');
@@ -1405,6 +1406,7 @@ function loadGame(){
     if(d.treeState)       treeState = d.treeState;
     if(d.bestTimes)       bestTimes = d.bestTimes;
     if(d.globalStats)     globalStats = { ...globalStats, ...d.globalStats };
+    if(d.heritageData)    heritageData = d.heritageData;
     recalcTreeState();
     updateSouchesDisplay();
     renderVirusDisplay();
@@ -1437,6 +1439,7 @@ function resetSave(){
   achievementStats = {totalInfected:0,totalLootboxesStd:0,totalLootboxesPremium:0,maxChapterCompleted:0,totalSpeedrunWins:0,totalClicks:0,totalLootboxes:0,unlockedMythic:0,totalSkinsUnlocked:0,totalPlayTimeMs:0,skinUsage:{}};
   globalStats = {totalRunsStory:0,totalWinsStory:0,totalRunsSpeed:0,totalWinsSpeed:0,chaptersCompleted:0,totalWins:0,totalClicsAll:0,totalInfectedAll:0,totalLootboxes:0};
   playerPseudo = '';
+  heritageData = null;
 
   // 3. Sauvegarder l'état vide immédiatement
   saveGame();
@@ -1477,9 +1480,11 @@ function importSave(){
 
 // Auto-save toutes les 20s + quand on quitte
 setInterval(saveGame, 20000);
-window.addEventListener('beforeunload', saveGame);
-window.addEventListener('pagehide', saveGame);
+window.addEventListener('beforeunload', function(){ saveGame(); if(currentMode==='story'&&!gameOver&&infected>100) saveRunInProgress(); });
+window.addEventListener('pagehide', function(){ saveGame(); if(currentMode==='story'&&!gameOver&&infected>100) saveRunInProgress(); });
 window.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden'){ saveGame(); if(currentMode==='story'&&!gameOver&&infected>100) saveRunInProgress(); } });
+// Auto-save run toutes les 10 secondes pendant une partie
+setInterval(()=>{ if(currentMode==='story'&&!gameOver&&infected>100) saveRunInProgress(); }, 10000);
 
 // ══════════════════════════════════════════
 //  STATS GLOBALES
@@ -1900,7 +1905,25 @@ function selectMode(mode, forceChapter){
   } else {
     currentChapter = 0;
   }
-  resetDefeatBonuses();
+
+  // Restaurer l'héritage si on rejoue le même chapitre en mode histoire
+  if(mode==='story' && heritageData && heritageData.chapter === currentChapter){
+    // Restaurer les bonus accumulés
+    defeatBonusState = {...heritageData.defeatBonusState};
+    silentVaxSlowdown = heritageData.silentVaxSlowdown || 1;
+    runCount = heritageData.runCount || 0;
+    lastShownGainMult = heritageData.lastShownGainMult || 1;
+    // Transfère vers permanentState pour que startRun les applique
+    permanentState.shopDiscount = defeatBonusState.shopDiscount;
+    permanentState.vaccineBonus = defeatBonusState.vaccineBonus;
+    permanentState.gainMult     = defeatBonusState.gainMult || 1;
+    permanentState.shopPowerMult = Math.min(4, (permanentState.shopPowerMult||1));
+  } else {
+    // Chapitre différent ou speedrun → pas d'héritage appliqué, mais on le garde en mémoire
+    resetDefeatBonuses();
+    // heritageData reste intact pour quand on reviendra sur le bon chapitre
+  }
+
   if(mode==='story') globalStats.totalRunsStory++;
   startRun();
 }
@@ -1973,7 +1996,6 @@ function startRun(){
 //  MODE DEV
 // ══════════════════════════════════════════
 let devMode = false;
-/* ##DEV_FNS##
 function toggleDev(){
   devMode=!devMode;
   document.getElementById('dev-panel').style.display=devMode?'block':'none';
@@ -2013,7 +2035,6 @@ function devClearSkins(){
   showFusionToast('Skins réinitialisés', 'var(--red)');
   if(skinsPanelOpen) renderSkins();
 }
-##DEV_FNS## */
 function devSetVaccine(val){
   if(currentMode!=='story') return;
   vaccine=Math.min(Math.max(0,parseFloat(val)||0),99.9);
@@ -3214,7 +3235,7 @@ function renderSkins(){
             <div style="font-size:9px;color:var(--text-faint);font-style:italic;margin-bottom:3px">${s.species||''}</div>
             <div style="font-size:9px;color:rgba(255,80,80,0.8);margin-bottom:4px">💀 ${s.mortality||''}</div>
             <div style="font-size:10px;color:var(--text-dim)">
-              ${s.bonusTap?`👆 +${Math.round(s.bonusTap*mult)}% `:''}${s.bonusAuto?`⚡ +${Math.round(s.bonusAuto*mult)}% `:''}${s.bonusVax?`💉 -${Math.round(s.bonusVax*mult)}%`:''}
+              ${s.bonusTap?`👆 +${Math.round(s.bonusTap*mult)}% `:''}${s.bonusAuto?`⚡ +${Math.round(s.bonusAuto*mult)}% `:''}${s.bonusVax?`💉 -${Math.round(s.bonusVax*mult)}% vit. vaccin`:''}
             </div>
           </div>
         </div>
@@ -3254,7 +3275,7 @@ function renderSkins(){
         const statsTxt = [
           s.bonusTap  ? '+'+(Math.round(s.bonusTap*mult))+'% tap'   : '',
           s.bonusAuto ? '+'+(Math.round(s.bonusAuto*mult))+'% auto'  : '',
-          s.bonusVax  ? '-'+(Math.round(s.bonusVax*mult))+'% vaccin' : '',
+          s.bonusVax  ? '-'+(Math.round(s.bonusVax*mult))+'% vit. vaccin' : '',
         ].filter(Boolean).join('<br>');
 
         html += `<div class="skin-card ${rc} ${isEq?'equipped':''}" style="position:relative"
@@ -3365,7 +3386,7 @@ function showSkinBio(id){
     <div style="display:flex;gap:10px;margin-bottom:14px;padding:10px;border:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.2)">
       ${s.bonusTap ?`<div style="flex:1;text-align:center"><div style="font-size:9px;color:var(--text-faint);margin-bottom:3px">TAP</div><div style="font-family:'Orbitron','Futura','Century Gothic','Trebuchet MS',sans-serif;font-size:13px;color:${col}">+${Math.round(s.bonusTap*mult)}%</div></div>`:''}
       ${s.bonusAuto?`<div style="flex:1;text-align:center"><div style="font-size:9px;color:var(--text-faint);margin-bottom:3px">AUTO</div><div style="font-family:'Orbitron','Futura','Century Gothic','Trebuchet MS',sans-serif;font-size:13px;color:${col}">+${Math.round(s.bonusAuto*mult)}%</div></div>`:''}
-      ${s.bonusVax ?`<div style="flex:1;text-align:center"><div style="font-size:9px;color:var(--text-faint);margin-bottom:3px">VACCIN</div><div style="font-family:'Orbitron','Futura','Century Gothic','Trebuchet MS',sans-serif;font-size:13px;color:var(--red)">-${Math.round(s.bonusVax*mult)}%</div></div>`:''}
+      ${s.bonusVax ?`<div style="flex:1;text-align:center"><div style="font-size:9px;color:var(--text-faint);margin-bottom:3px">VIT. VACCIN</div><div style="font-family:'Orbitron','Futura','Century Gothic','Trebuchet MS',sans-serif;font-size:13px;color:var(--red)">-${Math.round(s.bonusVax*mult)}%</div></div>`:''}
     </div>
 
     ${s.bio?`<div style="font-size:11px;color:var(--text-dim);line-height:1.75;margin-bottom:16px;padding:12px;border:1px solid rgba(255,255,255,0.07);background:rgba(0,0,0,0.2)">${s.bio}</div>`:''}
@@ -3755,7 +3776,7 @@ function runNextSingleReel(){
 
 function rollPremiumSkin(){
   // Taux boostés avec mythique inclus
-  const weights=[{r:'common',w:15},{r:'rare',w:38},{r:'epic',w:30},{r:'legendary',w:12},{r:'mythic',w:5}];
+  const weights=[{r:'common',w:16.5},{r:'rare',w:39},{r:'epic',w:31},{r:'legendary',w:13},{r:'mythic',w:0.5}];
   const total = weights.reduce((s,x)=>s+x.w,0);
   const r=Math.random()*total; let cum=0; let rarity='common';
   for(const w of weights){ cum+=w.w; if(r<cum){rarity=w.r;break;} }
@@ -3913,10 +3934,10 @@ const TREE_BRANCHES = [
   {
     id: 'res', icon: '💉', title: 'Résistance — Vaccin', cls: 'branch-res',
     nodes: [
-      { id:'res1', name:'Camouflage', effect:'-10% vaccin', desc:'Le virus se camoufle dans l\'organisme',  winsReq:1,  fragCost:20, apply: s=>{ s.vaxResist = (s.vaxResist||1)*0.90; } },
-      { id:'res2', name:'Mutation',   effect:'-20% vaccin', desc:'Mutation antigénique permanente',         winsReq:3,  fragCost:40, apply: s=>{ s.vaxResist = (s.vaxResist||1)*0.80; } },
-      { id:'res3', name:'Immunité',   effect:'-35% vaccin', desc:'Résistance totale aux anticorps',         winsReq:6,  fragCost:65, apply: s=>{ s.vaxResist = (s.vaxResist||1)*0.65; } },
-      { id:'res4', name:'Fantôme',    effect:'-50% vaccin', desc:'Le virus devient indétectable',           winsReq:10, fragCost:100,apply: s=>{ s.vaxResist = (s.vaxResist||1)*0.50; } },
+      { id:'res1', name:'Camouflage', effect:'-10% vit. vaccin', desc:'Le virus se camoufle dans l\'organisme',  winsReq:1,  fragCost:20, apply: s=>{ s.vaxResist = (s.vaxResist||1)*0.90; } },
+      { id:'res2', name:'Mutation',   effect:'-20% vit. vaccin', desc:'Mutation antigénique permanente',         winsReq:3,  fragCost:40, apply: s=>{ s.vaxResist = (s.vaxResist||1)*0.80; } },
+      { id:'res3', name:'Immunité',   effect:'-35% vit. vaccin', desc:'Résistance totale aux anticorps',         winsReq:6,  fragCost:65, apply: s=>{ s.vaxResist = (s.vaxResist||1)*0.65; } },
+      { id:'res4', name:'Fantôme',    effect:'-50% vit. vaccin', desc:'Le virus devient indétectable',           winsReq:10, fragCost:100,apply: s=>{ s.vaxResist = (s.vaxResist||1)*0.50; } },
     ]
   },
 ];
@@ -4096,7 +4117,7 @@ const DEFEAT_BONUSES = [
     apply: s => { s.gainMult = (s.gainMult||1) * 3; } },
   { run:2, icon:'🏷️', name:'Upgrades -30% + ×2 gains', desc:'moins chères et gains doublés', color:'#ff8800',
     apply: s => { s.shopDiscount = Math.max(0.4, (s.shopDiscount||1)*0.70); s.gainMult=(s.gainMult||1)*2; } },
-  { run:3, icon:'🛡️', name:'Vaccin -25% + ×2 gains',   desc:'vaccin ralenti et gains doublés', color:'#ff7777',
+  { run:3, icon:'🛡️', name:'Vit. vaccin -25% + ×2 gains',   desc:'vitesse vaccin ralentie et gains doublés', color:'#ff7777',
     apply: s => { s.vaccineBonus=(s.vaccineBonus||1)*0.75; s.gainMult=(s.gainMult||1)*2; } },
 ];
 
@@ -4108,6 +4129,10 @@ let defeatBonusState = { gainMult:1, shopDiscount:1, vaccineBonus:1 };
 let lastShownGainMult = 1;
 
 let runCount = 0;
+
+// ══ HÉRITAGE PERSISTANT ══
+// Sauvegardé entre sessions — lié à un chapitre précis
+let heritageData = null; // { chapter, defeatBonusState, silentVaxSlowdown, runCount, lastShownGainMult }
 
 function showDefeatScreen(){
   runCount++;
@@ -4183,6 +4208,16 @@ function showDefeatScreen(){
 
   document.getElementById('def-btn-next').textContent = '🧬 NOUVELLE RUN';
   document.getElementById('defeatscreen').className = 'show';
+
+  // Sauvegarder l'héritage pour ce chapitre (persiste entre sessions)
+  heritageData = {
+    chapter: currentChapter,
+    defeatBonusState: {...defeatBonusState},
+    silentVaxSlowdown,
+    runCount,
+    lastShownGainMult
+  };
+  saveGame();
 }
 
 function defeatNextRun(){
@@ -4195,6 +4230,17 @@ function defeatNextRun(){
   permanentState.gainMult     = defeatBonusState.gainMult || 1;
   // Bonus upgrades : chaque achat donne ×1.5 de puissance en plus
   permanentState.shopPowerMult = Math.min(4, (permanentState.shopPowerMult||1) * 1.5);
+
+  // Met à jour l'héritage persistant
+  heritageData = {
+    chapter: currentChapter,
+    defeatBonusState: {...defeatBonusState},
+    silentVaxSlowdown,
+    runCount,
+    lastShownGainMult
+  };
+  saveGame();
+
   document.getElementById('defeatscreen').className = '';
   startRun();
 }
@@ -4299,6 +4345,7 @@ function closeSkinsPanel(){
 function endRun(win){
   if(gameOver) return;
   gameOver=true;
+  clearRunInProgress(); // La run est terminée, plus besoin de la sauvegarder
   if(timerInterval){ clearInterval(timerInterval); timerInterval=null; }
   stopGlobuleSystem();
   const elapsed=Date.now()-startTime;
@@ -4326,6 +4373,7 @@ function endRun(win){
     maxChapter = Math.max(maxChapter, currentChapter);
     achievementStats.maxChapterCompleted = Math.max(achievementStats.maxChapterCompleted||0, currentChapter);
     resetDefeatBonuses();
+    heritageData = null; // Victoire → on perd l'héritage
     totalWins++;
     saveGame(); // Sauvegarde immédiate du chapitre débloqué
     setTimeout(()=>{
@@ -4342,6 +4390,7 @@ function endRun(win){
     maxChapter = maxChapterId;
     achievementStats.maxChapterCompleted = maxChapterId;
     resetDefeatBonuses();
+    heritageData = null; // Victoire finale → on perd l'héritage
     totalWins++;
     saveGame(); // Sauvegarde immédiate
     setTimeout(()=>{
@@ -4515,12 +4564,22 @@ function goMenu(){
   // Sauvegarde l'état de la run en cours si c'est une partie histoire non terminée avec progression réelle
   if(currentMode==='story' && !gameOver && infected > 100){
     saveRunInProgress();
-  } else {
+  } else if(currentMode !== null) {
+    // Ne clear que si on vient d'un mode de jeu actif (pas au démarrage)
     clearRunInProgress();
   }
   gameOver=true;
   stopGlobuleSystem();
-  resetDefeatBonuses();
+  // Reset runtime defeat state mais garder heritageData pour persistance
+  defeatBonusState = {gainMult:1, shopDiscount:1, vaccineBonus:1};
+  permanentState.gainMult = 1;
+  permanentState.shopPowerMult = 1;
+  permanentState.vaccineBonus = 1;
+  permanentState.shopDiscount = 1;
+  silentVaxSlowdown = 1;
+  lastShownGainMult = 1;
+  runCount = 0;
+  // NE PAS toucher heritageData — il persiste !
   resetTree();
   closeTreePanel();
   globalStats.totalClicsAll += totalClicks;
@@ -4618,7 +4677,7 @@ function loadRunInProgress(){
     vaxMilestonesHit = new Set();
     startTime = Date.now() - (d.elapsed || 0);
 
-    clearRunInProgress();
+    // Ne PAS clear ici — la run sera clear à la fin (victoire/défaite/menu)
     return true;
   } catch(e){
     console.warn('Run load failed', e);
