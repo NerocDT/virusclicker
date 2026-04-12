@@ -1340,7 +1340,8 @@ function fmt(n){
   if(n>=1e9)  return (n/1e9).toFixed(2)+'Md';
   if(n>=1e6)  return (n/1e6).toFixed(2)+'M';
   if(n>=1e3)  return (n/1e3).toFixed(1)+'k';
-  return Math.floor(n).toString();
+  if(n>=10)   return Math.floor(n).toString();
+  return n%1===0 ? n.toString() : n.toFixed(2); // décimales si < 10
 }
 function fmtTime(ms){ const s=Math.floor(ms/1000),m=Math.floor(s/60),d=Math.floor((ms%1000)/100); return (m>0?m+'m ':'')+( s%60)+'.'+d+'s'; }
 function fmtChrono(ms){ const s=Math.floor(ms/1000),m=Math.floor(s/60),d=Math.floor((ms%1000)/100); return String(m).padStart(2,'0')+':'+String(s%60).padStart(2,'0')+'.'+d; }
@@ -1916,7 +1917,7 @@ function startRun(){
 
   // Applique le multiplicateur du chapitre
   if(currentMode==='story' && ch.tapMult && ch.tapMult > 1){
-    clickPower = Math.floor(clickPower * ch.tapMult);
+    clickPower = clickPower * ch.tapMult; // garder les décimales
   }
   // Discount shop du chapitre appliqué via shopDiscountMult
   if(currentMode==='story' && ch.shopDiscount){
@@ -2070,7 +2071,7 @@ function initClickZone(){
     const count = e.changedTouches.length;
     const t = e.changedTouches[0];
     const skinB = getEquippedBonus();
-    const tb = getTreeBonus(); const chTapMult=(currentMode==='story')?(getChapter().tapMult||1):1; const effective = Math.floor(clickPower * skinB.tap * tb.tapMult * chTapMult);
+    const tb = getTreeBonus(); const chTapMult=(currentMode==='story')?(getChapter().tapMult||1):1; const effective = clickPower * skinB.tap * tb.tapMult * chTapMult;
     const total = effective * count;
     totalClicks += count;
     achievementStats.totalClicks += count;
@@ -2092,7 +2093,7 @@ function initClickZone(){
 function registerClick(x, y){
   const skinB = getEquippedBonus();
   const tb = getTreeBonus();
-  const chTapMult=(currentMode==='story')?(getChapter().tapMult||1):1; const effective = Math.floor(clickPower * skinB.tap * tb.tapMult * chTapMult);
+  const chTapMult=(currentMode==='story')?(getChapter().tapMult||1):1; const effective = clickPower * skinB.tap * tb.tapMult * chTapMult;
   totalClicks++;
   achievementStats.totalClicks++;
   infected=Math.min(infected+effective, runTarget);
@@ -2116,7 +2117,7 @@ function spawnParticleAmount(x, y, amount){
 function spawnParticle(x,y){
   var _sb=getEquippedBonus(); var _tb=getTreeBonus();
   var _ct=(currentMode==='story')?(getChapter().tapMult||1):1;
-  spawnParticleAmount(x,y,Math.floor(clickPower*_sb.tap*_tb.tapMult*_ct));
+  spawnParticleAmount(x,y,Math.floor(clickPower*_sb.tap*_tb.tapMult*_ct)); // particles restent entières
 }
 
 // ══════════════════════════════════════════
@@ -4495,7 +4496,7 @@ function updateUI(){
   if(tap){
     var _skinB=getEquippedBonus(); var _tb=getTreeBonus();
     var _chTapMult=(currentMode==='story')?(getChapter().tapMult||1):1;
-    var _eff=Math.floor(clickPower*_skinB.tap*_tb.tapMult*_chTapMult);
+    var _eff=clickPower*_skinB.tap*_tb.tapMult*_chTapMult;
     tap.textContent='+'+fmt(_eff);
   }
   const aut=document.getElementById('s-auto');
