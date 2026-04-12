@@ -5853,7 +5853,18 @@ function closeChapterSelectPopup(){
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script>
-    function initFirebase(){
+    
+// ID unique par appareil (persiste dans localStorage)
+function getDeviceId(){
+  var id = localStorage.getItem('vc_device_id');
+  if(!id){
+    id = 'vc_' + Date.now() + '_' + Math.random().toString(36).slice(2,9);
+    localStorage.setItem('vc_device_id', id);
+  }
+  return id;
+}
+
+function initFirebase(){
       try{
         if(typeof firebase === 'undefined'){ console.log('Firebase SDK pas encore charge, retry...'); setTimeout(initFirebase, 1000); return; }
         var cfg = {
@@ -5871,7 +5882,7 @@ function closeChapterSelectPopup(){
 
         window.fbSaveScore = async function(pseudo, data){
           try{
-            var key = pseudo.replace(/[^a-zA-Z0-9_-]/g,'_');
+            var key = getDeviceId(); // clé unique par appareil, indépendante du pseudo
             await db.collection('leaderboard').doc(key).set({
               pseudo:pseudo, score:data.score||0,
               chapitre:data.chapitre||0, skins:data.skins||0,
