@@ -6,7 +6,7 @@
   <title>☣ PATHOGEN-X</title>
   <script>
   // ══ AUTO-UPDATE — changer ce numéro à chaque mise à jour ══
-  var APP_VERSION = '1.4';
+  var APP_VERSION = '1.5';
   (function(){
     var storedVersion = localStorage.getItem('pathogenx_version');
     if(storedVersion && storedVersion !== APP_VERSION){
@@ -251,7 +251,7 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
 .ccheck{position:absolute;top:12px;right:12px;font-size:18px;}
 
 /* Popup */
-.popup{position:fixed;top:66px;left:50%;transform:translateX(-50%);background:#0a1f10;border:1px solid;padding:13px 20px;z-index:400;text-align:center;min-width:265px;animation:popIn 0.3s ease-out;}
+.popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#0a1f10;border:1px solid;padding:13px 20px;z-index:400;text-align:center;min-width:265px;animation:popIn 0.3s ease-out;}
 .plbl{font-size:10px;letter-spacing:4px;margin-bottom:4px;}
 .pname{font-family:'Orbitron','Futura','Century Gothic','Trebuchet MS',sans-serif;font-size:14px;color:var(--text);margin-bottom:3px;}
 .pdesc{font-size:12px;color:var(--text-dim);}
@@ -464,6 +464,7 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
 @keyframes glowGreen{0%,100%{box-shadow:0 0 8px rgba(0,255,136,0.08)}50%{box-shadow:0 0 20px rgba(0,255,136,0.2)}}
 @keyframes glowPurple{0%,100%{box-shadow:0 0 8px rgba(204,136,255,0.08)}50%{box-shadow:0 0 20px rgba(204,136,255,0.25)}}
 @keyframes popIn{from{opacity:0;transform:translateX(-50%) translateY(-12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@keyframes popInCenter{from{opacity:0;transform:translate(-50%,-50%) scale(0.95)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
 @keyframes slideUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
 @keyframes virusRotateY{
   0%   { transform: rotateY(0deg); }
@@ -800,7 +801,7 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
       </div>
     </div>
 
-    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.4</div>
+    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.5</div>
 
   </div>
 </div>
@@ -815,21 +816,33 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
 </div>
 
 <!-- ══ EVENT POPUP ══ -->
-<div id="event-popup" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:550;width:90%;max-width:340px;padding:0;animation:popIn 0.3s ease-out">
-  <div id="event-popup-inner" style="border:2px solid;padding:20px 18px;background:#060d08;text-align:center">
-    <div id="event-icon" style="font-size:40px;margin-bottom:8px"></div>
-    <div id="event-type-label" style="font-size:9px;letter-spacing:4px;margin-bottom:6px"></div>
-    <div id="event-name" style="font-family:'Orbitron','Futura','Century Gothic','Trebuchet MS',sans-serif;font-size:16px;font-weight:900;margin-bottom:6px;letter-spacing:2px"></div>
-    <div id="event-desc" style="font-size:12px;color:var(--text-dim);margin-bottom:4px;line-height:1.6"></div>
-    <div id="event-duration" style="font-size:10px;color:var(--text-faint);margin-bottom:16px;letter-spacing:2px"></div>
-    <button id="event-accept-btn" onclick="acceptEvent()" ontouchend="event.preventDefault();acceptEvent()" style="width:100%;padding:14px;font-family:'Share Tech Mono',monospace;font-size:14px;letter-spacing:3px;cursor:pointer;touch-action:manipulation;font-weight:bold"></button>
-    <div id="event-timer-bar" style="margin-top:10px;background:rgba(255,255,255,0.06);height:3px"><div id="event-timer-fill" style="height:100%;width:100%;transition:width linear"></div></div>
-    <div style="font-size:9px;color:var(--text-faint);margin-top:6px;letter-spacing:1px" id="event-expire-txt">Disparaît dans 8s</div>
+<div id="event-popup-backdrop" style="display:none;position:fixed;inset:0;z-index:549;background:rgba(0,0,0,0.6)"></div>
+
+<!-- ══ ABANDON POPUP ══ -->
+<div id="abandon-popup" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:760;width:82%;max-width:280px;background:#0d0606;border:1px solid rgba(255,58,58,0.5);padding:20px 18px;text-align:center;animation:popInCenter 0.25s ease-out">
+  <div style="font-size:28px;margin-bottom:8px">💀</div>
+  <div style="font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;color:var(--red);letter-spacing:2px;margin-bottom:8px">ABANDONNER ?</div>
+  <div style="font-size:11px;color:var(--text-dim);line-height:1.6;margin-bottom:18px">Tu vas perdre toute la progression et l'héritage en cours sur ce chapitre.</div>
+  <div style="display:flex;gap:8px">
+    <button onclick="closeAbandonPopup()" ontouchend="event.preventDefault();closeAbandonPopup()" style="flex:1;padding:10px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:11px;cursor:pointer;touch-action:manipulation;letter-spacing:1px">ANNULER</button>
+    <button onclick="confirmAbandon()" ontouchend="event.preventDefault();confirmAbandon()" style="flex:1;padding:10px;background:rgba(255,58,58,0.15);border:2px solid var(--red);color:var(--red);font-family:'Share Tech Mono',monospace;font-size:11px;cursor:pointer;touch-action:manipulation;font-weight:bold;letter-spacing:1px">ABANDONNER</button>
+  </div>
+</div>
+<div id="abandon-backdrop" style="display:none;position:fixed;inset:0;z-index:759;background:rgba(0,0,0,0.7)"></div>
+<div id="event-popup" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:550;width:80%;max-width:260px;padding:0;animation:popInCenter 0.3s ease-out">
+  <div id="event-popup-inner" style="border:1px solid;padding:12px 14px;background:#060d08;text-align:center">
+    <div id="event-icon" style="font-size:26px;margin-bottom:4px"></div>
+    <div id="event-type-label" style="font-size:8px;letter-spacing:3px;margin-bottom:3px"></div>
+    <div id="event-name" style="font-family:'Orbitron','Futura','Century Gothic','Trebuchet MS',sans-serif;font-size:12px;font-weight:900;margin-bottom:4px;letter-spacing:1px"></div>
+    <div id="event-desc" style="font-size:10px;color:var(--text-dim);margin-bottom:2px;line-height:1.4"></div>
+    <div id="event-duration" style="font-size:9px;color:var(--text-faint);margin-bottom:10px;letter-spacing:1px"></div>
+    <button id="event-accept-btn" onclick="acceptEvent()" ontouchend="event.preventDefault();acceptEvent()" style="width:100%;padding:8px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;cursor:pointer;touch-action:manipulation;font-weight:bold"></button>
+    <div id="event-timer-bar" style="margin-top:8px;background:rgba(255,255,255,0.06);height:2px"><div id="event-timer-fill" style="height:100%;width:100%;transition:width linear"></div></div>
+    <div style="font-size:8px;color:var(--text-faint);margin-top:4px;letter-spacing:1px" id="event-expire-txt">Disparaît dans 8s</div>
   </div>
 </div>
 
-<!-- ══ ACTIVE EVENT BANNER ══ -->
-<div id="active-event-banner" style="display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:500;padding:8px 18px;border:1px solid;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;text-align:center;white-space:nowrap;animation:popIn 0.3s ease-out;pointer-events:none"></div>
+
 
 <!-- ══ GAME ══ -->
 <div id="game" style="display: none;">
@@ -875,6 +888,9 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
       </div>
     </div>
 
+    <!-- Bouton abandonner -->
+    <div id="abandon-btn-wrap" style="display:none"></div>
+
     <!-- Timer (speedrun) -->
     <div class="timer-box" id="timer-box" style="display:none;justify-content:center;text-align:center">
       <div><div class="tval" id="tval">00:00.0</div></div>
@@ -882,7 +898,10 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
 
     <!-- Infected -->
     <div class="inf-wrap">
-      <div class="inf-lbl" id="inf-lbl">PATIENT ZÉRO</div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="inf-lbl" id="inf-lbl">PATIENT ZÉRO</div>
+        <button id="abandon-btn" onclick="showAbandonPopup()" ontouchend="event.preventDefault();showAbandonPopup()" style="display:none;padding:3px 10px;background:transparent;border:1px solid var(--red);color:var(--red);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1px;cursor:pointer;touch-action:manipulation;margin-top:8px">✕ ABANDON</button>
+      </div>
       <div class="inf-count" id="inf-count">0</div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
         <div class="inf-target" id="inf-target" style="margin-top:0">Chapitre 1 — Objectif : 5 000 000</div>
@@ -963,6 +982,17 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
           <span style="font-family:'Orbitron',sans-serif;font-size:13px;color:#ff8800;font-weight:bold" id="sr-world-time">--:--.--</span>
         </div>
       </div>
+      <!-- Événement actif -->
+      <div id="active-event-banner" style="margin-top:8px;border:1px solid rgba(255,255,255,0.08);padding:8px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;background:rgba(255,255,255,0.02)">
+        <div style="display:flex;align-items:center;gap:8px;flex:1">
+          <span id="aeb-icon" style="font-size:18px;flex-shrink:0">—</span>
+          <div>
+            <div id="aeb-name" style="font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;color:var(--text-faint)">Aucun événement actif</div>
+            <div id="aeb-desc" style="font-size:10px;color:var(--text-faint);margin-top:1px"></div>
+          </div>
+        </div>
+        <div id="aeb-timer" style="font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;flex-shrink:0"></div>
+      </div>
       <!-- Chapters toggle -->
       <div id="ch-wrap" style="display:none;margin-top:4px">
         <button class="ch-toggle" onclick="toggleChapters()">📖 Chapitres &nbsp;<span id="ch-arrow">▼</span></button>
@@ -1026,7 +1056,7 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
   <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid rgba(136,221,255,0.15);background:#04080e;flex-shrink:0">
     <div style="font-family:&#39;Orbitron&#39;,&#39;Futura&#39;,&#39;Century Gothic&#39;,&#39;Trebuchet MS&#39;,sans-serif;font-size:22px;font-weight:900;color:#88ddff;letter-spacing:4px;text-shadow:0 0 20px rgba(136,221,255,0.4)">SHOP</div>
     <div style="display:flex;gap:8px;align-items:center">
-      <button onclick="closeLootboxShop();openSkinsPanel()" ontouchend="safeTap(()=&gt;{closeLootboxShop();openSkinsPanel()})" style="padding:7px 16px;background:rgba(204,136,255,0.2);border:2px solid rgba(204,136,255,0.9);color:var(--purple);font-family:'Share Tech Mono',monospace;font-size:12px;cursor:pointer;touch-action:manipulation;font-weight:bold;box-shadow:0 0 18px rgba(204,136,255,0.45),0 0 35px rgba(204,136,255,0.1);text-shadow:0 0 10px rgba(204,136,255,0.9)">LABO</button>
+      <button onclick="closeLootboxShop();openSkinsPanel()" ontouchend="safeTap(()=>{closeLootboxShop();openSkinsPanel()})" style="padding:7px 16px;background:rgba(204,136,255,0.2);border:2px solid rgba(204,136,255,0.9);color:var(--purple);font-family:'Share Tech Mono',monospace;font-size:12px;cursor:pointer;touch-action:manipulation;font-weight:bold;box-shadow:0 0 18px rgba(204,136,255,0.45),0 0 35px rgba(204,136,255,0.1);text-shadow:0 0 10px rgba(204,136,255,0.9)">LABO</button>
       <button onclick="closeLootboxShop()" style="padding:7px 16px;background:transparent;border:1px solid rgba(136,221,255,0.3);color:#88ddff;font-family:&#39;Share Tech Mono&#39;,&#39;Courier New&#39;,monospace;font-size:12px;cursor:pointer;touch-action:manipulation">✕ FERMER</button>
     </div>
   </div>
@@ -1041,7 +1071,8 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
 
     <!-- Lootbox Standard -->
     <div style="border:1px solid rgba(0,255,136,0.35);padding:18px;background:rgba(0,255,136,0.04);margin-bottom:12px;position:relative;box-shadow:0 0 24px rgba(0,255,136,0.08),inset 0 0 30px rgba(0,255,136,0.04)">
-      <button onclick="showPityInfo('standard')" ontouchend="event.preventDefault();showPityInfo('standard')" style="position:absolute;top:10px;right:10px;background:transparent;border:1px solid rgba(136,221,255,0.6);color:#88ddff;width:22px;height:22px;border-radius:50%;font-size:12px;cursor:pointer;touch-action:manipulation;line-height:1;padding:0;box-shadow:0 0 8px rgba(136,221,255,0.3)">ⓘ</button>
+      <button onclick="openAtlasPopup()" ontouchend="event.preventDefault();openAtlasPopup()" style="position:absolute;top:10px;right:10px;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.5);color:var(--yellow);font-family:'Share Tech Mono',monospace;font-size:9px;cursor:pointer;touch-action:manipulation;padding:2px 7px;letter-spacing:1px;box-shadow:0 0 8px rgba(255,215,0,0.2)">ATLAS</button>
+      <button onclick="showPityInfo('standard')" ontouchend="event.preventDefault();showPityInfo('standard')" style="position:absolute;top:38px;right:10px;background:transparent;border:1px solid rgba(136,221,255,0.6);color:#88ddff;width:22px;height:22px;border-radius:50%;font-size:12px;cursor:pointer;touch-action:manipulation;line-height:1;padding:0;box-shadow:0 0 8px rgba(136,221,255,0.3)">ⓘ</button>
       <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,255,136,0.5),transparent)"></div>
       <div style="font-family:&#39;Orbitron&#39;,&#39;Futura&#39;,&#39;Century Gothic&#39;,&#39;Trebuchet MS&#39;,sans-serif;font-size:15px;color:var(--green);margin-bottom:4px">Lootbox Standard</div>
       <div style="font-size:20px;font-weight:900;color:#88ddff;font-family:&#39;Orbitron&#39;,&#39;Futura&#39;,&#39;Century Gothic&#39;,&#39;Trebuchet MS&#39;,sans-serif;margin-bottom:10px;text-shadow:0 0 16px rgba(136,221,255,0.6)">50 🧫</div>
@@ -1053,7 +1084,8 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
 
     <!-- Lootbox Premium -->
     <div style="border:1px solid rgba(204,136,255,0.45);padding:18px;background:rgba(204,136,255,0.05);margin-bottom:12px;position:relative;box-shadow:0 0 24px rgba(204,136,255,0.1),inset 0 0 30px rgba(204,136,255,0.05)">
-      <button onclick="showPityInfo('premium')" ontouchend="event.preventDefault();showPityInfo('premium')" style="position:absolute;top:10px;right:10px;background:transparent;border:1px solid rgba(136,221,255,0.6);color:#88ddff;width:22px;height:22px;border-radius:50%;font-size:12px;cursor:pointer;touch-action:manipulation;line-height:1;padding:0;box-shadow:0 0 8px rgba(136,221,255,0.3)">ⓘ</button>
+      <button onclick="openAtlasPopup()" ontouchend="event.preventDefault();openAtlasPopup()" style="position:absolute;top:10px;right:10px;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.5);color:var(--yellow);font-family:'Share Tech Mono',monospace;font-size:9px;cursor:pointer;touch-action:manipulation;padding:2px 7px;letter-spacing:1px;box-shadow:0 0 8px rgba(255,215,0,0.2)">ATLAS</button>
+      <button onclick="showPityInfo('premium')" ontouchend="event.preventDefault();showPityInfo('premium')" style="position:absolute;top:38px;right:10px;background:transparent;border:1px solid rgba(136,221,255,0.6);color:#88ddff;width:22px;height:22px;border-radius:50%;font-size:12px;cursor:pointer;touch-action:manipulation;line-height:1;padding:0;box-shadow:0 0 8px rgba(136,221,255,0.3)">ⓘ</button>
       <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(204,136,255,0.6),transparent)"></div>
       <div style="font-family:&#39;Orbitron&#39;,&#39;Futura&#39;,&#39;Century Gothic&#39;,&#39;Trebuchet MS&#39;,sans-serif;font-size:15px;color:var(--purple);margin-bottom:4px">Lootbox Premium</div>
       <div style="font-size:20px;font-weight:900;color:#88ddff;font-family:&#39;Orbitron&#39;,&#39;Futura&#39;,&#39;Century Gothic&#39;,&#39;Trebuchet MS&#39;,sans-serif;margin-bottom:10px;text-shadow:0 0 16px rgba(136,221,255,0.6)">250 🧫</div>
@@ -1079,6 +1111,38 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
 <!-- ══ GLOBULES / EPIDEMIC OVERLAY ══ -->
 <!-- ══ MINI-JEU GLOBULE ══ -->
 <!-- ══ SKIN BIO MODAL ══ -->
+<div id="upgrade-preview-modal" style="display:none;position:fixed;inset:0;z-index:670;background:rgba(0,0,0,0.88);align-items:center;justify-content:center;padding:20px">
+  <div style="width:100%;max-width:400px;background:#07100a;border:1px solid rgba(0,255,136,0.3);padding:18px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div id="upv-title" style="font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;color:var(--green);letter-spacing:2px">AMÉLIORATION</div>
+      <button onclick="closeUpgradePreview()" style="background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--text-faint);font-family:'Share Tech Mono',monospace;font-size:12px;cursor:pointer;padding:4px 10px;touch-action:manipulation">✕</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center">
+      <!-- Niveau actuel -->
+      <div id="upv-left" style="flex:1;border:1px solid rgba(255,255,255,0.1);padding:12px;background:rgba(0,0,0,0.3);text-align:center"></div>
+      <!-- Flèche stylisée -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0">
+        <div style="width:2px;height:10px;background:linear-gradient(to bottom,transparent,var(--green));border-radius:1px"></div>
+        <div style="font-size:18px;color:var(--green);text-shadow:0 0 10px rgba(0,255,136,0.8);line-height:1">▶</div>
+        <div style="width:2px;height:10px;background:linear-gradient(to top,transparent,var(--green));border-radius:1px"></div>
+        <div style="font-size:8px;color:var(--green-dim);letter-spacing:1px;margin-top:2px">UP</div>
+      </div>
+      <!-- Niveau suivant -->
+      <div id="upv-right" style="flex:1;border:1px solid rgba(0,255,136,0.35);padding:12px;background:rgba(0,255,136,0.04);text-align:center"></div>
+    </div>
+    <button id="upv-confirm-btn" onclick="confirmUpgradeLevel()" ontouchend="event.preventDefault();confirmUpgradeLevel()" style="width:100%;padding:12px;background:rgba(0,255,136,0.12);border:2px solid var(--green);color:var(--green);font-family:'Share Tech Mono',monospace;font-size:13px;font-weight:bold;letter-spacing:2px;cursor:pointer;touch-action:manipulation;box-shadow:0 0 14px rgba(0,255,136,0.25)">⬆️ CONFIRMER L'AMÉLIORATION</button>
+  </div>
+</div>
+
+<!-- ══ ATLAS POPUP ══ -->
+<div id="atlas-popup" style="display:none;position:fixed;inset:0;z-index:750;background:#04080a;flex-direction:column;">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid rgba(255,215,0,0.2);background:#04080a;flex-shrink:0">
+    <div style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;color:var(--yellow);letter-spacing:4px">🗺 ATLAS</div>
+    <button onclick="closeAtlasPopup()" ontouchend="event.preventDefault();closeAtlasPopup()" style="padding:7px 16px;background:transparent;border:1px solid rgba(255,215,0,0.3);color:var(--yellow);font-family:'Share Tech Mono',monospace;font-size:12px;cursor:pointer;touch-action:manipulation">✕ FERMER</button>
+  </div>
+  <div id="atlas-popup-content" style="flex:1;overflow-y:auto;padding:16px 18px 40px;-webkit-overflow-scrolling:touch"></div>
+</div>
+
 <div id="skin-bio-modal" style="display:none;position:fixed;inset:0;z-index:660;background:rgba(0,0,0,0.85);align-items:flex-end;justify-content:center;padding:0">
   <div id="skin-bio-inner" style="width:100%;max-width:440px;max-height:85vh;overflow-y:auto;background:#07100a;border-top:2px solid var(--green);padding:20px 18px 40px;animation:slideUp 0.25s ease-out">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
@@ -1306,7 +1370,7 @@ const CHAPTER_DATA = [
     target: 2_000_000_000,
     label: "2 000 000 000 infectés",
     scale: 400,
-    vaccineSpeed: 0.034,
+    vaccineSpeed: 0.028,
     stageMin: [0, 5000000, 50000000, 500000000, 1600000000],
     tapMult: 4,    autoMult: 4,    shopDiscount: 0.7,
     mutationMsg: "🧬 Mutation Gamma — Propagation ×4 · Upgrades -30%",
@@ -1317,7 +1381,7 @@ const CHAPTER_DATA = [
     target: 8_000_000_000,
     label: "8 000 000 000 — VICTOIRE FINALE",
     scale: 1600,
-    vaccineSpeed: 0.036,
+    vaccineSpeed: 0.030,
     stageMin: [0, 20000000, 200000000, 2000000000, 6000000000],
     tapMult: 6,    autoMult: 6,    shopDiscount: 0.6,
     mutationMsg: "🧬 Mutation Omega — Propagation ×6 · Upgrades -40%",
@@ -1357,20 +1421,20 @@ function makeShop(){
   const cs = Math.pow(s, 0.75);
   return [
     // AUTO — gaps marqués entre a2→a3→a4→a5
-    { id:'a1', cat:'auto', icon:'🏠', name:'Famille infectée',   desc:'+'+(1*s)+'/sec',    baseCost:Math.floor(200*cs),     basePower:1*s,    count:0, unlockAt:0,             cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.70,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); } },
-    { id:'a2', cat:'auto', icon:'🏫', name:'École contaminée',   desc:'+'+(4*s)+'/sec',    baseCost:Math.floor(2500*cs),    basePower:4*s,    count:0, unlockAt:500*s,         cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.72,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); } },
-    { id:'a3', cat:'auto', icon:'🏥', name:'Hôpital infiltré',   desc:'+'+(15*s)+'/sec',   baseCost:Math.floor(25000*cs),   basePower:15*s,   count:0, unlockAt:5000*s,        cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.80,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); } },
-    { id:'a4', cat:'auto', icon:'🚇', name:'Métro contaminé',    desc:'+'+(50*s)+'/sec',   baseCost:Math.floor(300000*cs),  basePower:50*s,   count:0, unlockAt:30000*s,       cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.85,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); } },
-    { id:'a5', cat:'auto', icon:'✈️', name:'Aéroport mondial',   desc:'+'+(200*s)+'/sec',  baseCost:Math.floor(3000000*cs), basePower:200*s,  count:0, unlockAt:200000*s,      cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.90,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); } },
+    { id:'a1', cat:'auto', icon:'🏠', name:'Famille infectée',   desc:'+'+(3*s)+'/sec',    baseCost:Math.floor(200*cs),     basePower:3*s,    count:0, unlockAt:0,             cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.70,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); } },
+    { id:'a2', cat:'auto', icon:'🏫', name:'École contaminée',   desc:'+'+(15*s)+'/sec',   baseCost:Math.floor(2500*cs),    basePower:15*s,   count:0, unlockAt:2500*cs,       cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.72,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); } },
+    { id:'a3', cat:'auto', icon:'🏥', name:'Hôpital infiltré',   desc:'+'+(60*s)+'/sec',   baseCost:Math.floor(25000*cs),   basePower:60*s,   count:0, unlockAt:25000*cs,      cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.80,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); } },
+    { id:'a4', cat:'auto', icon:'🚇', name:'Métro contaminé',    desc:'+'+(200*s)+'/sec',  baseCost:Math.floor(300000*cs),  basePower:200*s,  count:0, unlockAt:300000*cs,     cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.85,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); } },
+    { id:'a5', cat:'auto', icon:'✈️', name:'Aéroport mondial',   desc:'+'+(800*s)+'/sec',  baseCost:Math.floor(2100000*cs), basePower:800*s,  count:0, unlockAt:2100000*cs,    cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.90,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); } },
     // CLICK — même logique avec gros gaps
     { id:'c1', cat:'click', icon:'🧬', name:'Mutation ARN',          desc:'+'+(2*s)+'/tap',   baseCost:Math.floor(150*cs),     basePower:2*s,   count:0, unlockAt:0,             cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.70,this.count)); }, effect(){ clickPower+=this.basePower*(permanentState.shopPowerMult||1); } },
-    { id:'c2', cat:'click', icon:'☣️', name:'Nécrose Rapide',        desc:'+'+(8*s)+'/tap',   baseCost:Math.floor(1500*cs),    basePower:8*s,   count:0, unlockAt:1000*s,        cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.72,this.count)); }, effect(){ clickPower+=this.basePower*(permanentState.shopPowerMult||1); } },
-    { id:'c3', cat:'click', icon:'🧫', name:'Multiplication Forcée', desc:'+'+(30*s)+'/tap',  baseCost:Math.floor(15000*cs),   basePower:30*s,  count:0, unlockAt:10000*s,       cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.80,this.count)); }, effect(){ clickPower+=this.basePower*(permanentState.shopPowerMult||1); } },
-    { id:'c4', cat:'click', icon:'💀', name:'Souche Xénomorphe',     desc:'+'+(120*s)+'/tap', baseCost:Math.floor(200000*cs),  basePower:120*s, count:0, unlockAt:80000*s,       cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.85,this.count)); }, effect(){ clickPower+=this.basePower*(permanentState.shopPowerMult||1); } },
+    { id:'c2', cat:'click', icon:'☣️', name:'Nécrose Rapide',        desc:'+'+(8*s)+'/tap',   baseCost:Math.floor(1500*cs),    basePower:8*s,   count:0, unlockAt:1500*cs,       cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.72,this.count)); }, effect(){ clickPower+=this.basePower*(permanentState.shopPowerMult||1); } },
+    { id:'c3', cat:'click', icon:'🧫', name:'Multiplication Forcée', desc:'+'+(30*s)+'/tap',  baseCost:Math.floor(15000*cs),   basePower:30*s,  count:0, unlockAt:15000*cs,      cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.80,this.count)); }, effect(){ clickPower+=this.basePower*(permanentState.shopPowerMult||1); } },
+    { id:'c4', cat:'click', icon:'💀', name:'Souche Xénomorphe',     desc:'+'+(120*s)+'/tap', baseCost:Math.floor(200000*cs),  basePower:120*s, count:0, unlockAt:200000*cs,     cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.85,this.count)); }, effect(){ clickPower+=this.basePower*(permanentState.shopPowerMult||1); } },
     // RESIST — scalent aussi avec le chapitre
-    { id:'v1', cat:'resist', icon:'🛡️', name:'Membrane Renforcée',     desc:'Vitesse vaccin -15%', baseCost:Math.floor(2000*cs),    basePower:0, count:0, unlockAt:0,           maxCount:1, cost(m){ return this.count>=1?Infinity:Math.floor(this.baseCost*m); }, effect(){ vaxShopMult*=0.85; } },
-    { id:'v2', cat:'resist', icon:'🔬', name:'Camouflage Immunitaire', desc:'Vitesse vaccin -20%', baseCost:Math.floor(25000*cs),   basePower:0, count:0, unlockAt:10000*s,     maxCount:1, cost(m){ return this.count>=1?Infinity:Math.floor(this.baseCost*m); }, effect(){ vaxShopMult*=0.80; } },
-    { id:'v3', cat:'resist', icon:'🌑', name:'Mutation Fantôme',       desc:'Vitesse vaccin -30%', baseCost:Math.floor(200000*cs),  basePower:0, count:0, unlockAt:100000*s,    maxCount:1, cost(m){ return this.count>=1?Infinity:Math.floor(this.baseCost*m); }, effect(){ vaxShopMult*=0.70; } },
+    { id:'v1', cat:'resist', icon:'🛡️', name:'Membrane Renforcée',     desc:'Vitesse vaccin -15%', baseCost:Math.floor(20000*cs),    basePower:0, count:0, unlockAt:0,           maxCount:1, cost(m){ return this.count>=1?Infinity:Math.floor(this.baseCost*m); }, effect(){ vaxShopMult*=0.85; } },
+    { id:'v2', cat:'resist', icon:'🔬', name:'Camouflage Immunitaire', desc:'Vitesse vaccin -20%', baseCost:Math.floor(300000*cs),   basePower:0, count:0, unlockAt:300000*cs,   maxCount:1, cost(m){ return this.count>=1?Infinity:Math.floor(this.baseCost*m); }, effect(){ vaxShopMult*=0.80; } },
+    { id:'v3', cat:'resist', icon:'🌑', name:'Mutation Fantôme',       desc:'Vitesse vaccin -30%', baseCost:Math.floor(1000000*cs),  basePower:0, count:0, unlockAt:1000000*cs,  maxCount:1, cost(m){ return this.count>=1?Infinity:Math.floor(this.baseCost*m); }, effect(){ vaxShopMult*=0.70; } },
   ];
 }
 
@@ -1503,7 +1567,7 @@ function resetSave(){
   globalStats = {totalRunsStory:0,totalWinsStory:0,totalRunsSpeed:0,totalWinsSpeed:0,chaptersCompleted:0,totalWins:0,totalClicsAll:0,totalInfectedAll:0,totalLootboxes:0};
   playerPseudo = '';
   heritageData = null;
-  dailyChallengeState = { date:null, challengeIds:[], progress:{}, claimed:{}, clicksToday:0, winsToday:0, speedrunsToday:0, chaptersToday:0, lootboxToday:0, equipsToday:0, upgradeSkinsToday:0, rerolled:false };
+  dailyChallengeState = { date:null, challengeIds:[], progress:{}, claimed:{}, clicksToday:0, winsToday:0, speedrunsToday:0, chaptersToday:0, lootboxToday:0, equipsToday:0, upgradeSkinsToday:0, rerolled:false, jackpotClaimed:false };
 
   // 3. Sauvegarder l'état vide immédiatement
   saveGame();
@@ -1563,6 +1627,7 @@ let globalStats = {
   totalSouches: 0,
   totalLootboxes: 0,
   chaptersCompleted: 0,
+  totalPlayTimeMs: 0,
 };
 
 // Meilleurs temps speedrun par objectif
@@ -1652,6 +1717,8 @@ let achievementStats = {
   totalSouches: 0,         // souches gagnées au total
 };
 
+let pendingAchievementToasts = [];
+
 function checkAchievements(){
   // Mettre à jour les stats dynamiques
   achievementStats.totalSkinsUnlocked = SKINS.filter(s=>(skinCollection[s.id]||0)>0).length;
@@ -1668,13 +1735,23 @@ function checkAchievements(){
         // Donner la récompense
         if(a.reward.souches){ addSouches(a.reward.souches, ''); }
         if(a.reward.frags){ skinFragments += a.reward.frags; }
-        // Notif
-        showAchievementToast(a);
+        // Mettre en attente au lieu d'afficher immédiatement
+        pendingAchievementToasts.push(a);
         saveGame();
       }
     } catch(e){}
   });
   return newUnlock;
+}
+
+function flushAchievementToasts(){
+  if(pendingAchievementToasts.length === 0) return;
+  let delay = 0;
+  pendingAchievementToasts.forEach(a => {
+    setTimeout(() => showAchievementToast(a), delay);
+    delay += 800;
+  });
+  pendingAchievementToasts = [];
 }
 
 function showAchievementToast(a){
@@ -1711,9 +1788,13 @@ function renderAchievements(){
     catDiv.textContent = cat;
     el.appendChild(catDiv);
 
-    ACHIEVEMENTS.filter(function(a){ return a.cat===cat; }).forEach(function(a){
+    var catAchs = ACHIEVEMENTS.filter(function(a){ return a.cat===cat; });
+    var lastId = catAchs[catAchs.length - 1].id;
+
+    catAchs.forEach(function(a){
       var done = !!achievementsUnlocked[a.id];
       var claimed = achievementsUnlocked[a.id] === 'claimed';
+      var isLast = a.id === lastId;
       var rewardParts = [];
       if(a.reward.souches) rewardParts.push('+'+a.reward.souches+' souches');
       if(a.reward.frags) rewardParts.push('+'+a.reward.frags+' frags');
@@ -1724,12 +1805,12 @@ function renderAchievements(){
 
       var icon = document.createElement('div');
       icon.className = 'ach-icon';
-      icon.textContent = a.icon;
+      icon.textContent = (done || !isLast) ? a.icon : '?';
 
       var info = document.createElement('div');
       info.className = 'ach-info';
-      var nameD = document.createElement('div'); nameD.className='ach-name'; nameD.textContent=a.name;
-      var descD = document.createElement('div'); descD.className='ach-desc'; descD.textContent=(done?a.desc:'???');
+      var nameD = document.createElement('div'); nameD.className='ach-name'; nameD.textContent=(done || !isLast) ? a.name : '???';
+      var descD = document.createElement('div'); descD.className='ach-desc'; descD.textContent=(done || !isLast) ? a.desc : '???';
       info.appendChild(nameD); info.appendChild(descD);
 
       var btn = document.createElement('button');
@@ -1861,7 +1942,7 @@ function showMenuTab(tab){
   const brand = document.getElementById('menu-branding');
   if(brand) brand.style.display = tab==='play' ? 'block' : 'none';
   if(tab==='stats') renderStats();
-  if(tab==='achievements') renderAchievements();
+  if(tab==='achievements'){ renderAchievements(); flushAchievementToasts(); }
 }
 
 // Initialiser le menu au bon état au démarrage
@@ -1924,7 +2005,7 @@ function renderRecords(){
   // Skins preview
   const sp = document.getElementById('menu-skins-preview'); if(!sp) return;
   const owned = SKINS.filter(s=>(skinCollection[s.id]||0)>0);
-  if(owned.length===0){ sp.innerHTML='<div style="font-size:11px;color:var(--text-faint)">Aucun skin — gagne des chapitres !</div>'; return; }
+  if(owned.length===0){ sp.innerHTML='<div style="font-size:11px;color:var(--text-faint)">Aucun virus — gagne des chapitres !</div>'; return; }
   sp.innerHTML = owned.map(s=>{
     const svg = (SKIN_SVG[s.id]||SKIN_SVG['default']).replace('<svg ','<svg width="36" height="36" ');
     const col = skinColor(s.rarity);
@@ -2024,6 +2105,7 @@ function startRun(){
   document.getElementById('menu').style.display='none';
   document.getElementById('game').style.display='block';
   document.getElementById('scorescreen').className='';
+  var ab = document.getElementById('abandon-btn'); if(ab) ab.style.display='inline-block';
 
   const isSR=currentMode==='speedrun';
 
@@ -2109,9 +2191,7 @@ function devSetVaccine(val){
   vaccine=Math.min(Math.max(0,parseFloat(val)||0),99.9);
   const br=document.getElementById('bar-red'); if(br) br.style.width=vaccine+'%';
   const vl=document.getElementById('vax-lbl'); if(vl) vl.textContent=vaccine.toFixed(1)+'%';
-  const st=document.getElementById('s-third'); if(st) st.textContent=vaccine.toFixed(0)+'%';
-}
-function devAddInfected(amount){
+  const st=document.getElementById('s-third'); if(st) st.textContent=Math.min(99,Math.floor(vaccine))+'%';
   if(!currentMode||gameOver) return;
   infected=Math.min(infected+amount, runTarget);
   if(infected>=runTarget) endRun(true);
@@ -2199,12 +2279,14 @@ const RANDOM_EVENTS = [
   { id:'ev9',  type:'bonus',  icon:'💀', name:'Nécrose Accélérée',     desc:'×10 par tap',                   duration:8,  effect:'tapMult',   value:10 },
   { id:'ev10', type:'bonus',  icon:'🧩', name:'Fragment Trouvé',       desc:'+2 fragments instantanément',    duration:0,  effect:'instant',   value:'frags' },
   // ── MALUS ──
-  { id:'ev11', type:'malus',  icon:'💉', name:'Vaccin Accéléré',       desc:'Vaccin ×3 vitesse',              duration:15, effect:'vaxBoost',  value:3 },
   { id:'ev12', type:'malus',  icon:'🏗️', name:'Quarantaine',          desc:'Auto/sec réduit de 70%',         duration:20, effect:'autoMult',  value:0.3 },
-  { id:'ev13', type:'malus',  icon:'🔬', name:'Anticorps Détectés',    desc:'Tap réduit de 50%',              duration:15, effect:'tapMult',   value:0.5 },
-  { id:'ev14', type:'malus',  icon:'🚧', name:'Confinement Mondial',   desc:'Tap et auto réduits de 40%',     duration:18, effect:'allMult',   value:0.6 },
-  { id:'ev15', type:'malus',  icon:'💉', name:'Dose de Rappel',        desc:'Vaccin ×2 vitesse',              duration:20, effect:'vaxBoost',  value:2 },
-  { id:'ev16', type:'malus',  icon:'🧊', name:'Gel des Recherches',    desc:'Aucun achat possible',           duration:12, effect:'shopFreeze',value:1 },
+  { id:'ev13', type:'malus',  icon:'🔬', name:'Anticorps Détectés',    desc:'Tap réduit de 50%',              duration:20, effect:'tapMult',   value:0.5 },
+  { id:'ev14', type:'malus',  icon:'🚧', name:'Confinement Mondial',   desc:'Tap et auto réduits de 40%',     duration:25, effect:'allMult',   value:0.6 },
+  { id:'ev16', type:'malus',  icon:'🧊', name:'Gel des Recherches',    desc:'Aucun achat possible',           duration:30, effect:'shopFreeze',value:1 },
+  // ── NOUVEAUX BONUS ──
+  { id:'ev17', type:'bonus',  icon:'🧬', name:'Surcharge ARN',         desc:'×5 tap, auto coupé pendant 15s', duration:15, effect:'surchargeARN', value:5 },
+  { id:'ev18', type:'bonus',  icon:'⏱️', name:'Gel du Vaccin',         desc:'Vaccin figé pendant 15s',        duration:15, effect:'vaxFreeze',    value:0 },
+  { id:'ev19', type:'bonus',  icon:'💀', name:'Mutation Nécrotique',   desc:'Les 50 prochains clics ×10',     duration:0,  effect:'necroticMult', value:50 },
 ];
 
 let eventInterval = null;     // setInterval pour déclencher les events
@@ -2217,6 +2299,8 @@ let eventTapMult = 1;         // multiplicateur temporaire de tap
 let eventAutoMult = 1;        // multiplicateur temporaire d'auto
 let eventVaxMult = 1;         // multiplicateur temporaire de vaccin
 let eventShopFrozen = false;  // shop gelé ?
+let eventVaxFrozen = false;   // vaccin figé ?
+let necroticClicksLeft = 0;   // clics restants pour Mutation Nécrotique
 
 function startEventSystem(){
   stopEventSystem();
@@ -2245,7 +2329,10 @@ function scheduleNextEvent(){
 
 function triggerRandomEvent(){
   if(eventPopupVisible || gameOver) return;
-  const ev = RANDOM_EVENTS[Math.floor(Math.random() * RANDOM_EVENTS.length)];
+  const bonusEvents = RANDOM_EVENTS.filter(e => e.type === 'bonus');
+  const malusEvents = RANDOM_EVENTS.filter(e => e.type === 'malus');
+  const pool = Math.random() < 0.66 ? bonusEvents : malusEvents;
+  const ev = pool[Math.floor(Math.random() * pool.length)];
   pendingEvent = ev;
   showEventPopup(ev);
 }
@@ -2304,6 +2391,7 @@ function showEventPopup(ev){
     }, 50);
   }
 
+  document.getElementById('event-popup-backdrop').style.display = 'block';
   document.getElementById('event-popup').style.display = 'block';
 
   // Auto-expire après 8s (bonus) ou auto-apply après 3s (malus)
@@ -2322,6 +2410,7 @@ function showEventPopup(ev){
 function hideEventPopup(){
   eventPopupVisible = false;
   pendingEvent = null;
+  document.getElementById('event-popup-backdrop').style.display = 'none';
   document.getElementById('event-popup').style.display = 'none';
   if(eventExpireTO){ clearTimeout(eventExpireTO); eventExpireTO = null; }
 }
@@ -2368,24 +2457,36 @@ function applyEvent(ev){
   if(ev.effect === 'vaxSlow')   eventVaxMult = ev.value;
   if(ev.effect === 'vaxBoost')  eventVaxMult = ev.value;
   if(ev.effect === 'shopFreeze') eventShopFrozen = true;
+  if(ev.effect === 'surchargeARN') { eventTapMult = ev.value; eventAutoMult = 0; }
+  if(ev.effect === 'vaxFreeze')    { eventVaxFrozen = true; }
+  if(ev.effect === 'necroticMult') {
+    necroticClicksLeft = ev.value;
+    showFusionToast('💀 Les 50 prochains clics ×10 !', 'var(--green)');
+    clearActiveEvent();
+    return;
+  }
 
   // Afficher la bannière active
   const banner = document.getElementById('active-event-banner');
   if(banner){
-    banner.style.display = 'block';
     banner.style.borderColor = isBonus ? 'rgba(0,255,136,0.4)' : 'rgba(255,58,58,0.4)';
-    banner.style.background = isBonus ? 'rgba(0,255,136,0.08)' : 'rgba(255,58,58,0.08)';
-    banner.style.color = col;
-    banner.textContent = ev.icon + ' ' + ev.name + ' — ' + ev.duration + 's';
+    banner.style.background = isBonus ? 'rgba(0,255,136,0.06)' : 'rgba(255,58,58,0.06)';
+    document.getElementById('aeb-icon').textContent = ev.icon;
+    document.getElementById('aeb-name').textContent = ev.name;
+    document.getElementById('aeb-name').style.color = col;
+    document.getElementById('aeb-desc').textContent = ev.desc;
+    const timerEl = document.getElementById('aeb-timer');
+    timerEl.style.color = col;
     // Countdown
     let remaining = ev.duration;
+    timerEl.textContent = remaining + 's';
     const bannerInterval = setInterval(()=>{
       remaining--;
       if(remaining <= 0 || !activeEvent){
         clearInterval(bannerInterval);
         return;
       }
-      banner.textContent = ev.icon + ' ' + ev.name + ' — ' + remaining + 's';
+      timerEl.textContent = remaining + 's';
     }, 1000);
   }
 
@@ -2404,9 +2505,18 @@ function clearActiveEvent(){
   eventAutoMult = 1;
   eventVaxMult = 1;
   eventShopFrozen = false;
+  eventVaxFrozen = false;
   if(activeEventTO){ clearTimeout(activeEventTO); activeEventTO = null; }
   const banner = document.getElementById('active-event-banner');
-  if(banner) banner.style.display = 'none';
+  if(banner){
+    banner.style.borderColor = 'rgba(255,255,255,0.08)';
+    banner.style.background = 'rgba(255,255,255,0.02)';
+    document.getElementById('aeb-icon').textContent = '—';
+    document.getElementById('aeb-name').textContent = 'Aucun événement actif';
+    document.getElementById('aeb-name').style.color = 'var(--text-faint)';
+    document.getElementById('aeb-desc').textContent = '';
+    document.getElementById('aeb-timer').textContent = '';
+  }
 }
 
 function startSpeedrunTimer(){
@@ -2420,7 +2530,10 @@ function registerClick(x, y){
   startSpeedrunTimer();
   const skinB = getEquippedBonus();
   const tb = getTreeBonus();
-  const chTapMult=(currentMode==='story')?(getChapter().tapMult||1):1; const effective = clickPower * skinB.tap * tb.tapMult * chTapMult * eventTapMult;
+  const chTapMult=(currentMode==='story')?(getChapter().tapMult||1):1;
+  let necroMult = 1;
+  if(necroticClicksLeft > 0){ necroMult = 10; necroticClicksLeft--; if(necroticClicksLeft===0) showFusionToast('💀 Mutation Nécrotique terminée !', 'var(--text-faint)'); }
+  const effective = clickPower * skinB.tap * tb.tapMult * chTapMult * eventTapMult * necroMult;
   totalClicks++;
   achievementStats.totalClicks++;
   dailyOnClick(1);
@@ -2539,7 +2652,8 @@ function safeTap(fn){
 function buyUpgrade(id){
   if(eventShopFrozen){ showFusionToast('🧊 Shop gelé !', 'var(--red)'); return; }
   const u=shop.find(x=>x.id===id); if(!u) return;
-  const cost=shopCost(u);
+  let cost=shopCost(u);
+  if(u.count===0 && u.unlockAt>0 && cost>u.unlockAt) cost=u.unlockAt;
   if(cost===Infinity||infected<cost) return;
   infected-=cost; u.count++; u.effect();
   dailyOnBuyUpgrade();
@@ -2574,7 +2688,9 @@ function renderShop(){
     if(isSR&&cat.key==='resist') return;
     html+='<div class="shop-cat" style="color:'+(cat.color)+'">'+(cat.label)+'</div>';
     shop.filter(u=>u.cat===cat.key).forEach(u=>{
-      const cost=shopCost(u);
+      let cost=shopCost(u);
+      // Si c'est le premier achat et que le coût dépasse unlockAt, on plafonne à unlockAt
+      if(u.count===0 && u.unlockAt>0 && cost>u.unlockAt) cost=u.unlockAt;
       const isLocked=infected<u.unlockAt&&u.count===0;
       const cantBuy=cost===Infinity;
       const canAfford=!cantBuy&&!isLocked&&infected>=cost;
@@ -2587,10 +2703,6 @@ function renderShop(){
         </div>`; return;
       }
       let hint='';
-      if(cat.key==='auto'&&!cantBuy){
-        const roi=Math.ceil(cost/(u.basePower));
-        hint='<div class="sitem-hint">Rentable en ~'+(roi)+'s</div>';
-      }
       const cls=cantBuy?'maxed':canAfford?'buyable':'affordable';
       html+=`<div class="sitem ${cls}" onclick="buyUpgrade('${u.id}')" ontouchend="safeBuy('${u.id}')">
         <span class="sitem-icon">${u.icon}</span>
@@ -2616,70 +2728,70 @@ function renderShop(){
 // ══════════════════════════════════════════
 const SKINS = [
   // ── COMMUNS (vert) — maladies bénignes ──
-  { id:'s1', rarity:'common', rarityLabel:'COMMUN', drop:20, bonusTap:8, bonusAuto:0, bonusVax:0,
+  { id:'s1', rarity:'common', rarityLabel:'COMMUN', drop:20, bonusTap:16, bonusAuto:0, bonusVax:0,
     name:'Rhinovirus C9', species:'Rhinovirus humain C9', host:'Humains exclusivement',
     mortality:'0.001% — simple rhume', transmission:'Gouttelettes / surfaces', discovered:'Chicago, 1985',
     bio:`Le Rhinovirus C9 est la cause la plus fréquente du rhume commun. Transmis par les poignées de porte et les billets de banque, il infecte 1 milliard de personnes par an. Malgré sa totale bénignité, il résiste 3 heures sur les surfaces lisses et se réplique à une vitesse remarquable dans les muqueuses nasales à 33°C.` },
-  { id:'s2', rarity:'common', rarityLabel:'COMMUN', drop:18, bonusTap:0, bonusAuto:8, bonusVax:0,
+  { id:'s2', rarity:'common', rarityLabel:'COMMUN', drop:18, bonusTap:0, bonusAuto:16, bonusVax:0,
     name:'Influenza Saisonnière', species:'Influenzavirus A H3N2 saisonnier', host:'Humains / Oiseaux',
     mortality:'0.1% — grippe commune', transmission:'Aérosols respiratoires', discovered:'Paris, 1968',
     bio:`La grippe saisonnière infecte 5 à 15% de la population mondiale chaque hiver. Son génome segmenté lui permet de se réassortir avec des souches animales, produisant chaque année de nouveaux variants. Le vaccin annuel cible les trois souches les plus probables — avec un taux de succès d'environ 60%.` },
-  { id:'s3', rarity:'common', rarityLabel:'COMMUN', drop:12, bonusTap:6, bonusAuto:6, bonusVax:0,
+  { id:'s3', rarity:'common', rarityLabel:'COMMUN', drop:12, bonusTap:12, bonusAuto:12, bonusVax:0,
     name:'Adénovirus 2', species:'Human Mastadenovirus C2', host:'Humains — enfants principalement',
     mortality:'0.002% — rhume / conjonctivite', transmission:'Contact direct / piscines', discovered:'New York, 1953',
     bio:`L'Adénovirus de type 2 provoque des infections respiratoires légères et des conjonctivites chez l'enfant. Célèbre pour sa résistance au chlore des piscines, il est responsable des épidémies oculaires estivales. Son génome est si stable qu'il est utilisé comme vecteur viral dans de nombreux vaccins modernes, dont ceux contre la COVID-19.` },
-  { id:'s4', rarity:'common', rarityLabel:'COMMUN', drop:7, bonusTap:10, bonusAuto:0, bonusVax:0,
+  { id:'s4', rarity:'common', rarityLabel:'COMMUN', drop:7, bonusTap:20, bonusAuto:0, bonusVax:0,
     name:'Coronavirus OC43', species:'Betacoronavirus OC43', host:'Humains / Bovins',
     mortality:'0.05% — rhume hivernal', transmission:'Gouttelettes / aérosols', discovered:'Washington D.C., 1967',
     bio:`OC43 est responsable de 10 à 15% des rhumes hivernaux. Il franchit la barrière bovine-humaine vers 1890, provoquant possiblement la pandémie de grippe russe. Depuis, il circule discrètement parmi nous chaque hiver, muant lentement. Sa protéine S est étroitement surveillée depuis 2020 par analogie avec SARS-CoV-2.` },
 
   // ── RARES (bleu) — maladies dangereuses ──
-  { id:'s5', rarity:'rare', rarityLabel:'RARE', drop:12, bonusTap:18, bonusAuto:15, bonusVax:5,
+  { id:'s5', rarity:'rare', rarityLabel:'RARE', drop:12, bonusTap:36, bonusAuto:30, bonusVax:10,
     name:'Dengue DENV-2', species:'Dengue virus sérotype 2', host:'Humains / Moustiques Aedes',
     mortality:'5% — hémorragie interne possible', transmission:'Piqûre de moustique Aedes', discovered:'Hawaï, 1943',
     bio:`La dengue infecte 400 millions de personnes par an dans 130 pays. Sa particularité redoutable : une seconde infection par un sérotype différent déclenche une réaction immunitaire amplifiée qui peut provoquer une dengue hémorragique mortelle. Les moustiques vecteurs colonisent désormais l'Europe du sud.` },
-  { id:'s6', rarity:'rare', rarityLabel:'RARE', drop:10, bonusTap:15, bonusAuto:18, bonusVax:8,
+  { id:'s6', rarity:'rare', rarityLabel:'RARE', drop:10, bonusTap:30, bonusAuto:36, bonusVax:16,
     name:'West Nile Virus', species:'West Nile orthoflavivirus', host:'Oiseaux / Moustiques / Humains',
     mortality:'10% des formes neurologiques', transmission:'Piqûre de moustique Culex', discovered:'Ouganda, 1937',
     bio:`Le virus du Nil occidental a traversé l'Atlantique en 1999 et s'est répandu dans tout le continent américain en 3 ans — un record de propagation géographique. 80% des infectés ne développent aucun symptôme, mais 1% souffre d'encéphalite potentiellement fatale. Il n'existe aucun vaccin humain approuvé.` },
-  { id:'s7', rarity:'rare', rarityLabel:'RARE', drop:7, bonusTap:20, bonusAuto:15, bonusVax:10,
+  { id:'s7', rarity:'rare', rarityLabel:'RARE', drop:7, bonusTap:40, bonusAuto:30, bonusVax:20,
     name:'Hantavirus SNV', species:'Sin Nombre orthohantavirus', host:'Rongeurs Peromyscus / Humains',
     mortality:'36% — syndrome pulmonaire', transmission:'Inhalation d\'excréments de rongeurs', discovered:'Four Corners, USA, 1993',
     bio:`Le Sin Nombre virus fut identifié lors d'une mystérieuse épidémie dans la région Four Corners en 1993. Contrairement aux autres hantavirus, il provoque un syndrome pulmonaire fulminant : les poumons se remplissent de liquide en 24 heures. Il ne se transmet pas entre humains — chaque cas est une infection directe depuis les excréments de souris cervidées.` },
-  { id:'s15', rarity:'rare', rarityLabel:'RARE', drop:8, bonusTap:22, bonusAuto:12, bonusVax:6,
+  { id:'s15', rarity:'rare', rarityLabel:'RARE', drop:8, bonusTap:44, bonusAuto:24, bonusVax:12,
     name:'Yersinia Pestis', species:'Yersinia pestis', host:'Rongeurs / Puces / Humains',
     mortality:'90% sans antibiotiques (forme pulmonaire)', transmission:'Piqûre de puce / aérosols', discovered:'Hong Kong, 1894',
     bio:`Responsable de la Peste Noire qui décima 60% de l'Europe au XIVe siècle, Yersinia pestis possède un mécanisme d'évasion immunitaire remarquable. Elle inhibe la phagocytose en survivant à l'intérieur même des macrophages censés la détruire. Des foyers naturels persistent encore aujourd'hui dans les Rocheuses américaines.` },
 
   // ── ÉPIQUES (violet) — très dangereux ──
-  { id:'s8', rarity:'epic', rarityLabel:'ÉPIQUE', drop:6, bonusTap:40, bonusAuto:35, bonusVax:15,
+  { id:'s8', rarity:'epic', rarityLabel:'ÉPIQUE', drop:6, bonusTap:60, bonusAuto:53, bonusVax:23,
     name:'Ebola Soudan', species:'Sudan ebolavirus (SUDV)', host:'Chauves-souris / Humains / Primates',
     mortality:'53% — hémorragie systémique en 96h', transmission:'Contact direct / liquides biologiques', discovered:'Soudan du Sud, 1976',
     bio:`La souche Soudan d'Ebola fut découverte la même année que la souche Zaïre mais dans un pays différent. Moins létale que Zaïre, elle est plus difficile à contenir car ses porteurs survivent assez longtemps pour contaminer davantage de personnes. L'épidémie de 2000 en Ouganda infecta 425 personnes en partant d'un seul patient hospitalisé.` },
-  { id:'s9', rarity:'epic', rarityLabel:'ÉPIQUE', drop:4, bonusTap:35, bonusAuto:45, bonusVax:20,
+  { id:'s9', rarity:'epic', rarityLabel:'ÉPIQUE', drop:4, bonusTap:53, bonusAuto:67, bonusVax:30,
     name:'Virus Nipah', species:'Nipah henipavirus (NiV)', host:'Chauves-souris Pteropus / Porcs / Humains',
     mortality:'78% — encéphalite fulminante', transmission:'Contact direct / liquides biologiques', discovered:'Nipah, Malaisie, 1999',
     bio:`En 1999, des éleveurs de porcs malaisiens développèrent une mystérieuse encéphalite. Le virus Nipah — nommé d'après le village du premier patient — se révéla transmis par les excréments de grandes chauves-souris frugivores. L'OMS le classe comme pathogène prioritaire en raison de son potentiel pandémique et de l'absence totale de vaccin approuvé.` },
-  { id:'s10', rarity:'epic', rarityLabel:'ÉPIQUE', drop:3, bonusTap:50, bonusAuto:40, bonusVax:25,
+  { id:'s10', rarity:'epic', rarityLabel:'ÉPIQUE', drop:3, bonusTap:76, bonusAuto:60, bonusVax:37,
     name:'SARS-CoV-1', species:'SARS coronavirus 1 (SARS-CoV)', host:'Civettes / Humains',
     mortality:'9.6% — détresse respiratoire aiguë', transmission:'Aérosols / gouttelettes / surfaces', discovered:'Guangdong, Chine, 2002',
     bio:`Le SARS-CoV-1 stoppa net les économies asiatiques en 2003 avec un taux de létalité 96 fois supérieur à la grippe saisonnière. Sa protéine Spike se liait aux récepteurs ACE2 humains avec une affinité inédite pour un coronavirus animal. L'épidémie fut maîtrisée en 8 mois grâce à des quarantaines strictes — aucun vaccin ne fut jamais nécessaire.` },
-  { id:'s17', rarity:'epic', rarityLabel:'ÉPIQUE', drop:3, bonusTap:45, bonusAuto:30, bonusVax:18,
+  { id:'s17', rarity:'epic', rarityLabel:'ÉPIQUE', drop:3, bonusTap:67, bonusAuto:46, bonusVax:28,
     name:'Fièvre Lassa', species:'Lassa mammarenavirus (LASV)', host:'Rat Mastomys / Humains',
     mortality:'25% en cas de défaillance multi-organes', transmission:'Contact avec excréments de rongeurs', discovered:'Lassa, Nigéria, 1969',
     bio:`Le virus Lassa infecte entre 100 000 et 300 000 personnes chaque année en Afrique de l'Ouest. Il supprime complètement la réponse immunitaire initiale — les patients semblent se rétablir avant de subir une défaillance multi-organes soudaine. Les soignants nigérians l'appellent "la maladie qui revient".` },
 
   // ── LÉGENDAIRES (or) — extrêmement dangereux ──
 
-  { id:'s12', rarity:'legendary', rarityLabel:'LÉGENDAIRE', drop:0.5, bonusTap:150, bonusAuto:150, bonusVax:50,
+  { id:'s12', rarity:'legendary', rarityLabel:'LÉGENDAIRE', drop:0.5, bonusTap:150, bonusAuto:150, bonusVax:45,
     name:'Souche Oméga', species:'[CLASSIFIÉ — NIVEAU OMÉGA]', host:'[DONNÉES EFFACÉES]',
     mortality:'100% — aucun survivant répertorié', transmission:'Vecteur inconnu — transmission aérienne confirmée', discovered:'Station Vostok, Antarctique, 2019',
     bio:`Extrait de carottes de glace antarctiques datant de 800 000 ans, Pathogen-X fut isolé par une équipe russo-américaine en novembre 2019. Les fichiers de l'expédition furent immédiatement classifiés. Les 7 chercheurs présents ce jour-là sont décédés dans les 72h suivant l'ouverture du prélèvement. Aucune autopsie n'a été rendue publique. Ce que vous tenez entre vos mains n'existe pas officiellement.` },
-  { id:'s19', rarity:'legendary', rarityLabel:'LÉGENDAIRE', drop:0.4, bonusTap:120, bonusAuto:120, bonusVax:45,
+  { id:'s19', rarity:'legendary', rarityLabel:'LÉGENDAIRE', drop:0.4, bonusTap:120, bonusAuto:120, bonusVax:50,
     name:'Virus Chimère', species:'Chimera orthopoxvirus [SYNTHÉTIQUE]', host:'[TOUTES ESPÈCES MAMMIFÈRES]',
     mortality:'67% — données issues de modèles computationnels', transmission:'Aérosols / contact / vecteurs arthropodes', discovered:'Laboratoire P4, localisation classifiée, 2018',
     bio:`Le Virus Chimère est une construction théorique combinant la transmissibilité de la grippe H1N1, la létalité d'Ebola Zaïre et la résistance aux antiviraux du VIH. Son génome de synthèse a été modélisé par une équipe internationale dont les identités demeurent protégées par traité. Aucun antidote n'existe. Ce fichier est automatiquement supprimé après lecture.` },
-  { id:'s20', rarity:'legendary', rarityLabel:'LÉGENDAIRE', drop:0.3, bonusTap:200, bonusAuto:120, bonusVax:55,
+  { id:'s20', rarity:'legendary', rarityLabel:'LÉGENDAIRE', drop:0.3, bonusTap:135, bonusAuto:135, bonusVax:45,
     name:'Kronos-1', species:'[GENRE INCONNU — CLASSE OMEGA]', host:'[DONNÉES EFFACÉES PAR ORDRE EXÉCUTIF]',
     mortality:'[CENSURÉ]', transmission:'[CENSURÉ]', discovered:'Station Mir, orbite basse, 1991',
     bio:`Kronos-1 fut détecté dans les filtres à air de la station Mir lors de la mission EO-10. Les cosmonautes Artsebarsky et Krikalev furent mis en quarantaine 18 mois à leur retour. Les échantillons prélevés ne correspondent à aucune classification biologique connue. Le dossier complet est classifié Niveau Oméga par l'OMS et la NASA depuis 1994.` },
@@ -3292,6 +3404,7 @@ function closeLootbox(){
 // skinLevels[id] = 1-5, skinCollection[id] = nb d'exemplaires
 let skinLevels = {};
 let fusionView = false; // toggle entre collection et fusion
+let atlasView = false; // toggle atlas
 
 function getSkinLevel(id){ return skinLevels[id] || 1; }
 
@@ -3352,6 +3465,53 @@ function fuseToHigher(id){
   dailyOnUpgradeSkin();
   if(!equippedSkin){ equippedSkin=won.id; updateEquippedUI(won); }
   renderSkins();
+}
+
+let upgradePreviewId = null;
+
+function showUpgradePreview(id){
+  const s = SKINS.find(x=>x.id===id);
+  if(!s) return;
+  upgradePreviewId = id;
+  const lvl = getSkinLevel(id);
+  const col = skinColor(s.rarity);
+  const svg = (SKIN_SVG[id]||SKIN_SVG['default']).replace('<svg ','<svg width="48" height="48" ');
+
+  function statsHtml(level){
+    const m = 1 + (level - 1) * 0.5;
+    const lines = [
+      s.bonusTap  ? `<div>+${Math.round(s.bonusTap*m)}% tap</div>`   : '',
+      s.bonusAuto ? `<div>+${Math.round(s.bonusAuto*m)}% auto</div>`  : '',
+      s.bonusVax  ? `<div>-${Math.round(s.bonusVax*m)}% vaccin</div>` : '',
+    ].filter(Boolean).join('');
+    return lines || '<div style="opacity:0.4">Aucun bonus</div>';
+  }
+
+  document.getElementById('upv-title').textContent = s.name.toUpperCase();
+  document.getElementById('upv-left').innerHTML = `
+    <div style="font-size:10px;color:var(--text-faint);letter-spacing:2px;margin-bottom:6px">NIV. ${lvl}</div>
+    <div style="margin:0 auto 8px;width:48px;height:48px">${svg}</div>
+    <div style="font-size:11px;color:${col};font-weight:bold;margin-bottom:6px">${s.rarityLabel}</div>
+    <div style="font-size:11px;color:var(--text-dim);line-height:1.8">${statsHtml(lvl)}</div>`;
+  document.getElementById('upv-right').innerHTML = `
+    <div style="font-size:10px;color:var(--green);letter-spacing:2px;margin-bottom:6px">NIV. ${lvl+1}</div>
+    <div style="margin:0 auto 8px;width:48px;height:48px">${svg}</div>
+    <div style="font-size:11px;color:${col};font-weight:bold;margin-bottom:6px">${s.rarityLabel}</div>
+    <div style="font-size:11px;color:var(--green);line-height:1.8">${statsHtml(lvl+1)}</div>`;
+
+  const modal = document.getElementById('upgrade-preview-modal');
+  modal.style.display = 'flex';
+}
+
+function closeUpgradePreview(){
+  document.getElementById('upgrade-preview-modal').style.display = 'none';
+  upgradePreviewId = null;
+}
+
+function confirmUpgradeLevel(){
+  if(!upgradePreviewId) return;
+  upgradeLevel(upgradePreviewId);
+  closeUpgradePreview();
 }
 
 function upgradeLevel(id){
@@ -3555,13 +3715,45 @@ function renderSkins(){
     }
   }
 
-  // Toggle collection / fusion
+  // Toggle collection / fusion / atlas
   html += `<div style="display:flex;gap:8px;margin-bottom:12px">
-    <button onclick="fusionView=false;renderSkins()" ontouchend="safeTap(()=>{fusionView=false;renderSkins()})" style="flex:1;padding:9px;background:${!fusionView?'rgba(0,255,136,0.1)':'transparent'};border:1px solid ${!fusionView?'var(--green)':'rgba(255,255,255,0.1)'};color:${!fusionView?'var(--green)':'var(--text-faint)'};font-family:'Share Tech Mono','Courier New',monospace;font-size:11px;cursor:pointer;touch-action:manipulation">Virus</button>
-    <button onclick="fusionView=true;renderSkins()" ontouchend="safeTap(()=>{fusionView=true;renderSkins()})" style="flex:1;padding:9px;background:${fusionView?'rgba(204,136,255,0.1)':'transparent'};border:1px solid ${fusionView?'var(--purple)':'rgba(255,255,255,0.1)'};color:${fusionView?'var(--purple)':'var(--text-faint)'};font-family:'Share Tech Mono','Courier New',monospace;font-size:11px;cursor:pointer;touch-action:manipulation">Fusionner</button>
+    <button onclick="fusionView=false;atlasView=false;renderSkins()" ontouchend="safeTap(()=>{fusionView=false;atlasView=false;renderSkins()})" style="flex:1;padding:9px;background:${!fusionView&&!atlasView?'rgba(0,255,136,0.1)':'transparent'};border:1px solid ${!fusionView&&!atlasView?'var(--green)':'rgba(255,255,255,0.1)'};color:${!fusionView&&!atlasView?'var(--green)':'var(--text-faint)'};font-family:'Share Tech Mono','Courier New',monospace;font-size:11px;cursor:pointer;touch-action:manipulation">Virus</button>
+    <button onclick="fusionView=true;atlasView=false;renderSkins()" ontouchend="safeTap(()=>{fusionView=true;atlasView=false;renderSkins()})" style="flex:1;padding:9px;background:${fusionView?'rgba(204,136,255,0.1)':'transparent'};border:1px solid ${fusionView?'var(--purple)':'rgba(255,255,255,0.1)'};color:${fusionView?'var(--purple)':'var(--text-faint)'};font-family:'Share Tech Mono','Courier New',monospace;font-size:11px;cursor:pointer;touch-action:manipulation">Fusionner</button>
+    <button onclick="fusionView=false;atlasView=true;renderSkins()" ontouchend="safeTap(()=>{fusionView=false;atlasView=true;renderSkins()})" style="flex:1;padding:9px;background:${atlasView?'rgba(255,215,0,0.1)':'transparent'};border:1px solid ${atlasView?'var(--yellow)':'rgba(255,255,255,0.1)'};color:${atlasView?'var(--yellow)':'var(--text-faint)'};font-family:'Share Tech Mono','Courier New',monospace;font-size:11px;cursor:pointer;touch-action:manipulation">Atlas</button>
   </div>`;
 
-  if(!fusionView){
+  if(atlasView){
+    // ── VUE ATLAS ──
+    html += `<div style="font-size:10px;color:var(--yellow-dim);letter-spacing:3px;margin-bottom:12px">🗺 ATLAS VIRAL — ${SKINS.length} PATHOGÈNES RECENSÉS</div>`;
+    const rarityOrder = ['mythic','legendary','epic','rare','common'];
+    rarityOrder.forEach(rarity => {
+      const group = SKINS.filter(s => s.rarity === rarity);
+      if(!group.length) return;
+      const label = group[0].rarityLabel;
+      const col = skinColor(rarity);
+      html += `<div style="font-size:9px;color:${col};letter-spacing:3px;margin:12px 0 6px;opacity:0.7">${label.toUpperCase()}</div>`;
+      group.forEach(s => {
+        const owned = (skinCollection[s.id]||0) > 0;
+        const lvl = getSkinLevel(s.id);
+        const bord = skinBorder(s.rarity);
+        const svg = (SKIN_SVG[s.id]||SKIN_SVG['default']).replace('<svg ','<svg width="36" height="36" ');
+        const mult = skinStatMultiplier(s.id);
+        const statsTxt = [
+          s.bonusTap  ? `+${Math.round(s.bonusTap*mult)}% tap`  : '',
+          s.bonusAuto ? `+${Math.round(s.bonusAuto*mult)}% auto` : '',
+          s.bonusVax  ? `-${Math.round(s.bonusVax*mult)}% vaccin` : '',
+        ].filter(Boolean).join(' · ');
+        html += `<div style="display:flex;align-items:center;gap:12px;padding:10px 12px;margin-bottom:6px;border:1px solid ${owned?bord:'rgba(255,255,255,0.06)'};background:${owned?'rgba(0,0,0,0.2)':'rgba(0,0,0,0.35)'};${owned?'':'filter:grayscale(0.8);opacity:0.45'}">
+          <div style="flex-shrink:0;width:36px;height:36px">${svg}</div>
+          <div style="flex:1">
+            <div style="font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;color:${owned?col:'rgba(255,255,255,0.25)'};margin-bottom:2px">${owned?s.name:'???'}</div>
+            <div style="font-size:9px;color:${owned?'var(--text-faint)':'rgba(255,255,255,0.15)'}">${owned?statsTxt:'Non découvert'}</div>
+          </div>
+          ${owned?`<div style="font-size:9px;color:${col};border:1px solid ${bord};padding:2px 7px">${lvl>1?`LV${lvl}`:'LV1'}</div>`:`<div style="font-size:9px;color:rgba(255,255,255,0.15)">🔒</div>`}
+        </div>`;
+      });
+    });
+  } else if(!fusionView){
     // ── VUE COLLECTION — grille 2 colonnes ──
     html += `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
       <div style="font-size:10px;color:var(--text-faint);letter-spacing:3px">MA COLLECTION</div>
@@ -3571,7 +3763,7 @@ function renderSkins(){
     if(totalOwned === 0){
       html += `<div style="text-align:center;padding:40px 20px;border:1px solid rgba(255,255,255,0.06)">
         <div style="font-size:36px;margin-bottom:12px;opacity:0.3">🎁</div>
-        <div style="font-size:12px;color:var(--text-faint);line-height:1.7">Aucun skin pour le moment.<br>Termine un chapitre !</div>
+        <div style="font-size:12px;color:var(--text-faint);line-height:1.7">Aucun virus pour le moment.<br>Termine un chapitre !</div>
       </div>`;
     } else {
       html += `<div class="skin-grid">`;
@@ -3596,7 +3788,7 @@ function renderSkins(){
           ${isEq?`<div class="skin-badge">✓</div>`:`<div class="skin-badge" style="border-color:rgba(255,255,255,0.1);color:var(--text-faint)">TAP</div>`}
           <div style="width:56px;height:56px;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;overflow:hidden">${svgSmall}</div>
           <div class="skin-name" style="color:${col}">${s.name}</div>
-          <div class="skin-rarity">${s.rarityLabel}${count>1?` ×${count-1} doublon${count-1>1?'s':''}`:''}</div>
+          <div class="skin-rarity">${s.rarityLabel}</div>
           <div style="font-size:8px;color:rgba(255,80,80,0.6);margin:2px 0">💀 ${s.mortality||''}</div>
           <div class="skin-stats">${statsTxt}</div>
         </div>`;
@@ -3617,7 +3809,7 @@ function renderSkins(){
 
     if(fusionables.length === 0){
       html += `<div style="text-align:center;padding:30px;border:1px solid rgba(255,255,255,0.06);color:var(--text-faint);font-size:12px">
-        Aucun skin à fusionner pour l\'instant
+        Aucun virus à fusionner pour l\'instant
       </div>`;
     } else {
       fusionables.forEach(s=>{
@@ -3644,11 +3836,11 @@ function renderSkins(){
           <div style="display:flex;gap:8px">
             ${lvl < 5
               ? (canUpg
-                ? `<button onclick="upgradeLevel('${s.id}')" ontouchend="safeTap(()=>upgradeLevel('${s.id}'))"
+                ? `<button onclick="showUpgradePreview('${s.id}')" ontouchend="safeTap(()=>showUpgradePreview('${s.id}'))"
                     style="flex:1;padding:9px 6px;background:rgba(0,255,136,0.1);border:1px solid var(--green);color:var(--green);font-family:'Share Tech Mono','Courier New',monospace;font-size:10px;cursor:pointer;touch-action:manipulation;line-height:1.4">
                     ⬆️ Niv ${lvl+1}<br><span style="font-size:9px;opacity:0.7">${neededForUpg}× requis</span></button>`
                 : `<div style="flex:1;padding:9px 6px;background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.2);font-family:'Share Tech Mono','Courier New',monospace;font-size:10px;line-height:1.4;text-align:center;opacity:0.4">
-                    ⬆️ Niv ${lvl+1}<br><span style="font-size:9px">Faut ${neededForUpg}×</span></div>`)
+                    ⬆️ Niv ${lvl+1}<br><span style="font-size:9px">${neededForUpg}× requis</span></div>`)
               : `<div style="flex:1;padding:9px 6px;border:1px solid rgba(255,215,0,0.3);color:var(--yellow);font-size:10px;font-family:'Share Tech Mono','Courier New',monospace;text-align:center">✨ MAX</div>`
             }
             ${nextRarity
@@ -3657,7 +3849,7 @@ function renderSkins(){
                     style="flex:1;padding:9px 6px;background:rgba(204,136,255,0.1);border:1px solid var(--purple);color:var(--purple);font-family:'Share Tech Mono','Courier New',monospace;font-size:10px;cursor:pointer;touch-action:manipulation;line-height:1.4">
                     🔬 Fusionner<br><span style="font-size:9px;opacity:0.7">${fuseCost(s.id)}× → ${nextRarity.toUpperCase()}</span></button>`
                 : `<div style="flex:1;padding:9px 6px;background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.2);font-family:'Share Tech Mono','Courier New',monospace;font-size:10px;line-height:1.4;text-align:center;opacity:0.4">
-                    🔬 Fusionner<br><span style="font-size:9px">Faut ${fuseCost(s.id)}×</span></div>`)
+                    🔬 Fusionner<br><span style="font-size:9px">${fuseCost(s.id)}× requis</span></div>`)
               : `<div style="flex:1;padding:9px 6px;border:1px solid rgba(255,215,0,0.2);color:rgba(255,215,0,0.5);font-size:10px;font-family:'Share Tech Mono','Courier New',monospace;text-align:center">🏆 MAX</div>`
             }
           </div>
@@ -3815,7 +4007,7 @@ function showPseudoScreen(){
   if(inp) setTimeout(()=>inp.focus(), 300);
 }
 
-function confirmPseudo(){
+async function confirmPseudo(){
   const inp = document.getElementById('pseudo-input');
   const err = document.getElementById('pseudo-error');
   const val = (inp ? inp.value : '').trim();
@@ -3826,6 +4018,14 @@ function confirmPseudo(){
   if(val.length > 20){
     if(err) err.textContent = 'Maximum 20 caractères';
     return;
+  }
+  if(window.fbCheckPseudo){
+    if(err) err.textContent = 'Vérification en cours...';
+    const taken = await window.fbCheckPseudo(val);
+    if(taken){
+      if(err) err.textContent = '❌ Pseudo déjà utilisé, choisis-en un autre !';
+      return;
+    }
   }
   playerPseudo = val;
   localStorage.setItem('pathogenx_pseudo', val);
@@ -3960,7 +4160,7 @@ function renderShopCollection(){
   if(totalCount) totalCount.textContent = SKINS.length;
 
   if(owned.length === 0){
-    grid.innerHTML = `<div style="grid-column:span 4;text-align:center;padding:16px;font-size:11px;color:var(--text-faint)">Aucun skin — achète une lootbox !</div>`;
+    grid.innerHTML = `<div style="grid-column:span 4;text-align:center;padding:16px;font-size:11px;color:var(--text-faint)">Aucun virus — achète une lootbox !</div>`;
     return;
   }
   grid.innerHTML = owned.map(s=>{
@@ -4368,7 +4568,7 @@ function renderTree(){
       <div style="filter:drop-shadow(0 0 10px ${skinCol}50)">${svgSkin}</div>
       <div style="flex:1">
         <div style="font-size:9px;color:var(--text-faint);letter-spacing:3px;margin-bottom:4px">ARBRE BACTÉRIOLOGIQUE</div>
-        <div style="font-family:'Orbitron','Futura','Century Gothic','Trebuchet MS',sans-serif;font-size:13px;font-weight:700;color:${skinCol};margin-bottom:2px">${eqSkin?eqSkin.name:'Aucun skin équipé'}</div>
+        <div style="font-family:'Orbitron','Futura','Century Gothic','Trebuchet MS',sans-serif;font-size:13px;font-weight:700;color:${skinCol};margin-bottom:2px">${eqSkin?eqSkin.name:'Aucun virus équipé'}</div>
         <div style="font-size:9px;color:var(--text-faint);font-style:italic;margin-bottom:6px">${eqSkin?eqSkin.species||'':''}</div>
         <div style="font-size:10px;color:var(--text-dim)">
           ${bonusLines.length ? bonusLines.join(' &nbsp;·&nbsp; ') : '<span style="color:var(--text-faint)">Aucun bonus actif</span>'}
@@ -4452,6 +4652,19 @@ function showDefeatScreen(){
   const hasBonus = progressPct >= 10;
   const bonus = DEFEAT_BONUSES[Math.min(runCount-1, DEFEAT_BONUSES.length-1)];
 
+  // Paliers de souches selon le % atteint
+  const souchesPaliers = [
+    { pct:90, reward:40 }, { pct:80, reward:33 }, { pct:70, reward:28 },
+    { pct:60, reward:24 }, { pct:50, reward:20 }, { pct:40, reward:16 },
+    { pct:30, reward:12 }, { pct:20, reward:8  }, { pct:10, reward:5  }
+  ];
+  const palier = souchesPaliers.find(p => progressPct >= p.pct);
+  const souchesGained = palier ? palier.reward : 0;
+  if(souchesGained > 0){
+    souches += souchesGained;
+    updateSouchesDisplay();
+  }
+
   // Subtitle conditionnel
   const subEl = document.getElementById('def-sub');
   if(subEl){
@@ -4506,6 +4719,7 @@ function showDefeatScreen(){
             <div class="def-bonus-desc">${bonus.desc}</div>
           </div>
         </div>
+        ${souchesGained>0?`<div class="def-bonus-note">🧫 +${souchesGained} souches pour avoir atteint ${progressPct.toFixed(0)}%</div>`:''}
         ${totalTxt ? `<div class="def-bonus-note">${totalTxt} &nbsp;·&nbsp; Actif dès la prochaine run</div>` : '<div class="def-bonus-note">Actif automatiquement dès le début de la run suivante</div>'}
       </div>`;
   } else if(!hasBonus) {
@@ -4637,9 +4851,63 @@ function switchTab(tab){
 }
 
 let skinsPanelOpen = false;
+let atlasReturnToShop = false;
+
+function openAtlasPopup(){
+  const el = document.getElementById('atlas-popup-content');
+  const rarityOrder = ['mythic','legendary','epic','rare','common'];
+  let html = `<div style="font-size:10px;color:rgba(255,215,0,0.5);letter-spacing:2px;margin-bottom:14px">${SKINS.length} PATHOGÈNES RECENSÉS · ${Object.keys(skinCollection).filter(id=>(skinCollection[id]||0)>0).length} DÉCOUVERTS</div>`;
+  rarityOrder.forEach(rarity => {
+    const group = SKINS.filter(s => s.rarity === rarity);
+    if(!group.length) return;
+    const col = skinColor(rarity);
+    const label = group[0].rarityLabel;
+    html += `<div style="font-size:9px;color:${col};letter-spacing:3px;margin:14px 0 8px;padding-bottom:4px;border-bottom:1px solid ${col}22">${label.toUpperCase()} — ${group.length} virus</div>`;
+    group.forEach(s => {
+      const owned = (skinCollection[s.id]||0) > 0;
+      const lvl = getSkinLevel(s.id);
+      const bord = skinBorder(s.rarity);
+      const svg = (SKIN_SVG[s.id]||SKIN_SVG['default']).replace('<svg ','<svg width="38" height="38" ');
+      const mult = skinStatMultiplier(s.id);
+      const stats = [
+        s.bonusTap  ? `+${Math.round(s.bonusTap*mult)}% tap`   : '',
+        s.bonusAuto ? `+${Math.round(s.bonusAuto*mult)}% auto`  : '',
+        s.bonusVax  ? `-${Math.round(s.bonusVax*mult)}% vaccin` : '',
+      ].filter(Boolean).join(' · ');
+      html += `<div style="display:flex;align-items:center;gap:12px;padding:10px 12px;margin-bottom:6px;border:1px solid ${owned?bord:'rgba(255,255,255,0.05)'};background:${owned?'rgba(0,0,0,0.2)':'rgba(0,0,0,0.4)'};${owned?'':'opacity:0.4'}">
+        <div style="flex-shrink:0;width:38px;height:38px;${owned?'':'filter:grayscale(1)'}">${svg}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;color:${owned?col:'rgba(255,255,255,0.2)'};margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${owned?s.name:'???'}</div>
+          <div style="font-size:9px;color:${owned?'var(--text-faint)':'rgba(255,255,255,0.1)'}">${owned?(stats||s.rarityLabel):'Non découvert'}</div>
+        </div>
+        <div style="font-size:9px;flex-shrink:0;${owned?'color:'+col+';border:1px solid '+bord+';padding:2px 7px':'color:rgba(255,255,255,0.15)'}">${owned?'LV'+lvl:'🔒'}</div>
+      </div>`;
+    });
+  });
+  el.innerHTML = html;
+  document.getElementById('atlas-popup').style.display = 'flex';
+}
+
+function closeAtlasPopup(){
+  document.getElementById('atlas-popup').style.display = 'none';
+}
+
+function openAtlasFromShop(){
+  atlasReturnToShop = true;
+  closeLootboxShop();
+  atlasView = true; fusionView = false;
+  skinsPanelOpen = true;
+  skinSearchQuery = ''; skinRarityFilter = 'all';
+  const inp = document.getElementById('skin-search'); if(inp) inp.value = '';
+  document.getElementById('skins-panel').style.display = 'flex';
+  setSkinFilter('all');
+}
+
 function openSkinsPanel(){
   // Fermer le shop s'il est ouvert
   closeLootboxShop();
+  atlasReturnToShop = false;
+  atlasView = false; fusionView = false;
   skinsPanelOpen = true;
   skinSearchQuery = ''; skinRarityFilter = 'all';
   const inp = document.getElementById('skin-search'); if(inp) inp.value = '';
@@ -4648,7 +4916,9 @@ function openSkinsPanel(){
 }
 function closeSkinsPanel(){
   skinsPanelOpen = false;
+  atlasView = false; fusionView = false;
   document.getElementById('skins-panel').style.display='none';
+  if(atlasReturnToShop){ atlasReturnToShop = false; openLootboxShop(); }
 }
 
 // ══════════════════════════════════════════
@@ -4864,7 +5134,7 @@ function updateUI(){
   if(currentMode==='story'){
     const br=document.getElementById('bar-red'); if(br) br.style.width=vaccine+'%';
     const vl=document.getElementById('vax-lbl'); if(vl) vl.textContent=vaccine.toFixed(1)+'%';
-    const st=document.getElementById('s-third'); if(st) st.textContent=vaccine.toFixed(0)+'%';
+    const st=document.getElementById('s-third'); if(st) st.textContent=Math.min(99,Math.floor(vaccine))+'%';
 
   } else {
     const st=document.getElementById('s-third'); if(st) st.textContent=totalClicks;
@@ -4885,6 +5155,23 @@ function updateUI(){
     aut.textContent='+'+fmt(_effAuto);
   }
   renderVirusDisplay();
+}
+
+function showAbandonPopup(){
+  if(!currentMode || gameOver) return;
+  document.getElementById('abandon-popup').style.display = 'block';
+  document.getElementById('abandon-backdrop').style.display = 'block';
+}
+function closeAbandonPopup(){
+  document.getElementById('abandon-popup').style.display = 'none';
+  document.getElementById('abandon-backdrop').style.display = 'none';
+}
+function confirmAbandon(){
+  closeAbandonPopup();
+  resetDefeatBonuses();
+  clearRunInProgress();
+  var ab = document.getElementById('abandon-btn'); if(ab) ab.style.display='none';
+  goMenu();
 }
 
 function goMenu(){
@@ -5023,8 +5310,7 @@ function resumeRun(){
   document.getElementById('menu').style.display='none';
   document.getElementById('game').style.display='block';
   document.getElementById('scorescreen').className='';
-
-  document.getElementById('vax-section').style.display='block';
+  var ab = document.getElementById('abandon-btn'); if(ab) ab.style.display='inline-block';
   document.getElementById('timer-box').style.display='none';
   document.getElementById('slbl3').textContent='VACCIN';
   document.getElementById('s-third').style.color='var(--red)';
@@ -5074,15 +5360,22 @@ setInterval(()=>{
   else updateUI();
 },1000);
 
+// Temps de jeu — tourne en permanence, s'arrête uniquement si app en arrière-plan
+setInterval(()=>{
+  if(!document.hidden) globalStats.totalPlayTimeMs = (globalStats.totalPlayTimeMs||0) + 1000;
+},1000);
+
 setInterval(()=>{
   if(gameOver||currentMode!=='story') return;
   checkVaxMilestones();
-  const speed = getEffectiveVaxSpeed();
-  vaccine=Math.min(Math.max(0, vaccine+speed), 100);
-  if(vaccine>=100){ endRun(false); return; }
+  if(!eventVaxFrozen){
+    const speed = getEffectiveVaxSpeed();
+    vaccine=Math.min(Math.max(0, vaccine+speed), 100);
+    if(vaccine>=100){ endRun(false); return; }
+  }
   const br=document.getElementById('bar-red'); if(br) br.style.width=vaccine+'%';
   const vl=document.getElementById('vax-lbl'); if(vl) vl.textContent=vaccine.toFixed(1)+'%';
-  const st=document.getElementById('s-third'); if(st&&currentMode==='story') st.textContent=vaccine.toFixed(0)+'%';
+  const st=document.getElementById('s-third'); if(st&&currentMode==='story') st.textContent=Math.min(99,Math.floor(vaccine))+'%';
 },200);
 
 
@@ -5320,13 +5613,18 @@ function applyLightMode(){
   }
 }
 
-function saveSettingsPseudo(){
+async function saveSettingsPseudo(){
   var inp = document.getElementById('settings-pseudo');
   if(inp) inp.blur();
   var val = (inp ? inp.value : '').trim();
   if(val.length < 2){ showFusionToast('Minimum 2 caractères', 'var(--red)'); return; }
   if(val.length > 20){ showFusionToast('Maximum 20 caractères', 'var(--red)'); return; }
   if(val === playerPseudo){ showFusionToast('Pseudo identique', 'var(--text-faint)'); return; }
+  if(window.fbCheckPseudo){
+    showFusionToast('Vérification en cours...', 'var(--text-faint)');
+    const taken = await window.fbCheckPseudo(val);
+    if(taken){ showFusionToast('❌ Pseudo déjà utilisé, choisis-en un autre !', 'var(--red)'); return; }
+  }
   playerPseudo = val;
   localStorage.setItem('pathogenx_pseudo', val);
   showSettingsPopup('✓ Changement de pseudo confirmé');
@@ -5462,6 +5760,7 @@ let dailyChallengeState = {
   lootboxToday: 0,
   equipsToday: 0,
   upgradeSkinsToday: 0,
+  jackpotClaimed: false,
 };
 
 // Compteurs de session (reset à chaque run)
@@ -5507,6 +5806,7 @@ function initDailyChallenges(){
     dailyChallengeState.equipsToday = 0;
     dailyChallengeState.upgradeSkinsToday = 0;
     dailyChallengeState.rerolled = false;
+    dailyChallengeState.jackpotClaimed = false;
     saveGame();
   }
 }
@@ -5642,8 +5942,52 @@ function claimDailyReward(id){
   renderDailyChallenges();
 }
 
+function claimDailyJackpot(){
+  if(dailyChallengeState.jackpotClaimed) return;
+  const activeIds = dailyChallengeState.challengeIds;
+  const allClaimed = activeIds.every(id => !!dailyChallengeState.claimed[id]);
+  if(!allClaimed) return;
+  dailyChallengeState.jackpotClaimed = true;
+  saveGame();
+  renderDailyChallenges();
+  // Lootbox standard gratuite
+  currentLootboxType = 'standard';
+  closeDailyChallenges();
+  const won = rollWithPity();
+  lootboxNextAction = function(){ renderShopCollection(); openDailyChallenges(); };
+  lootboxPending = won;
+  document.getElementById('lb-chap').textContent = '🎁 RÉCOMPENSE QUOTIDIENNE';
+  document.getElementById('lb-result').style.display = 'none';
+  const reel = document.getElementById('lb-reel');
+  const rrc = document.getElementById('lb-reel-container'); if(rrc) rrc.style.display = 'block';
+  reel.style.transition = 'none'; reel.style.transform = 'translateX(0)'; reel.innerHTML = '';
+  const items = [];
+  for(var i = 0; i < 40; i++) items.push(i === 32 ? won : SKINS[Math.floor(Math.random() * SKINS.length)]);
+  items.forEach(function(s){
+    const d = document.createElement('div'); d.className = 'reel-item';
+    d.style.background = s.rarity==='mythic'?'rgba(255,51,51,0.15)':s.rarity==='legendary'?'rgba(255,215,0,0.13)':s.rarity==='epic'?'rgba(204,136,255,0.12)':s.rarity==='rare'?'rgba(88,170,255,0.11)':'rgba(0,255,136,0.06)';
+    const rSvg = (SKIN_SVG[s.id]||SKIN_SVG['default']).replace('<svg ','<svg width="42" height="42" ');
+    d.innerHTML = '<div style="width:42px;height:42px;margin:0 auto 4px">'+rSvg+'</div><div class="ri-name" style="color:var(--text-faint)">'+s.name+'</div>';
+    reel.appendChild(d);
+  });
+  document.getElementById('lootbox-screen').style.display = 'flex';
+  const itemW = 100; const screenW = Math.min(window.innerWidth, 420);
+  const targetX = -(32 * itemW - screenW / 2 + itemW / 2);
+  setTimeout(function(){ reel.style.transition = 'transform 4s cubic-bezier(0.25,0.1,0.1,1.0)'; reel.style.transform = 'translateX('+targetX+'px)'; }, 100);
+  setTimeout(function(){ showLootboxResult(won); }, 4400);
+}
+
 function rerollDailyChallenges(){
   if(dailyChallengeState.rerolled) return;
+  const activeIds = dailyChallengeState.challengeIds;
+  const anyDoneOrClaimed = activeIds.some(id => {
+    if(dailyChallengeState.claimed[id]) return true;
+    const ch = DAILY_CHALLENGES.find(c=>c.id===id);
+    if(!ch) return false;
+    const prog = dailyChallengeState.progress[id] || getDailyChallengeProgress(ch);
+    return prog >= ch.target;
+  });
+  if(anyDoneOrClaimed){ showFusionToast('Impossible de changer, un défi à déjà été réussi !', 'var(--red)'); return; }
   if(souches < 20){ showFusionToast('Pas assez de souches (20 🧫 requis)', 'var(--red)'); return; }
   souches -= 20;
   dailyChallengeState.rerolled = true;
@@ -5738,8 +6082,28 @@ function renderDailyChallenges(){
     html += '</div></div>';
   });
 
+  // Bouton lootbox quotidienne
+  const allClaimed = activeIds.every(id => !!dailyChallengeState.claimed[id]);
+  const jackpotClaimed = !!dailyChallengeState.jackpotClaimed;
+  if(jackpotClaimed){
+    html += '<div style="width:100%;padding:12px;border:1px solid rgba(255,136,0,0.15);color:rgba(255,136,0,0.4);font-family:\'Share Tech Mono\',monospace;font-size:11px;text-align:center;margin-top:16px;opacity:0.5">🎁 Lootbox quotidienne récupérée ✓</div>';
+  } else if(allClaimed){
+    html += '<button onclick="claimDailyJackpot()" ontouchend="event.preventDefault();claimDailyJackpot()" style="width:100%;padding:13px;background:rgba(255,136,0,0.12);border:2px solid #ff8800;color:#ff8800;font-family:\'Share Tech Mono\',monospace;font-size:13px;font-weight:bold;cursor:pointer;touch-action:manipulation;margin-top:16px;letter-spacing:2px;box-shadow:0 0 16px rgba(255,136,0,0.3);text-shadow:0 0 8px rgba(255,136,0,0.6)">🎁 RÉCUPÉRER MA LOOTBOX</button>';
+  } else {
+    html += '<div style="width:100%;padding:12px;border:1px solid rgba(255,255,255,0.06);color:rgba(255,255,255,0.2);font-family:\'Share Tech Mono\',monospace;font-size:11px;text-align:center;margin-top:16px;cursor:default">🎁 RÉCUPÉRER MA LOOTBOX — '+totalDone+'/3 défis complétés</div>';
+  }
+
   // Bouton reroll en bas
-  if(!dailyChallengeState.rerolled){
+  const anyDoneOrClaimed = activeIds.some(id => {
+    if(dailyChallengeState.claimed[id]) return true;
+    const ch = DAILY_CHALLENGES.find(c=>c.id===id);
+    if(!ch) return false;
+    const prog = dailyChallengeState.progress[id] || getDailyChallengeProgress(ch);
+    return prog >= ch.target;
+  });
+  if(anyDoneOrClaimed){
+    html += '<div style="width:100%;padding:11px;border:1px solid rgba(255,136,0,0.15);color:rgba(255,136,0,0.4);font-family:\'Share Tech Mono\',monospace;font-size:11px;text-align:center;margin-top:24px;opacity:0.5">🔒 Impossible de changer, un défi à déjà été réussi !</div>';
+  } else if(!dailyChallengeState.rerolled){
     html += '<button onclick="rerollDailyChallenges()" ontouchend="event.preventDefault();rerollDailyChallenges()" style="width:100%;padding:11px;background:rgba(255,136,0,0.06);border:1px solid rgba(255,136,0,0.35);color:#ff8800;font-family:\'Share Tech Mono\',monospace;font-size:12px;cursor:pointer;touch-action:manipulation;margin-top:24px;letter-spacing:1px">🔄 CHANGER LES DÉFIS — 20 🧫</button>';
   } else {
     html += '<div style="width:100%;padding:11px;border:1px solid rgba(255,255,255,0.06);color:var(--text-faint);font-family:\'Share Tech Mono\',monospace;font-size:11px;text-align:center;margin-top:24px;opacity:0.4">🔄 Déjà changé aujourd\'hui</div>';
@@ -6320,7 +6684,7 @@ async function loadLeaderboard(){
       var myEntry=entries[myRank-1];
       if(above&&myEntry){
         var gap=above.score-myEntry.score;
-        if(gap>0&&gap<2000){
+        if(gap>0){
           defiEl.style.display='flex';
           defiEl.innerHTML='<span style="font-size:10px;color:var(--text-faint)">+'
             +fmtScore(gap)+' VRS pour dépasser </span>'
@@ -6404,6 +6768,17 @@ function closeStats(){
   document.getElementById('stats-screen').style.display='none';
 }
 
+function fmtPlayTime(ms){
+  if(!ms || ms <= 0) return '—';
+  const totalSec = Math.floor(ms / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  if(h > 0) return h + 'h ' + String(m).padStart(2,'0') + 'min';
+  if(m > 0) return m + 'min ' + String(s).padStart(2,'0') + 's';
+  return s + 's';
+}
+
 function renderStatsScreen(){
   var filter = currentStatsFilter || 'story';
   var g = globalStats;
@@ -6411,6 +6786,7 @@ function renderStatsScreen(){
   var rows = [];
 
   if(filter==='story'){
+    rows.push({icon:'⏱', label:'Temps de jeu',         val: fmtPlayTime(g.totalPlayTimeMs||0), section:''});
     rows.push({icon:'🏃', label:'Total Runs Histoire',       val: g.totalRunsStory||0,   section:''});
     rows.push({icon:'✅', label:'Victoires Histoire',  val: g.totalWinsStory||0,   section:''});
     rows.push({icon:'📖', label:'Chapitres complétés', val: g.chaptersCompleted||0, section:''});
@@ -6678,6 +7054,14 @@ function initFirebase(){
         var db = firebase.firestore();
         // Activer la persistance pour Safari iOS
         db.settings({ experimentalForceLongPolling: true, merge: true });
+
+        window.fbCheckPseudo = async function(pseudo){
+          try{
+            var key = pseudo.replace(/[^a-zA-Z0-9_-]/g, '_');
+            var snap = await db.collection('leaderboard').doc(key).get();
+            return snap.exists; // true = pseudo déjà pris
+          }catch(e){ console.log('Firebase check pseudo error:', e.message); return false; }
+        };
 
         window.fbSaveScore = async function(pseudo, data){
           try{
