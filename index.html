@@ -6,7 +6,7 @@
   <title>☣ PATHOGEN-X</title>
   <script>
   // ══ AUTO-UPDATE — changer ce numéro à chaque mise à jour ══
-  var APP_VERSION = '1.8';
+  var APP_VERSION = '1.9';
   (function(){
     var storedVersion = localStorage.getItem('pathogenx_version');
     if(storedVersion && storedVersion !== APP_VERSION){
@@ -1013,14 +1013,17 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
       <!-- Speedrun records (visible only in speedrun mode) -->
       <div id="sr-records-box" style="display:none;border:1px solid rgba(255,215,0,0.2);background:rgba(255,215,0,0.03);padding:12px 14px;margin-top:8px">
         <div style="font-size:10px;color:rgba(255,215,0,0.5);letter-spacing:3px;margin-bottom:10px">🏆 RECORDS</div>
-        <div id="sr-record-perso" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div id="sr-record-perso" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
           <span style="font-size:11px;color:var(--text-faint)">Mon record</span>
           <span style="font-family:'Orbitron',sans-serif;font-size:13px;color:var(--yellow);font-weight:bold" id="sr-perso-time">--:--.--</span>
         </div>
-        <div style="height:1px;background:rgba(255,215,0,0.1);margin-bottom:6px"></div>
-        <div id="sr-record-world" style="display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:11px;color:var(--text-faint)">Record monde</span>
-          <span style="font-family:'Orbitron',sans-serif;font-size:13px;color:#ff8800;font-weight:bold" id="sr-world-time">--:--.--</span>
+        <div style="height:1px;background:rgba(255,215,0,0.15);margin-bottom:8px"></div>
+        <div id="sr-record-world">
+          <div style="font-size:9px;color:rgba(255,136,0,0.5);letter-spacing:2px;margin-bottom:6px">🌍 RECORD DU MONDE</div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span id="sr-world-pseudo" style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;color:#ff8800;letter-spacing:2px;text-transform:uppercase;text-shadow:0 0 12px rgba(255,136,0,0.5)">---</span>
+            <span style="font-family:'Orbitron',sans-serif;font-size:16px;color:#ff8800;font-weight:bold;text-shadow:0 0 12px rgba(255,136,0,0.4)" id="sr-world-time">--:--.--</span>
+          </div>
         </div>
       </div>
       <!-- Événement actif -->
@@ -5142,8 +5145,8 @@ function endRun(win){
     setTimeout(()=>showDefeatScreen(), 450);
     return;
   }
-  // Victoire → avance au chapitre + récompenses + lootbox
-  if(win && !isFinalWin){
+  // Victoire → avance au chapitre + récompenses + lootbox (MODE HISTOIRE UNIQUEMENT)
+  if(win && !isFinalWin && currentMode==='story'){
     currentChapter = Math.min(currentChapter + 1, maxChapterId); globalStats.chaptersCompleted++;
     maxChapter = Math.max(maxChapter, currentChapter);
     achievementStats.maxChapterCompleted = Math.max(achievementStats.maxChapterCompleted||0, currentChapter);
@@ -5161,7 +5164,7 @@ function endRun(win){
     setTimeout(()=>{ showVictoryThenLootbox(currentChapter-1, ()=>showScore(win,elapsed,isFinalWin)); }, 450);
     return;
   }
-  if(win && isFinalWin){
+  if(win && isFinalWin && currentMode==='story'){
     maxChapter = maxChapterId;
     achievementStats.maxChapterCompleted = maxChapterId;
     resetDefeatBonuses();
@@ -6336,11 +6339,14 @@ function updateSpeedrunRecordsUI(){
 
   // Record monde
   const worldEl = document.getElementById('sr-world-time');
+  const worldPseudo = document.getElementById('sr-world-pseudo');
   const wr = cachedWorldRecords[srK.key];
   if(worldEl){
     if(wr){
-      worldEl.innerHTML = '<span style="color:var(--text-faint);font-family:\'Share Tech Mono\',monospace;font-size:11px;font-weight:normal">' + wr.pseudo + '</span> &nbsp; <span style="color:#ff8800">' + fmtChrono(wr.timeMs) + '</span>';
+      if(worldPseudo) worldPseudo.textContent = wr.pseudo || '---';
+      worldEl.textContent = fmtChrono(wr.timeMs);
     } else {
+      if(worldPseudo) worldPseudo.textContent = '---';
       worldEl.textContent = '--:--.--';
     }
   }
