@@ -6,7 +6,7 @@
   <title>☣ PATHOGEN-X</title>
   <script>
   // ══ AUTO-UPDATE — changer ce numéro à chaque mise à jour ══
-  var APP_VERSION = '1.5';
+  var APP_VERSION = '1.6';
   (function(){
     var storedVersion = localStorage.getItem('pathogenx_version');
     if(storedVersion && storedVersion !== APP_VERSION){
@@ -688,18 +688,62 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
 </div>
 
 <!-- ══ POPUP PSEUDO ══ -->
-<div id="pseudo-screen" style="display:none;position:fixed;inset:0;z-index:700;background:#020b04;flex-direction:column;align-items:center;justify-content:center;padding:30px 24px">
-  <div style="max-width:360px;width:100%;text-align:center">
-    <div style="font-size:13px;color:var(--text-dim);margin-bottom:28px;font-family:'Share Tech Mono',monospace;letter-spacing:1px">Choisis ton identifiant de propagateur :</div>
-    <input id="pseudo-input" type="text" maxlength="20" placeholder="Ex: Pathogène_47" style="width:100%;padding:14px 16px;background:#060d10;border:1px solid rgba(0,255,136,0.3);color:var(--green);font-family:'Share Tech Mono',monospace;font-size:16px;outline:none;text-align:center;letter-spacing:2px;-webkit-appearance:none;box-sizing:border-box;margin-bottom:8px">
-    <div id="pseudo-error" style="font-size:10px;color:rgba(255,58,58,0.7);margin-bottom:12px;min-height:16px"></div>
-    <button ontouchend="event.preventDefault();confirmPseudo()" onclick="confirmPseudo()" style="width:100%;padding:14px;background:rgba(0,255,136,0.1);border:2px solid var(--green);color:var(--green);font-family:'Share Tech Mono',monospace;font-size:14px;letter-spacing:3px;cursor:pointer;touch-action:manipulation">
-      CONFIRMER →
-    </button>
-    <div style="font-size:9px;color:var(--text-faint);margin-top:12px">Tu pourras le modifier plus tard dans les paramètres</div>
+<div id="pseudo-screen" style="display:none;position:fixed;inset:0;z-index:700;background:#020b04;flex-direction:column;align-items:center;justify-content:center;padding:28px 20px;overflow-y:auto">
+
+  <div style="position:absolute;inset:0;pointer-events:none;overflow:hidden">
+    <div style="position:absolute;width:60vw;height:60vw;border-radius:50%;background:radial-gradient(circle,rgba(0,255,136,0.08) 0%,transparent 70%);top:-20%;left:-20%;animation:lsBlob1 8s ease-in-out infinite"></div>
+    <div style="position:absolute;width:50vw;height:50vw;border-radius:50%;background:radial-gradient(circle,rgba(0,200,100,0.06) 0%,transparent 70%);bottom:-15%;right:-15%;animation:lsBlob2 10s ease-in-out infinite"></div>
+  </div>
+
+  <div style="max-width:340px;width:100%;position:relative;z-index:1">
+
+    <div style="text-align:center;margin-bottom:28px">
+      <div style="font-size:52px;margin-bottom:10px;filter:drop-shadow(0 0 20px rgba(0,255,136,0.5))">☣️</div>
+      <div style="font-family:'Orbitron','Futura','Century Gothic',sans-serif;font-size:22px;font-weight:900;color:var(--green);letter-spacing:6px;text-shadow:0 0 30px rgba(0,255,136,0.4)">PATHOGEN-X</div>
+      <div style="font-size:10px;color:var(--text-faint);letter-spacing:4px;margin-top:5px">IDENTIFICATION REQUISE</div>
+    </div>
+
+    <div style="display:flex;margin-bottom:0;border:1px solid rgba(255,255,255,0.08);border-bottom:none">
+      <button id="tab-btn-new" onclick="switchPseudoTab('new')" ontouchend="event.preventDefault();switchPseudoTab('new')"
+        style="flex:1;padding:11px;background:rgba(0,255,136,0.08);border:none;border-right:1px solid rgba(255,255,255,0.08);color:var(--green);font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;cursor:pointer;touch-action:manipulation">
+        🧬 NOUVEAU
+      </button>
+      <button id="tab-btn-restore" onclick="switchPseudoTab('restore')" ontouchend="event.preventDefault();switchPseudoTab('restore')"
+        style="flex:1;padding:11px;background:transparent;border:none;color:var(--text-faint);font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;cursor:pointer;touch-action:manipulation">
+        🔄 CONNEXION
+      </button>
+    </div>
+
+    <div id="panel-new" style="border:1px solid rgba(0,255,136,0.2);padding:20px;background:rgba(0,8,4,0.8)">
+      <div style="font-size:9px;color:var(--text-faint);letter-spacing:3px;margin-bottom:16px">CHOISIS TON IDENTIFIANT DE PROPAGATEUR</div>
+      <input id="pseudo-input" type="text" maxlength="20" placeholder="Pseudo" autocomplete="off"
+        style="width:100%;padding:11px 14px;background:rgba(0,255,136,0.03);border:1px solid rgba(0,255,136,0.15);border-bottom:none;color:var(--green);font-family:'Share Tech Mono',monospace;font-size:16px;outline:none;letter-spacing:1px;-webkit-appearance:none;box-sizing:border-box">
+      <input id="pin-input-new" type="tel" maxlength="4" placeholder="PIN — 4 chiffres" autocomplete="off"
+        style="width:100%;padding:11px 14px;background:rgba(0,255,136,0.03);border:1px solid rgba(0,255,136,0.15);color:var(--green);font-family:'Share Tech Mono',monospace;font-size:16px;outline:none;letter-spacing:4px;-webkit-appearance:none;box-sizing:border-box;margin-bottom:16px"
+        oninput="if(this.value.length>4)this.value=this.value.slice(0,4)">
+      <div id="pseudo-error" style="font-size:10px;color:rgba(255,58,58,0.8);margin-bottom:12px;min-height:14px;letter-spacing:1px"></div>
+      <button ontouchend="event.preventDefault();confirmPseudo()" onclick="confirmPseudo()"
+        style="width:100%;padding:13px;background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.4);color:var(--green);font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:3px;cursor:pointer;touch-action:manipulation;box-shadow:0 0 20px rgba(0,255,136,0.1)">
+        INFECTER LE MONDE →
+      </button>
+      <div style="font-size:9px;color:rgba(255,215,0,0.35);margin-top:10px;text-align:center;letter-spacing:1px">⚠ Note ton PIN — impossible de le récupérer</div>
+    </div>
+
+    <div id="panel-restore" style="display:none;border:1px solid rgba(136,221,255,0.2);padding:20px;background:rgba(0,4,10,0.8)">
+      <input id="pseudo-restore" type="text" maxlength="20" placeholder="Pseudo" autocomplete="off"
+        style="width:100%;padding:11px 14px;background:rgba(136,221,255,0.03);border:1px solid rgba(136,221,255,0.15);border-bottom:none;color:#88ddff;font-family:'Share Tech Mono',monospace;font-size:16px;outline:none;letter-spacing:1px;-webkit-appearance:none;box-sizing:border-box">
+      <input id="pin-restore" type="tel" maxlength="4" placeholder="PIN — 4 chiffres" autocomplete="off"
+        style="width:100%;padding:11px 14px;background:rgba(136,221,255,0.03);border:1px solid rgba(136,221,255,0.15);color:#88ddff;font-family:'Share Tech Mono',monospace;font-size:16px;outline:none;letter-spacing:4px;-webkit-appearance:none;box-sizing:border-box;margin-bottom:16px"
+        oninput="if(this.value.length>4)this.value=this.value.slice(0,4)">
+      <div id="restore-error" style="font-size:10px;color:rgba(255,58,58,0.8);margin-bottom:12px;min-height:14px;letter-spacing:1px"></div>
+      <button ontouchend="event.preventDefault();restoreProgress()" onclick="restoreProgress()"
+        style="width:100%;padding:13px;background:rgba(136,221,255,0.07);border:1px solid rgba(136,221,255,0.35);color:#88ddff;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:3px;cursor:pointer;touch-action:manipulation">
+        SE CONNECTER →
+      </button>
+    </div>
+
   </div>
 </div>
-
 <!-- ══ CLASSEMENT ══ -->
 <div id="dashboard-screen" style="display:none;position:fixed;inset:0;z-index:620;background:#04080e;flex-direction:column;">
   <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid rgba(255,215,0,0.15);background:#04080e;flex-shrink:0">
@@ -801,7 +845,7 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
       </div>
     </div>
 
-    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.5</div>
+    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.6</div>
 
   </div>
 </div>
@@ -1505,6 +1549,12 @@ function saveGame(){
     localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     const el = document.getElementById('save-indicator');
     if(el){ el.textContent=''; el.style.color='var(--green-dim)'; }
+    // Sync cloud Firebase toutes les 30s max
+    const now = Date.now();
+    if(!saveGame._lastCloud || now - saveGame._lastCloud > 30000){
+      saveGame._lastCloud = now;
+      if(window.fbSaveFullSave && localStorage.getItem('pathogenx_pseudo')) fbSaveFullSave();
+    }
   } catch(e) {
     const el = document.getElementById('save-indicator');
     if(el){ el.textContent='✗ Erreur'; el.style.color='rgba(255,100,100,0.4)'; }
@@ -2133,6 +2183,7 @@ function startRun(){
     document.getElementById('sr-records-box').style.display='none';
     vaccineSlowMult = permanentState.vaccineBonus || 1;
     if(timerInterval){ clearInterval(timerInterval); timerInterval=null; }
+    storyStarted = false; // vaccin gelé jusqu'au premier clic
   }
   switchTab('virus');
   initClickZone();
@@ -2186,6 +2237,12 @@ function devClearSkins(){
   showFusionToast('Skins réinitialisés', 'var(--red)');
   if(skinsPanelOpen) renderSkins();
 }
+function devAddInfected(amount){
+  if(!currentMode||gameOver) return;
+  infected = Math.min(infected + Math.floor(amount), runTarget);
+  if(infected >= runTarget) endRun(true);
+  else updateUI();
+}
 function devSetVaccine(val){
   if(currentMode!=='story') return;
   vaccine=Math.min(Math.max(0,parseFloat(val)||0),99.9);
@@ -2220,6 +2277,7 @@ function devLose(){
 // ══════════════════════════════════════════
 let clickZoneReady = false;
 let speedrunStarted = false;
+let storyStarted = false;
 function initClickZone(){
   if(clickZoneReady) return; // Ne pas réattacher les listeners à chaque run
   const zone=document.getElementById('click-zone');
@@ -2461,8 +2519,21 @@ function applyEvent(ev){
   if(ev.effect === 'vaxFreeze')    { eventVaxFrozen = true; }
   if(ev.effect === 'necroticMult') {
     necroticClicksLeft = ev.value;
+    // Afficher dans la bannière avec compteur
+    const banner = document.getElementById('active-event-banner');
+    if(banner){
+      banner.style.borderColor = 'rgba(0,255,136,0.4)';
+      banner.style.background = 'rgba(0,255,136,0.06)';
+      document.getElementById('aeb-icon').textContent = ev.icon;
+      document.getElementById('aeb-name').textContent = ev.name;
+      document.getElementById('aeb-name').style.color = 'var(--green)';
+      document.getElementById('aeb-desc').textContent = ev.desc;
+      document.getElementById('aeb-timer').textContent = necroticClicksLeft + ' clics';
+      document.getElementById('aeb-timer').style.color = 'var(--green)';
+    }
     showFusionToast('💀 Les 50 prochains clics ×10 !', 'var(--green)');
-    clearActiveEvent();
+    activeEvent = null;
+    if(activeEventTO){ clearTimeout(activeEventTO); activeEventTO = null; }
     return;
   }
 
@@ -2528,11 +2599,30 @@ function startSpeedrunTimer(){
 
 function registerClick(x, y){
   startSpeedrunTimer();
+  if(currentMode==='story' && !storyStarted) storyStarted = true;
   const skinB = getEquippedBonus();
   const tb = getTreeBonus();
   const chTapMult=(currentMode==='story')?(getChapter().tapMult||1):1;
   let necroMult = 1;
-  if(necroticClicksLeft > 0){ necroMult = 10; necroticClicksLeft--; if(necroticClicksLeft===0) showFusionToast('💀 Mutation Nécrotique terminée !', 'var(--text-faint)'); }
+  if(necroticClicksLeft > 0){
+    necroMult = 10;
+    necroticClicksLeft--;
+    const timerEl = document.getElementById('aeb-timer');
+    if(timerEl) timerEl.textContent = necroticClicksLeft + ' clics';
+    if(necroticClicksLeft === 0){
+      showFusionToast('💀 Mutation Nécrotique terminée !', 'var(--text-faint)');
+      const banner = document.getElementById('active-event-banner');
+      if(banner){
+        banner.style.borderColor = 'rgba(255,255,255,0.08)';
+        banner.style.background = 'rgba(255,255,255,0.02)';
+        document.getElementById('aeb-icon').textContent = '—';
+        document.getElementById('aeb-name').textContent = 'Aucun événement actif';
+        document.getElementById('aeb-name').style.color = 'var(--text-faint)';
+        document.getElementById('aeb-desc').textContent = '';
+        document.getElementById('aeb-timer').textContent = '';
+      }
+    }
+  }
   const effective = clickPower * skinB.tap * tb.tapMult * chTapMult * eventTapMult * necroMult;
   totalClicks++;
   achievementStats.totalClicks++;
@@ -2657,7 +2747,6 @@ function buyUpgrade(id){
   if(cost===Infinity||infected<cost) return;
   infected-=cost; u.count++; u.effect();
   dailyOnBuyUpgrade();
-  showShopPopup(u,cost);
   updateUI(); renderShop();
 }
 
@@ -4007,30 +4096,79 @@ function showPseudoScreen(){
   if(inp) setTimeout(()=>inp.focus(), 300);
 }
 
+function switchPseudoTab(tab){
+  const isNew = tab === 'new';
+  document.getElementById('panel-new').style.display = isNew ? 'block' : 'none';
+  document.getElementById('panel-restore').style.display = isNew ? 'none' : 'block';
+  document.getElementById('tab-btn-new').style.background = isNew ? 'rgba(0,255,136,0.08)' : 'transparent';
+  document.getElementById('tab-btn-new').style.color = isNew ? 'var(--green)' : 'var(--text-faint)';
+  document.getElementById('tab-btn-restore').style.background = isNew ? 'transparent' : 'rgba(136,221,255,0.08)';
+  document.getElementById('tab-btn-restore').style.color = isNew ? 'var(--text-faint)' : '#88ddff';
+}
+
+function hashPin(pin){
+  // Hash simple côté client (pas cryptographique mais suffisant)
+  var h = 0;
+  var str = 'px_' + pin + '_salt_42';
+  for(var i = 0; i < str.length; i++){
+    h = Math.imul(31, h) + str.charCodeAt(i) | 0;
+  }
+  return Math.abs(h).toString(36);
+}
+
 async function confirmPseudo(){
   const inp = document.getElementById('pseudo-input');
+  const pinInp = document.getElementById('pin-input-new');
   const err = document.getElementById('pseudo-error');
   const val = (inp ? inp.value : '').trim();
-  if(val.length < 2){
-    if(err) err.textContent = 'Minimum 2 caractères requis';
-    return;
-  }
-  if(val.length > 20){
-    if(err) err.textContent = 'Maximum 20 caractères';
-    return;
-  }
+  const pin = (pinInp ? pinInp.value : '').trim();
+
+  if(val.length < 2){ if(err) err.textContent = 'Minimum 2 caractères requis'; return; }
+  if(val.length > 20){ if(err) err.textContent = 'Maximum 20 caractères'; return; }
+  if(pin.length !== 4 || !/^\d{4}$/.test(pin)){ if(err) err.textContent = '❌ PIN requis — exactement 4 chiffres'; return; }
+
   if(window.fbCheckPseudo){
     if(err) err.textContent = 'Vérification en cours...';
     const taken = await window.fbCheckPseudo(val);
-    if(taken){
-      if(err) err.textContent = '❌ Pseudo déjà utilisé, choisis-en un autre !';
-      return;
-    }
+    if(taken){ if(err) err.textContent = '❌ Pseudo déjà utilisé, choisis-en un autre !'; return; }
   }
+  if(err) err.textContent = '';
   playerPseudo = val;
   localStorage.setItem('pathogenx_pseudo', val);
+  localStorage.setItem('pathogenx_pin', hashPin(pin));
   document.getElementById('pseudo-screen').style.display = 'none';
   goMenu();
+  // Sauvegarde initiale sur Firebase
+  setTimeout(function(){ if(window.fbSaveFullSave) fbSaveFullSave(); }, 2000);
+}
+
+async function restoreProgress(){
+  const pseudo = (document.getElementById('pseudo-restore').value || '').trim();
+  const pin = (document.getElementById('pin-restore').value || '').trim();
+  const err = document.getElementById('restore-error');
+
+  if(pseudo.length < 2){ if(err) err.textContent = 'Pseudo requis'; return; }
+  if(pin.length !== 4 || !/^\d{4}$/.test(pin)){ if(err) err.textContent = '❌ PIN de 4 chiffres requis'; return; }
+
+  if(!window.fbRestoreFullSave){ if(err) err.textContent = 'Propagateur non reconnu, réessaie !'; return; }
+
+  if(err) err.textContent = 'Restauration en cours...';
+  const result = await window.fbRestoreFullSave(pseudo, hashPin(pin));
+  if(!result){
+    if(err) err.textContent = 'Propagateur non reconnu, réessaie !';
+    return;
+  }
+  // Appliquer les données restaurées
+  playerPseudo = pseudo;
+  localStorage.setItem('pathogenx_pseudo', pseudo);
+  localStorage.setItem('pathogenx_pin', hashPin(pin));
+  localStorage.setItem(SAVE_KEY, JSON.stringify(result));
+  if(err) err.textContent = '✓ Progression restaurée !';
+  setTimeout(function(){
+    document.getElementById('pseudo-screen').style.display = 'none';
+    loadGame();
+    goMenu();
+  }, 1000);
 }
 
 // ══════════════════════════════════════════
@@ -5367,6 +5505,7 @@ setInterval(()=>{
 
 setInterval(()=>{
   if(gameOver||currentMode!=='story') return;
+  if(!storyStarted) return; // vaccin gelé jusqu'au premier clic
   checkVaxMilestones();
   if(!eventVaxFrozen){
     const speed = getEffectiveVaxSpeed();
@@ -7028,97 +7167,148 @@ function closeChapterSelectPopup(){
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script>
-    
-// ID unique par appareil (persiste dans localStorage)
-function getDeviceId(){
-  var id = localStorage.getItem('vc_device_id');
-  if(!id){
-    id = 'vc_' + Date.now() + '_' + Math.random().toString(36).slice(2,9);
-    localStorage.setItem('vc_device_id', id);
-  }
-  return id;
-}
+
+// ══════════════════════════════════════════════════════════════
+//  FIREBASE — 3 collections :
+//
+//  leaderboard/      → scores publics légers (lu souvent)
+//    {pseudo} → { pseudo, score, chapitre, skins, victoires,
+//                  succes, srBest, srDiff, lootStd, lootPrem,
+//                  date, updatedAt }
+//
+//  cloud_saves/      → sauvegarde complète privée (lu rarement)
+//    {pseudo} → { pseudo, pinHash, saveData, updatedAt }
+//
+//  speedrun_records/ → record monde par catégorie (lu souvent)
+//    {categorie} → { pseudo, timeMs, date }
+// ══════════════════════════════════════════════════════════════
 
 function initFirebase(){
-      try{
-        if(typeof firebase === 'undefined'){ console.log('Firebase SDK pas encore charge, retry...'); setTimeout(initFirebase, 1000); return; }
-        var cfg = {
-          apiKey: "AIzaSyCi1WIbNFa3rhLSxDr43NJpOYbotkl6hLI",
-          authDomain: "virusclicker.firebaseapp.com",
-          projectId: "virusclicker",
-          storageBucket: "virusclicker.firebasestorage.app",
-          messagingSenderId: "781476455979",
-          appId: "1:781476455979:web:93d20c6b832b4996282c6e"
-        };
-        if(!firebase.apps.length) firebase.initializeApp(cfg);
-        var db = firebase.firestore();
-        // Activer la persistance pour Safari iOS
-        db.settings({ experimentalForceLongPolling: true, merge: true });
-
-        window.fbCheckPseudo = async function(pseudo){
-          try{
-            var key = pseudo.replace(/[^a-zA-Z0-9_-]/g, '_');
-            var snap = await db.collection('leaderboard').doc(key).get();
-            return snap.exists; // true = pseudo déjà pris
-          }catch(e){ console.log('Firebase check pseudo error:', e.message); return false; }
-        };
-
-        window.fbSaveScore = async function(pseudo, data){
-          try{
-            var key = pseudo.replace(/[^a-zA-Z0-9_-]/g, '_'); // clé = pseudo
-            await db.collection('leaderboard').doc(key).set({
-              pseudo:pseudo, score:data.score||0,
-              chapitre:data.chapitre||0, skins:data.skins||0,
-              victoires:data.victoires||0, succes:data.succes||0,
-              srBest:data.srBest||null, srDiff:data.srDiff||null,
-              lootStd:data.lootStd||0, lootPrem:data.lootPrem||0,
-              date:new Date().toISOString().slice(0,10),
-              updatedAt:Date.now()
-            });
-            console.log('Firebase OK: score sauvegarde', pseudo, data.score);
-          }catch(e){ console.log('Firebase save error:', e.message); }
-        };
-
-        window.fbGetLeaderboard = async function(){
-          try{
-            var snap = await db.collection('leaderboard').orderBy('score','desc').limit(200).get();
-            var res = [];
-            snap.forEach(function(d){ res.push(Object.assign({},d.data(),{fake:false})); });
-            console.log('Firebase: charge', res.length, 'joueurs reels');
-            return res;
-          }catch(e){ console.log('Firebase get error:', e.message); return []; }
-        };
-
-        // ══ SPEEDRUN RECORDS ══
-        window.fbSaveSpeedrunRecord = async function(category, pseudo, timeMs){
-          try{
-            var docRef = db.collection('speedrun_records').doc(category);
-            var snap = await docRef.get();
-            if(!snap.exists || timeMs < snap.data().timeMs){
-              await docRef.set({ pseudo:pseudo, timeMs:timeMs, date:new Date().toISOString().slice(0,10) });
-              console.log('Firebase: nouveau record monde', category, pseudo, timeMs);
-              return true;
-            }
-            return false;
-          }catch(e){ console.log('Firebase SR save error:', e.message); return false; }
-        };
-
-        window.fbGetSpeedrunRecord = async function(category){
-          try{
-            var snap = await db.collection('speedrun_records').doc(category).get();
-            if(snap.exists) return snap.data();
-            return null;
-          }catch(e){ console.log('Firebase SR get error:', e.message); return null; }
-        };
-
-        window.firebaseReady = true;
-        window.dispatchEvent(new Event('firebaseReady'));
-        console.log('Firebase pret !');
-      }catch(e){ console.log('Firebase init error:', e.message); }
+  try{
+    if(typeof firebase === 'undefined'){
+      console.log('[FB] SDK pas encore chargé, retry...');
+      setTimeout(initFirebase, 1000);
+      return;
     }
-    // Appel immédiat ET sur load pour couvrir tous les cas
+    var cfg = {
+      apiKey: "AIzaSyCi1WIbNFa3rhLSxDr43NJpOYbotkl6hLI",
+      authDomain: "virusclicker.firebaseapp.com",
+      projectId: "virusclicker",
+      storageBucket: "virusclicker.firebasestorage.app",
+      messagingSenderId: "781476455979",
+      appId: "1:781476455979:web:93d20c6b832b4996282c6e"
+    };
+    if(!firebase.apps.length) firebase.initializeApp(cfg);
+    var db = firebase.firestore();
+    db.settings({ experimentalForceLongPolling: true, merge: true });
+
+    // Utilitaire : pseudo → clé Firestore valide
+    function toKey(p){ return p.replace(/[^a-zA-Z0-9_-]/g, '_'); }
+
+    // ══ leaderboard ═══════════════════════════════════════════════════
+    // Vérifie si un pseudo est déjà pris (dans cloud_saves = source de vérité)
+    window.fbCheckPseudo = async function(pseudo){
+      try{
+        var snap = await db.collection('cloud_saves').doc(toKey(pseudo)).get();
+        return snap.exists;
+      }catch(e){ console.log('[FB] checkPseudo error:', e.message); return false; }
+    };
+
+    // Sauvegarde les données légères du classement
+    window.fbSaveScore = async function(pseudo, data){
+      try{
+        await db.collection('leaderboard').doc(toKey(pseudo)).set({
+          pseudo:    pseudo,
+          score:     data.score     || 0,
+          chapitre:  data.chapitre  || 0,
+          skins:     data.skins     || 0,
+          victoires: data.victoires || 0,
+          succes:    data.succes    || 0,
+          srBest:    data.srBest    || null,
+          srDiff:    data.srDiff    || null,
+          lootStd:   data.lootStd   || 0,
+          lootPrem:  data.lootPrem  || 0,
+          date:      new Date().toISOString().slice(0,10),
+          updatedAt: Date.now()
+        });
+        console.log('[FB] leaderboard OK:', pseudo, data.score);
+      }catch(e){ console.log('[FB] saveScore error:', e.message); }
+    };
+
+    // Récupère le classement trié par score décroissant
+    window.fbGetLeaderboard = async function(){
+      try{
+        var snap = await db.collection('leaderboard').orderBy('score','desc').limit(200).get();
+        var res = [];
+        snap.forEach(function(d){ res.push(Object.assign({}, d.data(), {fake:false})); });
+        console.log('[FB] leaderboard chargé:', res.length, 'joueurs');
+        return res;
+      }catch(e){ console.log('[FB] getLeaderboard error:', e.message); return []; }
+    };
+
+    // ══ cloud_saves ═══════════════════════════════════════════════════
+    // Sauvegarde complète — appelée toutes les 30s en arrière-plan
+    window.fbSaveFullSave = async function(){
+      try{
+        var pseudo   = localStorage.getItem('pathogenx_pseudo');
+        var pinHash  = localStorage.getItem('pathogenx_pin');
+        var saveData = localStorage.getItem('pathogenx_save');
+        if(!pseudo || !pinHash || !saveData) return;
+        await db.collection('cloud_saves').doc(toKey(pseudo)).set({
+          pseudo:    pseudo,
+          pinHash:   pinHash,
+          saveData:  saveData,
+          updatedAt: Date.now()
+        });
+        console.log('[FB] cloud_saves OK:', pseudo);
+      }catch(e){ console.log('[FB] saveFullSave error:', e.message); }
+    };
+
+    // Restaure la sauvegarde complète si pseudo + pinHash correspondent
+    window.fbRestoreFullSave = async function(pseudo, pinHash){
+      try{
+        var snap = await db.collection('cloud_saves').doc(toKey(pseudo)).get();
+        if(!snap.exists) return null;
+        var data = snap.data();
+        if(data.pinHash !== pinHash) return null;
+        console.log('[FB] cloud_saves restauré:', pseudo);
+        return JSON.parse(data.saveData);
+      }catch(e){ console.log('[FB] restoreFullSave error:', e.message); return null; }
+    };
+
+    // ══ speedrun_records ══════════════════════════════════════════════
+    // Enregistre un record monde si c'est le meilleur temps pour la catégorie
+    window.fbSaveSpeedrunRecord = async function(category, pseudo, timeMs){
+      try{
+        var docRef = db.collection('speedrun_records').doc(category);
+        var snap   = await docRef.get();
+        if(!snap.exists || timeMs < snap.data().timeMs){
+          await docRef.set({ pseudo:pseudo, timeMs:timeMs, date:new Date().toISOString().slice(0,10) });
+          console.log('[FB] speedrun_records nouveau record:', category, pseudo, timeMs);
+          return true;
+        }
+        return false;
+      }catch(e){ console.log('[FB] saveSpeedrunRecord error:', e.message); return false; }
+    };
+
+    // Récupère le record monde pour une catégorie
+    window.fbGetSpeedrunRecord = async function(category){
+      try{
+        var snap = await db.collection('speedrun_records').doc(category).get();
+        if(snap.exists) return snap.data();
+        return null;
+      }catch(e){ console.log('[FB] getSpeedrunRecord error:', e.message); return null; }
+    };
+
+    window.firebaseReady = true;
+    window.dispatchEvent(new Event('firebaseReady'));
+    console.log('[FB] Firebase prêt !');
+  }catch(e){ console.log('[FB] init error:', e.message); }
+}
+
 try{ initFirebase(); }catch(e){}
 window.addEventListener('load', function(){ if(!window.firebaseReady) initFirebase(); });
+
   </script>
 
 </body></html>
