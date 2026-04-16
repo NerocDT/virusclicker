@@ -6,7 +6,7 @@
   <title>☣ PATHOGEN-X</title>
   <script>
   // ══ AUTO-UPDATE — changer ce numéro à chaque mise à jour ══
-  var APP_VERSION = '1.9';
+  var APP_VERSION = '1.10';
   (function(){
     var storedVersion = localStorage.getItem('pathogenx_version');
     if(storedVersion && storedVersion !== APP_VERSION){
@@ -845,7 +845,7 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
       </div>
     </div>
 
-    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.8</div>
+    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.10</div>
 
   </div>
 </div>
@@ -895,7 +895,7 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
       <button onclick="openSkinsPanel()" ontouchend="safeTap(()=>openSkinsPanel())" style="padding:5px 14px;background:rgba(204,136,255,0.22);border:2px solid rgba(204,136,255,0.9);color:var(--purple);font-family:'Share Tech Mono','Courier New',monospace;font-size:11px;cursor:pointer;touch-action:manipulation;box-shadow:0 0 14px rgba(204,136,255,0.4);text-shadow:0 0 8px rgba(204,136,255,0.8);font-weight:bold;letter-spacing:2px">LABO</button>
       <button onclick="openLootboxShop()" ontouchend="safeTap(()=>openLootboxShop())" style="padding:5px 20px;background:rgba(136,221,255,0.22);border:2px solid rgba(136,221,255,0.9);color:#88ddff;font-family:'Share Tech Mono','Courier New',monospace;font-size:11px;cursor:pointer;touch-action:manipulation;box-shadow:0 0 14px rgba(136,221,255,0.4);text-shadow:0 0 8px rgba(136,221,255,0.8);font-weight:bold;letter-spacing:2px">SHOP</button>
       <button class="hdr-back" onclick="goMenu()" style="padding:5px 12px">← Menu</button>
-      <button onclick="toggleDev()" ontouchend="event.preventDefault();toggleDev()" style="padding:4px 8px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);color:rgba(255,215,0,0.6);font-family:monospace;font-size:10px;cursor:pointer;touch-action:manipulation">DEV</button>
+      <!-- <button onclick="toggleDev()" ontouchend="event.preventDefault();toggleDev()" style="padding:4px 8px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);color:rgba(255,215,0,0.6);font-family:monospace;font-size:10px;cursor:pointer;touch-action:manipulation">DEV</button> -->
     </div>
 
     <!-- Dev panel -->
@@ -965,10 +965,10 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
     </div>
 
     <!-- Tabs -->
-    <div class="tabs">
-      <button class="tbtn ag" id="t-virus" onclick="switchTab(&#39;virus&#39;)">🦠 Virus</button>
-      <button class="tbtn" id="t-shop" onclick="switchTab(&#39;shop&#39;)">⚗ Upgrades</button>
-      <button class="tbtn" id="t-tree" onclick="switchTab(&#39;tree&#39;)">🌿 Arbre Bact.</button>
+    <div class="tabs" id="game-tabs">
+      <button class="tbtn ag" id="t-virus" onclick="switchTab('virus')">🦠 Virus</button>
+      <button class="tbtn" id="t-shop" onclick="switchTab('shop')">⚗ Upgrades</button>
+      <button class="tbtn" id="t-tree" onclick="switchTab('tree')">🌿 Arbre Bact.</button>
     </div>
 
     <!-- Virus tab -->
@@ -1011,19 +1011,19 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
         <div class="sbox" id="sbox3"><div class="slbl" id="slbl3">VACCIN</div><div class="sval" id="s-third" style="color:var(--red)">0%</div></div>
       </div>
       <!-- Speedrun records (visible only in speedrun mode) -->
-      <div id="sr-records-box" style="display:none;border:1px solid rgba(255,215,0,0.2);background:rgba(255,215,0,0.03);padding:12px 14px;margin-top:8px">
+      <div id="sr-records-box" style="display:none;border:1px solid rgba(255,215,0,0.5);background:rgba(255,215,0,0.08);padding:12px 14px;margin-top:8px;box-shadow:0 0 24px rgba(255,215,0,0.15),inset 0 0 30px rgba(255,215,0,0.05)">
         <div style="font-size:10px;color:rgba(255,215,0,0.5);letter-spacing:3px;margin-bottom:10px">🏆 RECORDS</div>
-        <div id="sr-record-perso" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <span style="font-size:11px;color:var(--text-faint)">Mon record</span>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-size:11px;color:var(--text-faint)">Mon meilleur temps</span>
           <span style="font-family:'Orbitron',sans-serif;font-size:13px;color:var(--yellow);font-weight:bold" id="sr-perso-time">--:--.--</span>
         </div>
         <div style="height:1px;background:rgba(255,215,0,0.15);margin-bottom:8px"></div>
-        <div id="sr-record-world">
-          <div style="font-size:9px;color:rgba(255,136,0,0.5);letter-spacing:2px;margin-bottom:6px">🌍 RECORD DU MONDE</div>
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <span id="sr-world-pseudo" style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;color:#ff8800;letter-spacing:2px;text-transform:uppercase;text-shadow:0 0 12px rgba(255,136,0,0.5)">---</span>
-            <span style="font-family:'Orbitron',sans-serif;font-size:16px;color:#ff8800;font-weight:bold;text-shadow:0 0 12px rgba(255,136,0,0.4)" id="sr-world-time">--:--.--</span>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">
+            <span style="font-size:11px;color:var(--text-faint);white-space:nowrap">Record du monde :</span>
+            <span id="sr-world-pseudo" style="font-family:'Orbitron',sans-serif;font-size:12px;font-weight:900;color:#ff8800;letter-spacing:1px;text-transform:uppercase;text-shadow:0 0 10px rgba(255,136,0,0.5);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">---</span>
           </div>
+          <span style="font-family:'Orbitron',sans-serif;font-size:13px;color:#ff8800;font-weight:bold;text-shadow:0 0 10px rgba(255,136,0,0.4);flex-shrink:0;margin-left:8px" id="sr-world-time">--:--.--</span>
         </div>
       </div>
       <!-- Événement actif -->
@@ -2162,6 +2162,8 @@ function startRun(){
     document.getElementById('ch-wrap').style.display='none';
     document.getElementById('abandon-btn').style.display='none';
     document.querySelector('.stats-row').style.display='none';
+    document.getElementById('game-tabs').style.display='none';
+    document.getElementById('active-event-banner').style.display='none';
     const srKey = SR_TARGETS.find(s=>s.clicks===currentSpeedrunTarget);
     if(timerInterval) clearInterval(timerInterval);
     speedrunStarted = false;
@@ -2179,6 +2181,8 @@ function startRun(){
     document.getElementById('sr-records-box').style.display='none';
     document.getElementById('abandon-btn').style.display='inline-block';
     document.querySelector('.stats-row').style.display='flex';
+    document.getElementById('game-tabs').style.display='flex';
+    document.getElementById('active-event-banner').style.display='flex';
     vaccineSlowMult = permanentState.vaccineBonus || 1;
     if(timerInterval){ clearInterval(timerInterval); timerInterval=null; }
     storyStarted = false;
