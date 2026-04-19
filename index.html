@@ -6,7 +6,7 @@
   <title>☣ PATHOGEN-X</title>
   <script>
   // ══ AUTO-UPDATE — changer ce numéro à chaque mise à jour ══
-  var APP_VERSION = '1.10';
+  var APP_VERSION = '1.11';
   (function(){
     var storedVersion = localStorage.getItem('pathogenx_version');
     if(storedVersion && storedVersion !== APP_VERSION){
@@ -845,7 +845,7 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
       </div>
     </div>
 
-    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.10</div>
+    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.11</div>
 
   </div>
 </div>
@@ -891,11 +891,14 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
 <!-- ══ GAME ══ -->
 <div id="game" style="display: none;overflow:hidden;">
   <div class="wrap">
-    <div class="hdr" style="justify-content:space-between">
+    <div class="hdr" style="justify-content:space-between;gap:6px">
+      <div style="font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;color:var(--green);letter-spacing:3px">PATHOGEN-X</div>
+      <div style="display:flex;gap:6px;align-items:center">
       <button onclick="openSkinsPanel()" ontouchend="safeTap(()=>openSkinsPanel())" style="padding:5px 14px;background:rgba(204,136,255,0.22);border:2px solid rgba(204,136,255,0.9);color:var(--purple);font-family:'Share Tech Mono','Courier New',monospace;font-size:11px;cursor:pointer;touch-action:manipulation;box-shadow:0 0 14px rgba(204,136,255,0.4);text-shadow:0 0 8px rgba(204,136,255,0.8);font-weight:bold;letter-spacing:2px">LABO</button>
       <button onclick="openLootboxShop()" ontouchend="safeTap(()=>openLootboxShop())" style="padding:5px 20px;background:rgba(136,221,255,0.22);border:2px solid rgba(136,221,255,0.9);color:#88ddff;font-family:'Share Tech Mono','Courier New',monospace;font-size:11px;cursor:pointer;touch-action:manipulation;box-shadow:0 0 14px rgba(136,221,255,0.4);text-shadow:0 0 8px rgba(136,221,255,0.8);font-weight:bold;letter-spacing:2px">SHOP</button>
       <button class="hdr-back" onclick="goMenu()" style="padding:5px 12px">← Menu</button>
       <!-- <button onclick="toggleDev()" ontouchend="event.preventDefault();toggleDev()" style="padding:4px 8px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);color:rgba(255,215,0,0.6);font-family:monospace;font-size:10px;cursor:pointer;touch-action:manipulation">DEV</button> -->
+      </div>
     </div>
 
     <!-- Dev panel -->
@@ -1036,6 +1039,16 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
           </div>
         </div>
         <div id="aeb-timer" style="font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;flex-shrink:0"></div>
+      </div>
+      <!-- Heritage banner — visible si héritage actif -->
+      <div id="heritage-banner" style="display:none;margin-top:6px;border:1px solid rgba(255,136,0,0.35);background:rgba(255,136,0,0.06);padding:8px 12px;box-shadow:0 0 12px rgba(255,136,0,0.1)">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:16px;flex-shrink:0">🧬</span>
+          <div style="flex:1">
+            <div style="font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:#ff8800;margin-bottom:3px">HÉRITAGE VIRAL ACTIF</div>
+            <div id="heritage-desc" style="font-size:10px;color:rgba(255,136,0,0.7);letter-spacing:0.5px"></div>
+          </div>
+        </div>
       </div>
       <!-- Chapters toggle -->
       <div id="ch-wrap" style="display:none;margin-top:4px">
@@ -1463,18 +1476,24 @@ function makeShop(){
   // cs = s^0.75 — coûts augmentent fortement à chaque chapitre
   // Ch1:×1  Ch2:×5.6  Ch3:×31.6  Ch4:×89  Ch5:×253
   const cs = Math.pow(s, 0.75);
+  const pm = permanentState.shopPowerMult || 1;
+  const effDesc = (val, unit) => {
+    const base = Math.round(val*s);
+    const eff = Math.round(base*pm);
+    return pm > 1 ? '+'+eff+unit+' <span style="color:rgba(255,136,0,0.7);font-size:9px">(×'+pm.toFixed(0)+')</span>' : '+'+base+unit;
+  };
   return [
-    // AUTO — gaps marqués entre a2→a3→a4→a5
-    { id:'a1', cat:'auto', icon:'🏠', name:'Famille infectée',   desc:'+'+(Math.round(2*s))+'/sec',    baseCost:Math.floor(100*cs),     basePower:2*s,    count:0, unlockAt:0,             cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.70,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); } },
-    { id:'a2', cat:'auto', icon:'🏫', name:'École contaminée',   desc:'+'+(Math.round(10*s))+'/sec',   baseCost:Math.floor(2500*cs),    basePower:10*s,   count:0, unlockAt:2500*cs,       cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.72,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); } },
-    { id:'a3', cat:'auto', icon:'🏥', name:'Hôpital infiltré',   desc:'+'+(Math.round(42*s))+'/sec',   baseCost:Math.floor(25000*cs),   basePower:42*s,   count:0, unlockAt:25000*cs,      cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.80,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); } },
-    { id:'a4', cat:'auto', icon:'🚇', name:'Métro contaminé',    desc:'+'+(Math.round(140*s))+'/sec',  baseCost:Math.floor(300000*cs),  basePower:140*s,  count:0, unlockAt:300000*cs,     cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.85,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); } },
-    { id:'a5', cat:'auto', icon:'✈️', name:'Aéroport mondial',   desc:'+'+(Math.round(560*s))+'/sec',  baseCost:Math.floor(2100000*cs), basePower:560*s,  count:0, unlockAt:2100000*cs,    cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.90,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); } },
-    // CLICK — même logique avec gros gaps
-    { id:'c1', cat:'click', icon:'🧬', name:'Mutation ARN',          desc:'+'+(Math.round(1.4*s))+'/tap',  baseCost:Math.floor(80*cs),      basePower:1.4*s, count:0, unlockAt:0,             cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.70,this.count)); }, effect(){ clickPower+=this.basePower*(permanentState.shopPowerMult||1); } },
-    { id:'c2', cat:'click', icon:'☣️', name:'Nécrose Rapide',        desc:'+'+(Math.round(5.6*s))+'/tap',  baseCost:Math.floor(1500*cs),    basePower:5.6*s, count:0, unlockAt:1500*cs,       cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.72,this.count)); }, effect(){ clickPower+=this.basePower*(permanentState.shopPowerMult||1); } },
-    { id:'c3', cat:'click', icon:'🧫', name:'Multiplication Forcée', desc:'+'+(Math.round(21*s))+'/tap',   baseCost:Math.floor(15000*cs),   basePower:21*s,  count:0, unlockAt:15000*cs,      cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.80,this.count)); }, effect(){ clickPower+=this.basePower*(permanentState.shopPowerMult||1); } },
-    { id:'c4', cat:'click', icon:'💀', name:'Souche Xénomorphe',     desc:'+'+(Math.round(84*s))+'/tap',   baseCost:Math.floor(200000*cs),  basePower:84*s,  count:0, unlockAt:200000*cs,     cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.85,this.count)); }, effect(){ clickPower+=this.basePower*(permanentState.shopPowerMult||1); } },
+    // AUTO
+    { id:'a1', cat:'auto', icon:'🏠', name:'Famille infectée',   descBase:Math.round(2*s),   unit:'/sec', baseCost:Math.floor(100*cs),     basePower:Math.round(2*s),    count:0, unlockAt:0,           cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.70,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(2,'/sec'); } },
+    { id:'a2', cat:'auto', icon:'🏫', name:'École contaminée',   descBase:Math.round(10*s),  unit:'/sec', baseCost:Math.floor(2500*cs),    basePower:Math.round(10*s),   count:0, unlockAt:2500*cs,     cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.72,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(10,'/sec'); } },
+    { id:'a3', cat:'auto', icon:'🏥', name:'Hôpital infiltré',   descBase:Math.round(42*s),  unit:'/sec', baseCost:Math.floor(25000*cs),   basePower:Math.round(42*s),   count:0, unlockAt:25000*cs,    cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.80,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(42,'/sec'); } },
+    { id:'a4', cat:'auto', icon:'🚇', name:'Métro contaminé',    descBase:Math.round(140*s), unit:'/sec', baseCost:Math.floor(300000*cs),  basePower:Math.round(140*s),  count:0, unlockAt:300000*cs,   cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.85,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(140,'/sec'); } },
+    { id:'a5', cat:'auto', icon:'✈️', name:'Aéroport mondial',   descBase:Math.round(560*s), unit:'/sec', baseCost:Math.floor(2100000*cs), basePower:Math.round(560*s),  count:0, unlockAt:2100000*cs,  cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.90,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(560,'/sec'); } },
+    // CLICK
+    { id:'c1', cat:'click', icon:'🧬', name:'Mutation ARN',          descBase:1,  unit:'/tap', baseCost:Math.floor(80*cs),      basePower:Math.round(1*s),   count:0, unlockAt:0,           cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.70,this.count)); }, effect(){ clickPower+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(1,'/tap'); } },
+    { id:'c2', cat:'click', icon:'☣️', name:'Nécrose Rapide',        descBase:6,  unit:'/tap', baseCost:Math.floor(1500*cs),    basePower:Math.round(6*s),   count:0, unlockAt:1500*cs,     cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.72,this.count)); }, effect(){ clickPower+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(6,'/tap'); } },
+    { id:'c3', cat:'click', icon:'🧫', name:'Multiplication Forcée', descBase:21, unit:'/tap', baseCost:Math.floor(15000*cs),   basePower:Math.round(21*s),  count:0, unlockAt:15000*cs,    cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.80,this.count)); }, effect(){ clickPower+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(21,'/tap'); } },
+    { id:'c4', cat:'click', icon:'💀', name:'Souche Xénomorphe',     descBase:84, unit:'/tap', baseCost:Math.floor(200000*cs),  basePower:Math.round(84*s),  count:0, unlockAt:200000*cs,   cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.85,this.count)); }, effect(){ clickPower+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(84,'/tap'); } },
     // RESIST — scalent aussi avec le chapitre
     { id:'v1', cat:'resist', icon:'🛡️', name:'Membrane Renforcée',     desc:'Vitesse vaccin -10%', baseCost:Math.floor(20000*cs),    basePower:0, count:0, unlockAt:0,           maxCount:1, cost(m){ return this.count>=1?Infinity:Math.floor(this.baseCost*m); }, effect(){ vaxShopMult*=0.90; } },
     { id:'v2', cat:'resist', icon:'🔬', name:'Camouflage Immunitaire', desc:'Vitesse vaccin -20%', baseCost:Math.floor(300000*cs),   basePower:0, count:0, unlockAt:300000*cs,   maxCount:1, cost(m){ return this.count>=1?Infinity:Math.floor(this.baseCost*m); }, effect(){ vaxShopMult*=0.80; } },
@@ -1494,12 +1513,11 @@ let shop=[];
 let popupTO=null, startTime=0, timerInterval=null;
 
 // Permanent state (survives prestige mais PAS la victoire)
-const permanentState = { shopDiscount:1, vaccineBonus:1, gainMult:1 };
+const permanentState = { shopDiscount:1, vaccineBonus:1, gainMult:1, shopPowerMult:1 };
 
 function applyPermanentState(){
   shopDiscountMult = permanentState.shopDiscount;
   vaccineSlowMult  = permanentState.vaccineBonus;
-  // no startPassive
 }
 
 // ══════════════════════════════════════════
@@ -1521,7 +1539,7 @@ function shopCost(u){ return Math.floor(u.cost(shopDiscountMult)); }
 // ══════════════════════════════════════════
 // Reset complet de tous les bonus de défaite — appelé sur victoire ou retour menu
 function resetDefeatBonuses(){
-  defeatBonusState = {gainMult:1, shopDiscount:1, vaccineBonus:1};
+  defeatBonusState = {gainMult:1, shopDiscount:1, vaccineBonus:1, shopPowerMult:1};
   permanentState.gainMult     = 1;
   permanentState.shopPowerMult= 1;
   permanentState.vaccineBonus = 1;
@@ -2109,6 +2127,7 @@ function selectMode(mode, forceChapter){
     permanentState.shopDiscount = defeatBonusState.shopDiscount;
     permanentState.vaccineBonus = defeatBonusState.vaccineBonus;
     permanentState.gainMult     = defeatBonusState.gainMult || 1;
+    permanentState.shopPowerMult = defeatBonusState.shopPowerMult || 1;
     permanentState.shopPowerMult = Math.min(4, (permanentState.shopPowerMult||1));
   } else {
     // Chapitre différent ou speedrun → pas d'héritage appliqué, mais on le garde en mémoire
@@ -2191,6 +2210,7 @@ function startRun(){
   initClickZone();
   if(currentMode==='story') startGlobuleSystem();
   if(currentMode==='story') startEventSystem();
+  updateHeritageBanner();
   renderVirusDisplay();
   renderChapters();
   updateUI();
@@ -2211,8 +2231,9 @@ function buildDevSkinButtons(){
   if(!wrap) return;
   wrap.innerHTML = SKINS.map(s=>{
     const col = s.rarity==='legendary'?'rgba(255,215,0,0.5)':s.rarity==='epic'?'rgba(204,136,255,0.5)':s.rarity==='rare'?'rgba(88,170,255,0.5)':'rgba(0,255,136,0.4)';
+    const label = s.id;
     return `<button ontouchend="event.preventDefault();devGiveSkin('${s.id}')"
-      style="padding:4px 8px;background:transparent;border:1px solid ${col};color:${col};font-family:monospace;font-size:12px;cursor:pointer;touch-action:manipulation" title="${s.name}">${s.emoji}</button>`;
+      style="padding:4px 8px;background:transparent;border:1px solid ${col};color:${col};font-family:monospace;font-size:9px;cursor:pointer;touch-action:manipulation" title="${s.name}">${s.name.slice(0,6)}</button>`;
   }).join('');
 }
 
@@ -2340,10 +2361,17 @@ function initClickZone(){
     if(infected>=runTarget) endRun(true);
     else updateUI();
   },{passive:false});
+  // Bloque le menu contextuel (long press sur mobile)
+  zone.addEventListener('contextmenu', e=>{ e.preventDefault(); },{passive:false});
+  // Click desktop uniquement — ignoré si touchend vient de se déclencher
   zone.addEventListener('click', e=>{
     if(gameOver) return;
+    if(zone._lastTouchEnd && Date.now() - zone._lastTouchEnd < 500) return; // évite double comptage touch+click
     registerClick(e.clientX, e.clientY);
   });
+  zone.addEventListener('touchend', e=>{
+    zone._lastTouchEnd = Date.now();
+  }, {passive:true, capture:true}); // capture phase pour marquer avant le handler principal
 }
 
 // ══════════════════════════════════════════
@@ -2760,6 +2788,8 @@ document.addEventListener('touchmove', e=>{
   const dx=Math.abs(e.touches[0].clientX-touchStartX);
   if(dy>8||dx>8) touchMoved=true;
 }, {passive:true});
+// Bloque le menu contextuel sur tout le jeu (long press mobile)
+document.addEventListener('contextmenu', e=>{ if(currentMode) e.preventDefault(); });
 
 function safeBuy(id){
   if(touchMoved) return;
@@ -2781,6 +2811,25 @@ function buyUpgrade(id){
   if(cost===Infinity||infected<cost) return;
   infected-=cost; u.count++; u.effect();
   dailyOnBuyUpgrade();
+  updateUI(); renderShop();
+}
+
+function buyMax(id){
+  if(eventShopFrozen){ showFusionToast('🧊 Shop gelé !', 'var(--red)'); return; }
+  const u=shop.find(x=>x.id===id); if(!u) return;
+  // Simule combien on peut acheter sans dépasser le budget
+  let budget=infected, count=0, simCount=u.count;
+  while(true){
+    const nextCost=Math.floor(u.cost(shopDiscountMult));
+    if(nextCost===Infinity||nextCost<=0||nextCost>budget) break;
+    budget-=nextCost; count++; u.count++; // incrémente temporairement pour le prochain calcul
+  }
+  // Remet le count à l'état initial pour faire les vrais achats
+  u.count-=count;
+  if(count===0) return;
+  // Applique les vrais achats
+  for(let i=0;i<count;i++){ const c=shopCost(u); infected-=c; u.count++; u.effect(); dailyOnBuyUpgrade(); }
+  showFusionToast('×'+count+' '+u.name, 'var(--green)');
   updateUI(); renderShop();
 }
 
@@ -2825,12 +2874,23 @@ function renderShop(){
       }
       let hint='';
       const cls=cantBuy?'maxed':canAfford?'buyable':'affordable';
+      // Calcule combien on peut acheter max (simulation propre)
+      let maxCount=0;
+      if(!cantBuy && canAfford){
+        let budget=infected;
+        const origCount=u.count;
+        while(true){
+          const nc=shopCost(u);
+          if(nc===Infinity||nc<=0||nc>budget) break;
+          budget-=nc; maxCount++; u.count++;
+        }
+        u.count=origCount; // remet à l'état initial
+      }
       html+=`<div class="sitem ${cls}" onclick="buyUpgrade('${u.id}')" ontouchend="safeBuy('${u.id}')">
         <span class="sitem-icon">${u.icon}</span>
         <div class="sitem-info">
           <div class="sitem-name">${u.name}${owned?` <span style="font-size:10px;color:var(--text-faint);font-family:monospace;font-weight:normal">(×${u.count})</span>`:''}</div>
-          <div class="sitem-desc">${u.desc}</div>
-          ${hint}
+          <div class="sitem-desc">${typeof u.desc === 'string' ? u.desc : ''}</div>
         </div>
         <div class="sitem-cost">
           <div class="sitem-price">${cantBuy?'MAX':fmt(cost)}</div>
@@ -4148,6 +4208,27 @@ async function checkAndSyncFromFirebase(){
   }
 }
 
+function updateHeritageBanner(){
+  const banner = document.getElementById('heritage-banner');
+  const desc = document.getElementById('heritage-desc');
+  if(!banner || !desc) return;
+
+  const pm = permanentState.shopPowerMult || 1;
+  const pd = permanentState.shopDiscount || 1;
+  const hasHeritage = pm > 1 || pd < 1;
+
+  if(!hasHeritage || currentMode !== 'story'){
+    banner.style.display = 'none';
+    return;
+  }
+
+  banner.style.display = 'block';
+  const parts = [];
+  if(pm > 1) parts.push('Upgrades ×' + pm.toFixed(0) + ' plus puissantes');
+  if(pd < 1) parts.push('-' + Math.round((1-pd)*100) + '% sur le coût');
+  desc.textContent = parts.join(' · ');
+}
+
 function switchPseudoTab(tab){
   const isNew = tab === 'new';
   document.getElementById('panel-new').style.display = isNew ? 'block' : 'none';
@@ -4190,8 +4271,14 @@ async function confirmPseudo(){
   localStorage.setItem('pathogenx_pin', hashPin(pin));
   document.getElementById('pseudo-screen').style.display = 'none';
   goMenu();
-  // Sauvegarde initiale sur Firebase
-  setTimeout(function(){ if(window.fbSaveFullSave) fbSaveFullSave(); }, 2000);
+  // Sauvegarde initiale sur Firebase — leaderboard + cloud
+  setTimeout(function(){
+    if(window.fbSaveFullSave) fbSaveFullSave();
+    if(window.fbSaveScore) fbSaveScore(val, {
+      score:0, chapitre:0, skins:0, victoires:0, succes:0,
+      srBest:null, srDiff:null, lootStd:0, lootPrem:0
+    });
+  }, 1500);
 }
 
 async function restoreProgress(){
@@ -4813,19 +4900,17 @@ function resetTree(){
 //  BONUS DÉFAITE — Héritage Viral
 // ══════════════════════════════════════════
 const DEFEAT_BONUSES = [
-  { run:0, icon:'🧬', name:'×2 sur tous les gains',     desc:'clics et auto-propagation à la prochaine run', color:'#00ff88',
-    apply: s => { s.gainMult = (s.gainMult||1) * 2; } },
-  { run:1, icon:'⚡', name:'×3 sur tous les gains',     desc:'clics et auto-propagation à la prochaine run', color:'#ffd700',
-    apply: s => { s.gainMult = (s.gainMult||1) * 3; } },
-  { run:2, icon:'🏷️', name:'Upgrades -30% + ×2 gains', desc:'moins chères et gains doublés', color:'#ff8800',
-    apply: s => { s.shopDiscount = Math.max(0.4, (s.shopDiscount||1)*0.70); s.gainMult=(s.gainMult||1)*2; } },
-  { run:3, icon:'🛡️', name:'Vit. vaccin -25% + ×2 gains',   desc:'vitesse vaccin ralentie et gains doublés', color:'#ff7777',
-    apply: s => { s.vaccineBonus=(s.vaccineBonus||1)*0.75; s.gainMult=(s.gainMult||1)*2; } },
+  { run:0, icon:'🧬', name:'×2 puissance upgrades',          desc:'Toutes les upgrades sont 2× plus puissantes', color:'#00ff88',
+    apply: s => { s.shopPowerMult = (s.shopPowerMult||1) * 2; } },
+  { run:1, icon:'⚡', name:'×2 puissance + -20% coût',       desc:'Upgrades 4× plus puissantes et 20% moins chères', color:'#ffd700',
+    apply: s => { s.shopPowerMult = (s.shopPowerMult||1) * 2; s.shopDiscount = (s.shopDiscount||1) * 0.80; } },
+  { run:2, icon:'🏷️', name:'×3 puissance + -25% coût',      desc:'Upgrades 12× plus puissantes et ~40% moins chères', color:'#ff8800',
+    apply: s => { s.shopPowerMult = (s.shopPowerMult||1) * 3; s.shopDiscount = (s.shopDiscount||1) * 0.75; } },
 ];
 
 // Bonus defeat state (survives to next run, CUMULATIF)
 // gainMult s'empile : run0 ×2 → run1 ×2 = ×4 total etc.
-let defeatBonusState = { gainMult:1, shopDiscount:1, vaccineBonus:1 };
+let defeatBonusState = { gainMult:1, shopDiscount:1, vaccineBonus:1, shopPowerMult:1 };
 // On ne limite plus par run index — chaque défaite avec ≥10% ajoute le bonus
 // On garde juste en mémoire le dernier mult total affiché pour l'UX
 let lastShownGainMult = 1;
@@ -4941,11 +5026,10 @@ function defeatNextRun(){
   silentVaxSlowdown = Math.max(0.3, silentVaxSlowdown * 0.85);
 
   // Transfère les bonus héritage vers permanentState
-  permanentState.shopDiscount = defeatBonusState.shopDiscount;
-  permanentState.vaccineBonus = defeatBonusState.vaccineBonus;
-  permanentState.gainMult     = defeatBonusState.gainMult || 1;
-  // Bonus upgrades : chaque achat donne ×1.5 de puissance en plus
-  permanentState.shopPowerMult = Math.min(4, (permanentState.shopPowerMult||1) * 1.5);
+  permanentState.shopDiscount  = defeatBonusState.shopDiscount;
+  permanentState.vaccineBonus  = defeatBonusState.vaccineBonus;
+  permanentState.gainMult      = defeatBonusState.gainMult || 1;
+  permanentState.shopPowerMult = defeatBonusState.shopPowerMult || 1;
 
   // Met à jour l'héritage persistant
   heritageData = {
@@ -5385,7 +5469,7 @@ function goMenu(){
   stopGlobuleSystem();
   stopEventSystem();
   // Reset runtime defeat state mais garder heritageData pour persistance
-  defeatBonusState = {gainMult:1, shopDiscount:1, vaccineBonus:1};
+  defeatBonusState = {gainMult:1, shopDiscount:1, vaccineBonus:1, shopPowerMult:1};
   permanentState.gainMult = 1;
   permanentState.shopPowerMult = 1;
   permanentState.vaccineBonus = 1;
@@ -7342,26 +7426,47 @@ function initFirebase(){
     };
 
     // ══ speedrun_records ══════════════════════════════════════════════
-    // Enregistre un record monde si c'est le meilleur temps pour la catégorie
+    // Structure : un doc par catégorie contenant le top 3
+    // { top: [ {pseudo, timeMs, date}, {pseudo, timeMs, date}, {pseudo, timeMs, date} ] }
+    // Pour supprimer un joueur depuis la console Firebase : éditer le tableau top[]
+
+    // Enregistre un temps et met à jour le top 3
     window.fbSaveSpeedrunRecord = async function(category, pseudo, timeMs){
       try{
         var docRef = db.collection('speedrun_records').doc(category);
         var snap   = await docRef.get();
-        if(!snap.exists || timeMs < snap.data().timeMs){
-          await docRef.set({ pseudo:pseudo, timeMs:timeMs, date:new Date().toISOString().slice(0,10) });
-          console.log('[FB] speedrun_records nouveau record:', category, pseudo, timeMs);
-          return true;
+        var top = snap.exists && snap.data().top ? snap.data().top : [];
+
+        // Vérifie si le joueur est déjà dans le top — on garde son meilleur temps
+        var existing = top.findIndex(function(e){ return e.pseudo === pseudo; });
+        if(existing >= 0){
+          if(timeMs >= top[existing].timeMs) return false; // pas de nouveau record perso
+          top.splice(existing, 1); // retire l'ancienne entrée pour la remplacer
         }
-        return false;
+
+        // Ajoute le nouveau temps
+        top.push({ pseudo:pseudo, timeMs:timeMs, date:new Date().toISOString().slice(0,10) });
+
+        // Trie par timeMs croissant et garde seulement le top 3
+        top.sort(function(a,b){ return a.timeMs - b.timeMs; });
+        top = top.slice(0, 3);
+
+        await docRef.set({ top: top });
+
+        var isRecord = top[0].pseudo === pseudo && top[0].timeMs === timeMs;
+        console.log('[FB] speedrun_records top3 mis à jour:', category, pseudo, timeMs);
+        return isRecord; // true si c'est le nouveau #1
       }catch(e){ console.log('[FB] saveSpeedrunRecord error:', e.message); return false; }
     };
 
-    // Récupère le record monde pour une catégorie
+    // Récupère le #1 du top 3 pour une catégorie
     window.fbGetSpeedrunRecord = async function(category){
       try{
         var snap = await db.collection('speedrun_records').doc(category).get();
-        if(snap.exists) return snap.data();
-        return null;
+        if(!snap.exists) return null;
+        var top = snap.data().top;
+        if(!top || top.length === 0) return null;
+        return top[0]; // retourne le #1
       }catch(e){ console.log('[FB] getSpeedrunRecord error:', e.message); return null; }
     };
 
