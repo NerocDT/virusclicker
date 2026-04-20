@@ -6,7 +6,7 @@
   <title>☣ PATHOGEN-X</title>
   <script>
   // ══ AUTO-UPDATE — changer ce numéro à chaque mise à jour ══
-  var APP_VERSION = '1.11';
+  var APP_VERSION = '1.12';
   (function(){
     var storedVersion = localStorage.getItem('pathogenx_version');
     if(storedVersion && storedVersion !== APP_VERSION){
@@ -845,7 +845,7 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
       </div>
     </div>
 
-    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.11</div>
+    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.12</div>
 
   </div>
 </div>
@@ -897,7 +897,7 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
       <button onclick="openSkinsPanel()" ontouchend="safeTap(()=>openSkinsPanel())" style="padding:5px 14px;background:rgba(204,136,255,0.22);border:2px solid rgba(204,136,255,0.9);color:var(--purple);font-family:'Share Tech Mono','Courier New',monospace;font-size:11px;cursor:pointer;touch-action:manipulation;box-shadow:0 0 14px rgba(204,136,255,0.4);text-shadow:0 0 8px rgba(204,136,255,0.8);font-weight:bold;letter-spacing:2px">LABO</button>
       <button onclick="openLootboxShop()" ontouchend="safeTap(()=>openLootboxShop())" style="padding:5px 20px;background:rgba(136,221,255,0.22);border:2px solid rgba(136,221,255,0.9);color:#88ddff;font-family:'Share Tech Mono','Courier New',monospace;font-size:11px;cursor:pointer;touch-action:manipulation;box-shadow:0 0 14px rgba(136,221,255,0.4);text-shadow:0 0 8px rgba(136,221,255,0.8);font-weight:bold;letter-spacing:2px">SHOP</button>
       <button class="hdr-back" onclick="goMenu()" style="padding:5px 12px">← Menu</button>
-      <!-- <button onclick="toggleDev()" ontouchend="event.preventDefault();toggleDev()" style="padding:4px 8px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);color:rgba(255,215,0,0.6);font-family:monospace;font-size:10px;cursor:pointer;touch-action:manipulation">DEV</button> -->
+      <button onclick="toggleDev()" ontouchend="event.preventDefault();toggleDev()" style="padding:4px 8px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);color:rgba(255,215,0,0.6);font-family:monospace;font-size:10px;cursor:pointer;touch-action:manipulation">DEV</button>
       </div>
     </div>
 
@@ -1568,11 +1568,20 @@ function saveGame(){
     localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     const el = document.getElementById('save-indicator');
     if(el){ el.textContent=''; el.style.color='var(--green-dim)'; }
-    // Sync cloud Firebase toutes les 30s max
+    // Sync cloud Firebase toutes les 5s max — attend que Firebase soit prêt
     const now = Date.now();
-    if(!saveGame._lastCloud || now - saveGame._lastCloud > 10000){
+    if(!saveGame._lastCloud || now - saveGame._lastCloud > 5000){
       saveGame._lastCloud = now;
-      if(window.fbSaveFullSave && localStorage.getItem('pathogenx_pseudo')) fbSaveFullSave();
+      if(localStorage.getItem('pathogenx_pseudo')){
+        if(window.fbSaveFullSave){
+          fbSaveFullSave();
+        } else {
+          // Firebase pas encore prêt — on attend et on retry
+          window.addEventListener('firebaseReady', function(){
+            fbSaveFullSave();
+          }, {once:true});
+        }
+      }
     }
   } catch(e) {
     const el = document.getElementById('save-indicator');
@@ -1671,8 +1680,8 @@ function importSave(){
 
 // Auto-save toutes les 20s + quand on quitte
 setInterval(saveGame, 20000);
-window.addEventListener('beforeunload', function(){ saveGame(); if(currentMode==='story'&&!gameOver&&infected>100) saveRunInProgress(); });
-window.addEventListener('pagehide', function(){ saveGame(); if(currentMode==='story'&&!gameOver&&infected>100) saveRunInProgress(); });
+window.addEventListener('beforeunload', function(){ saveGame(); if(window.fbSaveFullSave && localStorage.getItem('pathogenx_pseudo')) fbSaveFullSave(); if(currentMode==='story'&&!gameOver&&infected>100) saveRunInProgress(); });
+window.addEventListener('pagehide', function(){ saveGame(); if(window.fbSaveFullSave && localStorage.getItem('pathogenx_pseudo')) fbSaveFullSave(); if(currentMode==='story'&&!gameOver&&infected>100) saveRunInProgress(); });
 window.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden'){ saveGame(); if(currentMode==='story'&&!gameOver&&infected>100) saveRunInProgress(); if(window.fbSaveFullSave && localStorage.getItem('pathogenx_pseudo')) fbSaveFullSave(); } });
 // Auto-save run toutes les 10 secondes pendant une partie
 setInterval(()=>{ if(currentMode==='story'&&!gameOver&&infected>100) saveRunInProgress(); }, 10000);
@@ -4198,13 +4207,24 @@ async function checkAndSyncFromFirebase(){
     var cloudData = await window.fbRestoreFullSave(pseudo, pinHash);
     if(!cloudData) return;
 
-    // Firebase = source de vérité, on charge toujours depuis le cloud
-    console.log('[SYNC] Chargement depuis Firebase...');
-    localStorage.setItem(SAVE_KEY, JSON.stringify(cloudData));
-    loadGame();
+    // Compare les timestamps — garde le plus récent
+    var localRaw  = localStorage.getItem(SAVE_KEY);
+    var localData = localRaw ? JSON.parse(localRaw) : null;
+    var localTime = localData && localData.updatedAt ? localData.updatedAt : 0;
+    var cloudTime = cloudData.updatedAt ? cloudData.updatedAt : 0;
+
+    if(cloudTime > localTime){
+      // Cloud plus récent → on charge depuis Firebase
+      console.log('[SYNC] Cloud plus récent, chargement Firebase...');
+      localStorage.setItem(SAVE_KEY, JSON.stringify(cloudData));
+      loadGame();
+    } else {
+      // Local plus récent ou égal → on garde le local et on re-sync Firebase
+      console.log('[SYNC] Local plus récent, on garde et on sync Firebase...');
+      if(window.fbSaveFullSave) fbSaveFullSave();
+    }
   }catch(e){
     console.log('[SYNC] checkAndSyncFromFirebase error:', e.message);
-    // En cas d'erreur réseau, on joue avec le cache local
   }
 }
 
@@ -5740,8 +5760,8 @@ function initLoadingScreen(){
         const saved = localStorage.getItem('pathogenx_pseudo');
         if(saved){
           playerPseudo = saved;
-          // Vérifier si Firebase a une version plus récente
-          checkAndSyncFromFirebase().then(() => goMenu());
+          loadGame(); // charge le localStorage immédiatement
+          checkAndSyncFromFirebase().then(() => goMenu()); // puis vérifie Firebase
         }
         else { showPseudoScreen(); }
       },800);
@@ -7410,7 +7430,14 @@ function initFirebase(){
           updatedAt: Date.now()
         });
         console.log('[FB] cloud_saves OK:', pseudo);
-      }catch(e){ console.log('[FB] saveFullSave error:', e.message); }
+        // Indicateur visuel discret de sync réussie
+        var el = document.getElementById('save-indicator');
+        if(el){ el.textContent='☁ sync'; el.style.color='rgba(0,255,136,0.3)'; setTimeout(function(){ if(el) el.textContent=''; }, 2000); }
+      }catch(e){
+        console.log('[FB] saveFullSave error:', e.message);
+        var el = document.getElementById('save-indicator');
+        if(el){ el.textContent='☁ erreur'; el.style.color='rgba(255,100,100,0.4)'; }
+      }
     };
 
     // Restaure la sauvegarde complète si pseudo + pinHash correspondent
@@ -7473,6 +7500,10 @@ function initFirebase(){
     window.firebaseReady = true;
     window.dispatchEvent(new Event('firebaseReady'));
     console.log('[FB] Firebase prêt !');
+    // Sync immédiate au démarrage si un pseudo est présent
+    if(localStorage.getItem('pathogenx_pseudo') && localStorage.getItem('pathogenx_save')){
+      setTimeout(function(){ window.fbSaveFullSave(); }, 500);
+    }
   }catch(e){ console.log('[FB] init error:', e.message); }
 }
 
