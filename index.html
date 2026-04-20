@@ -6,23 +6,9 @@
   <title>☣ PATHOGEN-X</title>
   <script>
   // ══ AUTO-UPDATE — changer ce numéro à chaque mise à jour ══
-  var APP_VERSION = '1.13';
+  var APP_VERSION = '1.14';
   (function(){
-    var storedVersion = localStorage.getItem('pathogenx_version');
-    if(storedVersion && storedVersion !== APP_VERSION){
-      // Nouvelle version détectée → sauvegarder le numéro puis forcer le rechargement
-      localStorage.setItem('pathogenx_version', APP_VERSION);
-      // Vider le cache de la page sans toucher au localStorage
-      if(caches && caches.keys){
-        caches.keys().then(function(names){
-          names.forEach(function(name){ caches.delete(name); });
-        }).then(function(){ location.reload(true); });
-      } else {
-        location.reload(true);
-      }
-      return;
-    }
-    // Première visite ou version déjà à jour
+    // On met juste à jour le numéro de version — pas de reload qui risque de perdre des données
     localStorage.setItem('pathogenx_version', APP_VERSION);
   })();
   </script>
@@ -845,7 +831,7 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
       </div>
     </div>
 
-    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.13</div>
+    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.14</div>
 
   </div>
 </div>
@@ -4207,20 +4193,19 @@ async function checkAndSyncFromFirebase(){
     var cloudData = await window.fbRestoreFullSave(pseudo, pinHash);
     if(!cloudData) return;
 
-    // Compare les timestamps — garde le plus récent
     var localRaw  = localStorage.getItem(SAVE_KEY);
     var localData = localRaw ? JSON.parse(localRaw) : null;
     var localTime = localData && localData.updatedAt ? localData.updatedAt : 0;
     var cloudTime = cloudData.updatedAt ? cloudData.updatedAt : 0;
 
-    if(cloudTime > localTime){
-      // Cloud plus récent → on charge depuis Firebase
-      console.log('[SYNC] Cloud plus récent, chargement Firebase...');
+    if(cloudTime >= localTime){
+      // Cloud aussi récent ou plus récent → charge Firebase
+      console.log('[SYNC] Chargement depuis Firebase (cloud:', cloudTime, '/ local:', localTime, ')');
       localStorage.setItem(SAVE_KEY, JSON.stringify(cloudData));
       loadGame();
     } else {
-      // Local plus récent ou égal → on garde le local et on re-sync Firebase
-      console.log('[SYNC] Local plus récent, on garde et on sync Firebase...');
+      // Local plus récent → garde le local et re-sync Firebase
+      console.log('[SYNC] Local plus récent, sync Firebase...');
       if(window.fbSaveFullSave) fbSaveFullSave();
     }
   }catch(e){
