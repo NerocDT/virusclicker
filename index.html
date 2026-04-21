@@ -6,7 +6,7 @@
   <title>☣ PATHOGEN-X</title>
   <script>
   // ══ AUTO-UPDATE — changer ce numéro à chaque mise à jour ══
-  var APP_VERSION = '1.21';
+  var APP_VERSION = '1.22';
   (function(){
     // On met juste à jour le numéro de version
     localStorage.setItem('pathogenx_version', APP_VERSION);
@@ -399,7 +399,7 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
 .mtab.active{background:rgba(0,255,136,0.08);border-color:rgba(0,255,136,0.35);color:var(--green);}
 .sr-card{padding:10px 6px!important;cursor:pointer;text-align:center;}
 .sr-target{font-family:'Orbitron','Futura','Century Gothic','Trebuchet MS',sans-serif;font-size:14px;font-weight:900;color:var(--yellow);margin-bottom:2px;}
-.sr-label{font-size:9px;color:var(--yellow-dim);letter-spacing:2px;margin-bottom:4px;}
+.sr-label{font-size:10px;color:var(--yellow);letter-spacing:2px;margin-bottom:4px;font-weight:900;}
 .sr-best{font-size:10px;color:var(--text-faint);font-family:'Share Tech Mono','Courier New',monospace;}
 .sf-btn{padding:5px 10px;background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--text-faint);font-family:'Share Tech Mono','Courier New',monospace;font-size:10px;cursor:pointer;touch-action:manipulation;}
 .sf-btn.active{background:rgba(255,215,0,0.08);border-color:rgba(255,215,0,0.35);color:var(--yellow);}
@@ -607,38 +607,34 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
       </div>
 
       <!-- Speedrun modes -->
-      <div style="font-size:10px;color:var(--yellow-dim);letter-spacing:3px;margin:8px 0 6px">⚡ MODE SPEEDRUN</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:4px">
-        <div class="mcard speed sr-card" ontouchend="if(!touchMoved){event.preventDefault();selectSpeedrun(1000)}" onclick="selectSpeedrun(1000)">
-          <div class="sr-target">1 000</div>
-          <div class="sr-label">STARTER</div>
-          <div class="sr-best" id="sr-best-1k">--:--.--</div>
+      <div class="mcard speed" style="padding:16px">
+        <div class="mtop"><span class="micon">⚡</span><div class="mname">MODE SPEEDRUN</div></div>
+        <div class="mdesc" style="font-size:11px;white-space:nowrap">Clique le plus vite et obtiens le meilleur record !</div>
+
+        <!-- Sélecteur type de speedrun -->
+        <div style="margin-top:10px;position:relative">
+          <div id="sr-dropdown-btn" onclick="toggleSrDropdown()" ontouchend="event.preventDefault();toggleSrDropdown()" style="display:flex;justify-content:space-between;align-items:center;padding:9px 14px;border:2px solid rgba(255,255,255,0.55);background:rgba(255,255,255,0.15);cursor:pointer;touch-action:manipulation">
+            <span id="sr-selected-label" style="font-family:'Share Tech Mono',monospace;font-size:12px;color:#ffffff;letter-spacing:1px;font-weight:bold">Skills — NoUpgrade NoVirus</span>
+            <span id="sr-dropdown-arrow" style="color:#ffffff;font-size:11px">▼</span>
+          </div>
+          <div id="sr-dropdown-menu" style="display:none;position:absolute;left:0;right:0;z-index:100;border:2px solid rgba(255,255,255,0.35);border-top:none;background:#0d1610">
+            <div onclick="selectSrType('no-bonus','Skills — NoUpgrade NoVirus')" ontouchend="event.preventDefault();selectSrType('no-bonus','Skills — NoUpgrade NoVirus')" style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.08);cursor:pointer;touch-action:manipulation">
+              <div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:rgba(255,255,255,0.85);font-weight:bold">Skills — NoUpgrade NoVirus</div>
+              <div style="font-size:9px;color:rgba(255,255,255,0.35);margin-top:2px">Talent pur — aucun bonus</div>
+            </div>
+            <div onclick="selectSrType('virus','JustVirus — VirusOn')" ontouchend="event.preventDefault();selectSrType('virus','JustVirus — VirusOn')" style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.08);cursor:pointer;touch-action:manipulation">
+              <div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:rgba(255,255,255,0.85);font-weight:bold">JustVirus — VirusOn</div>
+              <div style="font-size:9px;color:rgba(255,255,255,0.35);margin-top:2px">Virus activé</div>
+            </div>
+            <div onclick="selectSrType('full','Any% — Full')" ontouchend="event.preventDefault();selectSrType('full','Any% — Full')" style="padding:10px 14px;cursor:pointer;touch-action:manipulation">
+              <div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:rgba(255,255,255,0.85);font-weight:bold">Any% — Full</div>
+              <div style="font-size:9px;color:rgba(255,255,255,0.35);margin-top:2px">Virus + upgrades actifs</div>
+            </div>
+          </div>
         </div>
-        <div class="mcard speed sr-card" ontouchend="if(!touchMoved){event.preventDefault();selectSpeedrun(2000)}" onclick="selectSpeedrun(2000)">
-          <div class="sr-target">2 000</div>
-          <div class="sr-label">NORMAL</div>
-          <div class="sr-best" id="sr-best-2k">--:--.--</div>
-        </div>
-        <div class="mcard speed sr-card" ontouchend="if(!touchMoved){event.preventDefault();selectSpeedrun(3000)}" onclick="selectSpeedrun(3000)">
-          <div class="sr-target">3 000</div>
-          <div class="sr-label">HARD</div>
-          <div class="sr-best" id="sr-best-3k">--:--.--</div>
-        </div>
-        <div class="mcard speed sr-card" ontouchend="if(!touchMoved){event.preventDefault();selectSpeedrun(4000)}" onclick="selectSpeedrun(4000)">
-          <div class="sr-target">4 000</div>
-          <div class="sr-label">EXPERT</div>
-          <div class="sr-best" id="sr-best-4k">--:--.--</div>
-        </div>
-        <div class="mcard speed sr-card" ontouchend="if(!touchMoved){event.preventDefault();selectSpeedrun(5000)}" onclick="selectSpeedrun(5000)">
-          <div class="sr-target">5 000</div>
-          <div class="sr-label">MASTER</div>
-          <div class="sr-best" id="sr-best-5k">--:--.--</div>
-        </div>
-        <div class="mcard speed sr-card" style="opacity:0.4;cursor:default">
-          <div class="sr-target">???</div>
-          <div class="sr-label">BIENTÔT</div>
-          <div class="sr-best">--</div>
-        </div>
+
+        <!-- Grille catégories — dynamique selon le mode -->
+        <div id="sr-cards-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px"></div>
       </div>
     </div>
   </div>
@@ -858,7 +854,7 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
       </div>
     </div>
 
-    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.20</div>
+    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.22</div>
 
   </div>
 </div>
@@ -1498,14 +1494,14 @@ function makeShop(){
   return [
     // AUTO
     { id:'a1', cat:'auto', icon:'🏠', name:'Famille infectée',   descBase:Math.round(2*s),   unit:'/sec', baseCost:Math.floor(100*cs),     basePower:Math.round(2*s),    count:0, unlockAt:0,           cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.70,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(2,'/sec'); } },
-    { id:'a2', cat:'auto', icon:'🏫', name:'École contaminée',   descBase:Math.round(10*s),  unit:'/sec', baseCost:Math.floor(2500*cs),    basePower:Math.round(10*s),   count:0, unlockAt:2500*cs,     cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.72,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(10,'/sec'); } },
-    { id:'a3', cat:'auto', icon:'🏥', name:'Hôpital infiltré',   descBase:Math.round(42*s),  unit:'/sec', baseCost:Math.floor(25000*cs),   basePower:Math.round(42*s),   count:0, unlockAt:25000*cs,    cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.80,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(42,'/sec'); } },
+    { id:'a2', cat:'auto', icon:'🏫', name:'École contaminée',   descBase:Math.round(10*s),  unit:'/sec', baseCost:Math.floor(2500*cs),    basePower:Math.round(10*s),   count:0, unlockAt:2500*cs,     cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.72,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(this.basePower,'/sec'); } },
+    { id:'a3', cat:'auto', icon:'🏥', name:'Hôpital infiltré',   descBase:Math.round(42*s),  unit:'/sec', baseCost:Math.floor(25000*cs),   basePower:Math.round(42*s),   count:0, unlockAt:25000*cs,    cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.80,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(this.basePower,'/sec'); } },
     { id:'a4', cat:'auto', icon:'🚇', name:'Métro contaminé',    descBase:Math.round(140*s), unit:'/sec', baseCost:Math.floor(300000*cs),  basePower:Math.round(140*s),  count:0, unlockAt:300000*cs,   cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.85,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(140,'/sec'); } },
     { id:'a5', cat:'auto', icon:'✈️', name:'Aéroport mondial',   descBase:Math.round(560*s), unit:'/sec', baseCost:Math.floor(2100000*cs), basePower:Math.round(560*s),  count:0, unlockAt:2100000*cs,  cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.90,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(560,'/sec'); } },
     // CLICK
     { id:'c1', cat:'click', icon:'🧬', name:'Mutation ARN',          descBase:1,  unit:'/tap', baseCost:Math.floor(80*cs),      basePower:Math.round(1*s),   count:0, unlockAt:0,           cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.70,this.count)); }, effect(){ clickPower+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(1,'/tap'); } },
-    { id:'c2', cat:'click', icon:'☣️', name:'Nécrose Rapide',        descBase:6,  unit:'/tap', baseCost:Math.floor(1500*cs),    basePower:Math.round(6*s),   count:0, unlockAt:1500*cs,     cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.72,this.count)); }, effect(){ clickPower+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(6,'/tap'); } },
-    { id:'c3', cat:'click', icon:'🧫', name:'Multiplication Forcée', descBase:21, unit:'/tap', baseCost:Math.floor(15000*cs),   basePower:Math.round(21*s),  count:0, unlockAt:15000*cs,    cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.80,this.count)); }, effect(){ clickPower+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(21,'/tap'); } },
+    { id:'c2', cat:'click', icon:'☣️', name:'Nécrose Rapide',        descBase:6,  unit:'/tap', baseCost:Math.floor(1500*cs),    basePower:Math.round(6*s),   count:0, unlockAt:1500*cs,     cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.72,this.count)); }, effect(){ clickPower+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(this.basePower,'/tap'); } },
+    { id:'c3', cat:'click', icon:'🧫', name:'Multiplication Forcée', descBase:21, unit:'/tap', baseCost:Math.floor(15000*cs),   basePower:Math.round(21*s),  count:0, unlockAt:15000*cs,    cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.80,this.count)); }, effect(){ clickPower+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(this.basePower,'/tap'); } },
     { id:'c4', cat:'click', icon:'💀', name:'Souche Xénomorphe',     descBase:84, unit:'/tap', baseCost:Math.floor(200000*cs),  basePower:Math.round(84*s),  count:0, unlockAt:200000*cs,   cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.85,this.count)); }, effect(){ clickPower+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(84,'/tap'); } },
     // RESIST — scalent aussi avec le chapitre
     { id:'v1', cat:'resist', icon:'🛡️', name:'Membrane Renforcée',     desc:'Vitesse vaccin -10%', baseCost:Math.floor(20000*cs),    basePower:0, count:0, unlockAt:0,           maxCount:1, cost(m){ return this.count>=1?Infinity:Math.floor(this.baseCost*m); }, effect(){ vaxShopMult*=0.90; } },
@@ -1697,7 +1693,16 @@ function importSave(){
 setInterval(saveGame, 20000);
 window.addEventListener('beforeunload', function(){ saveGame(); if(window.fbSaveFullSave && localStorage.getItem('pathogenx_pseudo')) fbSaveFullSave(); if(currentMode==='story'&&!gameOver&&infected>100) saveRunInProgress(); });
 window.addEventListener('pagehide', function(){ saveGame(); if(window.fbSaveFullSave && localStorage.getItem('pathogenx_pseudo')) fbSaveFullSave(); if(currentMode==='story'&&!gameOver&&infected>100) saveRunInProgress(); });
-window.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden'){ saveGame(); if(currentMode==='story'&&!gameOver&&infected>100) saveRunInProgress(); if(window.fbSaveFullSave && localStorage.getItem('pathogenx_pseudo')) fbSaveFullSave(); } });
+window.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState==='hidden'){
+    pauseActiveEvent();
+    saveGame();
+    if(currentMode==='story'&&!gameOver&&infected>100) saveRunInProgress();
+    if(window.fbSaveFullSave && localStorage.getItem('pathogenx_pseudo')) fbSaveFullSave();
+  } else {
+    resumeActiveEvent();
+  }
+});
 // Auto-save run toutes les 5 secondes pendant une partie
 setInterval(()=>{ if(currentMode==='story'&&!gameOver&&infected>100) saveRunInProgress(); }, 5000);
 
@@ -1725,6 +1730,16 @@ const SR_TARGETS = [
   { key:'3k',   clicks:3000,  label:'3 000 clics',   diff:'HARD',    baseScore:600,  timeBonus:1400, timeCoeff:2   },
   { key:'4k',   clicks:4000,  label:'4 000 clics',   diff:'EXPERT',  baseScore:800,  timeBonus:1700, timeCoeff:1.5 },
   { key:'5k',   clicks:5000,  label:'5 000 clics',   diff:'MASTER',  baseScore:1000, timeBonus:2000, timeCoeff:1   },
+  { key:'10k',  clicks:10000, label:'10 000 clics',  diff:'EXTREME', baseScore:1500, timeBonus:3000, timeCoeff:0.8 },
+];
+
+const SR_TARGETS_ANY = [
+  { key:'5k',   clicks:5000,  label:'5 000 clics',   diff:'STARTER', baseScore:200,  timeBonus:800,  timeCoeff:4   },
+  { key:'7.5k', clicks:7500,  label:'7 500 clics',   diff:'NORMAL',  baseScore:400,  timeBonus:1100, timeCoeff:3   },
+  { key:'10k',  clicks:10000, label:'10 000 clics',  diff:'HARD',    baseScore:600,  timeBonus:1400, timeCoeff:2   },
+  { key:'12.5k',clicks:12500, label:'12 500 clics',  diff:'EXPERT',  baseScore:800,  timeBonus:1700, timeCoeff:1.5 },
+  { key:'15k',  clicks:15000, label:'15 000 clics',  diff:'MASTER',  baseScore:1000, timeBonus:2000, timeCoeff:1   },
+  { key:'20k',  clicks:20000, label:'20 000 clics',  diff:'EXTREME', baseScore:1500, timeBonus:3000, timeCoeff:0.8 },
 ];
 
 // ══════════════════════════════════════════
@@ -2102,10 +2117,7 @@ function renderRecords(){
 }
 
 function updateClassement(){
-  SR_TARGETS.forEach(sr=>{
-    const el = document.getElementById('sr-best-'+sr.key);
-    if(el) el.textContent = bestTimes[sr.key] ? fmtChrono(bestTimes[sr.key]) : '--:--.--';
-  });
+  renderSrCards(); // re-render les cartes avec les bons temps et couleurs
   // Badge chapitre sur la carte histoire
   const badge = document.getElementById('story-chapter-badge');
   if(badge){
@@ -2119,8 +2131,19 @@ function updateClassement(){
 // ══════════════════════════════════════════
 //  SELECTSPEEDRUN
 // ══════════════════════════════════════════
+let currentSrType = 'no-bonus'; // 'no-bonus' ou 'virus'
+
+function getSrKey(baseKey){
+  if(currentSrType === 'virus') return 'jv_' + baseKey;
+  if(currentSrType === 'full')  return 'any_' + baseKey;
+  return baseKey;
+}
+
+let menuTouch=false;
+
 function selectSpeedrun(clicks){
   if(menuTouch) return; menuTouch=true; setTimeout(()=>menuTouch=false,600);
+  currentSrType = window._srType || 'no-bonus';
   currentSpeedrunTarget = clicks;
   srClicksCount = 0;
   currentMode = 'speedrun';
@@ -2130,7 +2153,10 @@ function selectSpeedrun(clicks){
   startRun();
 }
 
-let menuTouch=false;
+function getActiveSrTargets(){
+  return (currentSrType === 'full') ? SR_TARGETS_ANY : SR_TARGETS;
+}
+
 function selectMode(mode, forceChapter){
   if(menuTouch) return; menuTouch=true; setTimeout(()=>menuTouch=false,600);
   currentMode=mode;
@@ -2172,11 +2198,20 @@ function startRun(){
   passive=0;
   vaccine=0; vaccineSpeed=0; vaxMilestonesHit=new Set(); vaxMilestoneMult=1; vaxShopMult=1; gameOver=false; storyStarted=false;
   shop=makeShop();
+  // Any% : valeurs spéciales pour a2, a3, c2, c3
+  if(currentMode==='speedrun' && currentSrType==='full'){
+    const _ch1scale = CHAPTER_DATA[0].scale; // scale ch1 = 1
+    const _cs = Math.pow(_ch1scale, 0.75);   // = 1
+    const a2=shop.find(u=>u.id==='a2'); if(a2){ a2.basePower=10; a2.baseCost=1500; }
+    const a3=shop.find(u=>u.id==='a3'); if(a3){ a3.basePower=20; a3.baseCost=4000; }
+    const c2=shop.find(u=>u.id==='c2'); if(c2){ c2.basePower=5;  c2.baseCost=1000; }
+    const c3=shop.find(u=>u.id==='c3'); if(c3){ c3.basePower=20; c3.baseCost=4000; }
+  }
   applyPermanentState();
 
   // Applique le multiplicateur du chapitre
   if(currentMode==='story' && ch.tapMult && ch.tapMult > 1){
-    clickPower = clickPower * ch.tapMult; // garder les décimales
+    clickPower = clickPower * ch.tapMult;
   }
   // Discount shop du chapitre appliqué via shopDiscountMult
   if(currentMode==='story' && ch.shopDiscount){
@@ -2205,16 +2240,28 @@ function startRun(){
     document.getElementById('ch-wrap').style.display='none';
     document.getElementById('abandon-btn').style.display='none';
     document.querySelector('.stats-row').style.display='none';
-    document.getElementById('game-tabs').style.display='none';
     document.getElementById('active-event-banner').style.display='none';
-    const srKey = SR_TARGETS.find(s=>s.clicks===currentSpeedrunTarget);
+    // Any% : onglets visibles avec upgrades ch1
+    const isAny = currentSrType === 'full';
+    document.getElementById('game-tabs').style.display = isAny ? 'flex' : 'none';
+    document.querySelector('.stats-row').style.display = isAny ? 'flex' : 'none';
+    const sbox3 = document.getElementById('sbox3');
+    if(sbox3) sbox3.style.display = isAny ? 'none' : '';
+    if(isAny){
+      // Initialise les upgrades au niveau chapitre 1
+      currentChapter = 0;
+      shop = makeShop();
+      shopDiscountMult = 1;
+    }
+    const srKey = getActiveSrTargets().find(s=>s.clicks===currentSpeedrunTarget);
     if(timerInterval) clearInterval(timerInterval);
     speedrunStarted = false;
     srClicksCount = 0;
     document.getElementById('tval').textContent='00:00.0';
-    runTarget = currentSpeedrunTarget; // utilisé pour la barre de progression
+    runTarget = currentSpeedrunTarget;
     updateSpeedrunRecordsUI();
-    if(srKey) loadWorldRecord(srKey.key).then(()=>updateSpeedrunRecordsUI());
+    const fbKey = srKey ? getSrKey(srKey.key) : null;
+    if(fbKey) loadWorldRecord(fbKey).then(()=>updateSpeedrunRecordsUI());
   } else {
     document.getElementById('vax-section').style.display='block';
     document.getElementById('timer-box').style.display='none';
@@ -2621,9 +2668,26 @@ function applyEvent(ev){
   activeEventTO = setTimeout(()=>{
     clearActiveEvent();
   }, ev.duration * 1000);
+  activeEvent._endAt = Date.now() + ev.duration * 1000;
 
   updateUI();
   if(ev.effect === 'shopFreeze') renderShop();
+}
+
+function pauseActiveEvent(){
+  if(!activeEvent || !activeEvent._endAt) return;
+  const remaining = activeEvent._endAt - Date.now();
+  if(remaining <= 0) return;
+  activeEvent._pausedRemaining = remaining;
+  if(activeEventTO){ clearTimeout(activeEventTO); activeEventTO = null; }
+}
+
+function resumeActiveEvent(){
+  if(!activeEvent || !activeEvent._pausedRemaining) return;
+  const remaining = activeEvent._pausedRemaining;
+  activeEvent._endAt = Date.now() + remaining;
+  activeEvent._pausedRemaining = null;
+  activeEventTO = setTimeout(()=>{ clearActiveEvent(); }, remaining);
 }
 
 function clearActiveEvent(){
@@ -2664,15 +2728,29 @@ function registerClick(x, y){
   dailyOnClick(1);
 
   if(currentMode==='speedrun'){
-    srClicksCount++;
+    // Skills : 1 clic = 1
+    // JustVirus : bonus virus tap (ex: virus +150% → 2.5)
+    // Any% : upgrades + bonus virus additif (ex: clickPower=2 + virus bonus 1.5 = 3.5)
+    let clickVal;
+    if(currentSrType === 'full'){
+      // clickPower = 1 (base) + upgrades ajoutées via effect()
+      // virus s'additionne : clickPower + (skinB.tap - 1)
+      clickVal = clickPower + (skinB.tap - 1);
+    } else if(currentSrType === 'virus'){
+      clickVal = skinB.tap;
+    } else {
+      clickVal = 1;
+    }
+    srClicksCount += clickVal;
     const pct = Math.min((srClicksCount/currentSpeedrunTarget)*100, 100);
     const bg = document.getElementById('bar-green'); if(bg) bg.style.width=pct+'%';
     const pl = document.getElementById('pct-lbl'); if(pl) pl.textContent=pct.toFixed(2)+'%';
-    const it = document.getElementById('inf-count'); if(it) it.textContent=srClicksCount;
-    const st = document.getElementById('s-third'); if(st) st.textContent=srClicksCount;
+    const displayVal = (currentSrType === 'no-bonus') ? Math.floor(srClicksCount) : srClicksCount.toFixed(1);
+    const it = document.getElementById('inf-count'); if(it) it.textContent=displayVal;
+    const st = document.getElementById('s-third'); if(st) st.textContent=displayVal;
     const b=document.getElementById('vbtn');
     if(b){ b.classList.add('pressed'); setTimeout(()=>b.classList.remove('pressed'),120); }
-    spawnParticleAmount(x, y, 1);
+    spawnParticleAmount(x, y, clickVal);
     if(srClicksCount >= currentSpeedrunTarget) endRun(true);
     return;
   }
@@ -2787,12 +2865,16 @@ function safeTap(fn){
 // ══════════════════════════════════════════
 //  SHOP
 // ══════════════════════════════════════════
+// En Any% on utilise srClicksCount comme monnaie
+function shopBudget(){ return (currentMode==='speedrun' && currentSrType==='full') ? srClicksCount : infected; }
+function spendBudget(amount){ if(currentMode==='speedrun' && currentSrType==='full') srClicksCount-=amount; else infected-=amount; }
+
 function buyUpgrade(id){
   if(eventShopFrozen){ showFusionToast('🧊 Shop gelé !', 'var(--red)'); return; }
   const u=shop.find(x=>x.id===id); if(!u) return;
   const cost=shopCost(u);
-  if(cost===Infinity||infected<cost) return;
-  infected-=cost; u.count++; u.effect();
+  if(cost===Infinity||shopBudget()<cost) return;
+  spendBudget(cost); u.count++; u.effect();
   dailyOnBuyUpgrade();
   updateUI(); renderShop();
 }
@@ -2800,18 +2882,15 @@ function buyUpgrade(id){
 function buyMax(id){
   if(eventShopFrozen){ showFusionToast('🧊 Shop gelé !', 'var(--red)'); return; }
   const u=shop.find(x=>x.id===id); if(!u) return;
-  // Simule combien on peut acheter sans dépasser le budget
-  let budget=infected, count=0, simCount=u.count;
+  let budget=shopBudget(), count=0;
   while(true){
     const nextCost=Math.floor(u.cost(shopDiscountMult));
     if(nextCost===Infinity||nextCost<=0||nextCost>budget) break;
-    budget-=nextCost; count++; u.count++; // incrémente temporairement pour le prochain calcul
+    budget-=nextCost; count++; u.count++;
   }
-  // Remet le count à l'état initial pour faire les vrais achats
   u.count-=count;
   if(count===0) return;
-  // Applique les vrais achats
-  for(let i=0;i<count;i++){ const c=shopCost(u); infected-=c; u.count++; u.effect(); dailyOnBuyUpgrade(); }
+  for(let i=0;i<count;i++){ const c=shopCost(u); spendBudget(c); u.count++; u.effect(); dailyOnBuyUpgrade(); }
   showFusionToast('×'+count+' '+u.name, 'var(--green)');
   updateUI(); renderShop();
 }
@@ -2839,14 +2918,18 @@ function renderShop(){
     {key:'resist', label:'🛡️ RÉSISTANCE VACCIN', color:'#ffaa44'},
   ];
   let html='<div style="padding-bottom:40px">';
+  const isAnyPercent = isSR && currentSrType==='full';
   cats.forEach(cat=>{
     if(isSR&&cat.key==='resist') return;
     html+='<div class="shop-cat" style="color:'+(cat.color)+'">'+(cat.label)+'</div>';
-    shop.filter(u=>u.cat===cat.key).forEach(u=>{
+    const budget = shopBudget();
+    let catItems = shop.filter(u=>u.cat===cat.key);
+    if(isAnyPercent) catItems = catItems.slice(0, 3); // limite à 3 en Any%
+    catItems.forEach(u=>{
       const cost=shopCost(u);
-      const isLocked=infected<u.unlockAt&&u.count===0;
+      const isLocked = isAnyPercent ? false : (budget<u.unlockAt&&u.count===0);
       const cantBuy=cost===Infinity;
-      const canAfford=!cantBuy&&!isLocked&&infected>=cost;
+      const canAfford=!cantBuy&&!isLocked&&budget>=cost;
       const owned=u.count>0;
       if(isLocked){
         html+=`<div class="sitem locked">
@@ -2857,17 +2940,16 @@ function renderShop(){
       }
       let hint='';
       const cls=cantBuy?'maxed':canAfford?'buyable':'affordable';
-      // Calcule combien on peut acheter max (simulation propre)
       let maxCount=0;
       if(!cantBuy && canAfford){
-        let budget=infected;
+        let bgt=shopBudget();
         const origCount=u.count;
         while(true){
           const nc=shopCost(u);
-          if(nc===Infinity||nc<=0||nc>budget) break;
-          budget-=nc; maxCount++; u.count++;
+          if(nc===Infinity||nc<=0||nc>bgt) break;
+          bgt-=nc; maxCount++; u.count++;
         }
-        u.count=origCount; // remet à l'état initial
+        u.count=origCount;
       }
       html+=`<div class="sitem ${cls}" onclick="buyUpgrade('${u.id}')" ontouchend="safeBuy('${u.id}')">
         <span class="sitem-icon">${u.icon}</span>
@@ -2877,7 +2959,7 @@ function renderShop(){
         </div>
         <div class="sitem-cost">
           <div class="sitem-price">${cantBuy?'MAX':fmt(cost)}</div>
-          ${!cantBuy?`<div class="sitem-cur">infectés</div>`:''}
+          ${!cantBuy?`<div class="sitem-cur">${isAnyPercent?'clics':'infectés'}</div>`:''}
         </div>
       </div>`;
     });
@@ -4239,6 +4321,61 @@ function updateHeritageBanner(){
   desc.textContent = parts.join(' · ');
 }
 
+function toggleSrDropdown(){
+  const menu = document.getElementById('sr-dropdown-menu');
+  const arrow = document.getElementById('sr-dropdown-arrow');
+  if(!menu) return;
+  const isOpen = menu.style.display !== 'none';
+  menu.style.display = isOpen ? 'none' : 'block';
+  if(arrow) arrow.textContent = isOpen ? '▼' : '▲';
+}
+
+function renderSrCards(){
+  const grid = document.getElementById('sr-cards-grid');
+  if(!grid) return;
+  const type = window._srType || 'no-bonus';
+  const targets = (type === 'full') ? SR_TARGETS_ANY : SR_TARGETS;
+  // Couleurs par index (0-5) : jaune pour les 3 premiers, puis orange, orange-rouge, rouge
+  const colors = [
+    {border:'rgba(255,215,0,0.5)', text:'var(--yellow)'},
+    {border:'rgba(255,215,0,0.5)', text:'var(--yellow)'},
+    {border:'rgba(255,215,0,0.5)', text:'var(--yellow)'},
+    {border:'rgba(255,140,0,0.6)', text:'#ff8c00'},
+    {border:'rgba(255,80,0,0.6)',  text:'#ff5000'},
+    {border:'rgba(255,40,40,0.7)', text:'#ff2828'},
+  ];
+  grid.innerHTML = targets.map((t, i) => {
+    const c = colors[i] || colors[0];
+    const key = (type === 'full') ? 'any_' + t.key : (type === 'virus') ? 'jv_' + t.key : t.key;
+    const best = bestTimes[key] ? fmtChrono(bestTimes[key]) : '--:--.--';
+    const num = t.label.split(' ')[0] + ' ' + (t.label.split(' ')[1]||'');
+    return `<div class="mcard speed sr-card" style="border-color:${c.border}" ontouchend="if(!touchMoved){event.preventDefault();selectSpeedrun(${t.clicks})}" onclick="selectSpeedrun(${t.clicks})">
+      <div class="sr-target" style="color:${c.text}">${num}</div>
+      <div class="sr-label" style="color:${c.text}">${t.diff}</div>
+      <div class="sr-best" id="sr-best-${t.key}">${best}</div>
+    </div>`;
+  }).join('');
+}
+
+function selectSrType(type, label){
+  window._srType = type;
+  const lbl = document.getElementById('sr-selected-label');
+  if(lbl) lbl.textContent = label;
+  toggleSrDropdown();
+  renderSrCards();
+  updateClassement();
+}
+
+document.addEventListener('click', function(e){
+  const menu = document.getElementById('sr-dropdown-menu');
+  const btn = document.getElementById('sr-dropdown-btn');
+  if(menu && btn && !btn.contains(e.target) && !menu.contains(e.target)){
+    menu.style.display = 'none';
+    const arrow = document.getElementById('sr-dropdown-arrow');
+    if(arrow) arrow.textContent = '▼';
+  }
+});
+
 function switchPseudoTab(tab){
   const isNew = tab === 'new';
   document.getElementById('panel-new').style.display = isNew ? 'block' : 'none';
@@ -4434,6 +4571,7 @@ function updateSouchesDisplay(){
 // ══════════════════════════════════════════
 let shopOpenedFromMenu = false;
 function openLootboxShop(){
+  pauseActiveEvent();
   // Fermer le labo s'il est ouvert
   closeSkinsPanel();
   closeBurger(false);
@@ -4475,6 +4613,7 @@ function renderShopCollection(){
   }).join('');
 }
 function closeLootboxShop(){
+  if(currentMode==='story') resumeActiveEvent();
   document.getElementById('lb-shop').style.display='none';
   if(shopOpenedFromMenu){
     shopOpenedFromMenu = false;
@@ -4920,12 +5059,14 @@ function resetTree(){
 //  BONUS DÉFAITE — Héritage Viral
 // ══════════════════════════════════════════
 const DEFEAT_BONUSES = [
-  { run:0, icon:'🧬', name:'×2 puissance upgrades',          desc:'Toutes les upgrades sont 2× plus puissantes', color:'#00ff88',
-    apply: s => { s.shopPowerMult = (s.shopPowerMult||1) * 2; } },
-  { run:1, icon:'⚡', name:'×2 puissance + -20% coût',       desc:'Upgrades 4× plus puissantes et 20% moins chères', color:'#ffd700',
+  { run:0, icon:'🧬', name:'×1.5 puissance upgrades',              desc:'Toutes les upgrades sont 1.5× plus puissantes', color:'#00ff88',
+    apply: s => { s.shopPowerMult = (s.shopPowerMult||1) * 1.5; } },
+  { run:1, icon:'⚡', name:'×1.5 puissance + -20% coût',           desc:'Upgrades plus puissantes et 20% moins chères', color:'#ffd700',
+    apply: s => { s.shopPowerMult = (s.shopPowerMult||1) * 1.5; s.shopDiscount = (s.shopDiscount||1) * 0.80; } },
+  { run:2, icon:'🏷️', name:'×2 puissance + -20% coût',            desc:'Upgrades encore plus puissantes et 20% moins chères', color:'#ff8800',
     apply: s => { s.shopPowerMult = (s.shopPowerMult||1) * 2; s.shopDiscount = (s.shopDiscount||1) * 0.80; } },
-  { run:2, icon:'🏷️', name:'×3 puissance + -25% coût',      desc:'Upgrades 12× plus puissantes et ~40% moins chères', color:'#ff8800',
-    apply: s => { s.shopPowerMult = (s.shopPowerMult||1) * 3; s.shopDiscount = (s.shopDiscount||1) * 0.75; } },
+  { run:3, icon:'💉', name:'×2 puissance + -20% coût + vaccin -20%', desc:'Upgrades puissantes, moins chères et vaccin ralenti', color:'#ff4444',
+    apply: s => { s.shopPowerMult = (s.shopPowerMult||1) * 2; s.shopDiscount = (s.shopDiscount||1) * 0.80; s.vaccineBonus = (s.vaccineBonus||1) * 0.80; } },
 ];
 
 // Bonus defeat state (survives to next run, CUMULATIF)
@@ -5198,6 +5339,7 @@ function openAtlasFromShop(){
 }
 
 function openSkinsPanel(){
+  pauseActiveEvent();
   // Fermer le shop s'il est ouvert
   closeLootboxShop();
   atlasReturnToShop = false;
@@ -5212,6 +5354,7 @@ function closeSkinsPanel(){
   skinsPanelOpen = false;
   atlasView = false; fusionView = false;
   document.getElementById('skins-panel').style.display='none';
+  if(currentMode==='story') resumeActiveEvent();
   if(atlasReturnToShop){ atlasReturnToShop = false; openLootboxShop(); }
 }
 
@@ -5227,12 +5370,13 @@ function endRun(win){
   stopEventSystem();
   const elapsed=Date.now()-startTime;
   if(currentMode==='speedrun'&&win){
-    const srK=SR_TARGETS.find(s=>s.clicks===currentSpeedrunTarget);
-    if(srK&&(!bestTimes[srK.key]||elapsed<bestTimes[srK.key])){ bestTimes[srK.key]=elapsed; }
+    const srK=getActiveSrTargets().find(s=>s.clicks===currentSpeedrunTarget);
+    const srKey = srK ? getSrKey(srK.key) : null;
+    if(srK&&(!bestTimes[srKey]||elapsed<bestTimes[srKey])){ bestTimes[srKey]=elapsed; }
     globalStats.totalWinsSpeed++;
     achievementStats.totalSpeedrunWins=(achievementStats.totalSpeedrunWins||0)+1;
     dailyOnWin(true, elapsed);
-    if(srK) submitSpeedrunRecord(srK.key, elapsed);
+    if(srK) submitSpeedrunRecord(srKey, elapsed);
     // Récompense : 10 souches
     setTimeout(()=>{
       addSouches(10, 'speedrun');
@@ -5453,13 +5597,23 @@ function updateUI(){
   const tap=document.getElementById('s-tap');
   if(tap){
     var _skinB=getEquippedBonus(); var _tb=getTreeBonus();
-    var _eff=clickPower*_skinB.tap*_tb.tapMult*eventTapMult;
+    var _eff;
+    if(currentMode==='speedrun' && currentSrType==='full'){
+      _eff = clickPower + (_skinB.tap - 1); // additif en Any%
+    } else {
+      _eff=clickPower*_skinB.tap*_tb.tapMult*eventTapMult;
+    }
     tap.textContent='+'+fmt(_eff);
   }
   const aut=document.getElementById('s-auto');
   if(aut){
     var _sb=getEquippedBonus(); var _tb=getTreeBonus();
-    var _effAuto=Math.floor(passive*_sb.auto*_tb.autoMult*eventAutoMult);
+    var _effAuto;
+    if(currentMode==='speedrun' && currentSrType==='full'){
+      _effAuto = passive; // valeur brute en Any%
+    } else {
+      _effAuto=Math.floor(passive*_sb.auto*_tb.autoMult*eventAutoMult);
+    }
     aut.textContent='+'+fmt(_effAuto);
   }
   renderVirusDisplay();
@@ -5496,10 +5650,11 @@ function goMenu(){
       var runRaw = localStorage.getItem(RUN_SAVE_KEY);
       if(runRaw) fbSaveRunInProgress(JSON.parse(runRaw));
     }
-  } else if(currentMode !== null) {
-    // Ne clear que si on vient d'un mode de jeu actif (pas au démarrage)
+  } else if(currentMode === 'story') {
+    // Run histoire terminée ou abandonnée → on efface
     clearRunInProgress();
   }
+  // Si on vient du speedrun → on ne touche pas au RUN_SAVE_KEY (la run histoire est préservée)
   gameOver=true;
   stopGlobuleSystem();
   stopEventSystem();
@@ -5634,11 +5789,20 @@ function resumeRun(){
   document.getElementById('game').style.display='block';
   document.getElementById('scorescreen').className='';
   var ab = document.getElementById('abandon-btn'); if(ab) ab.style.display='inline-block';
+
+  // UI mode histoire
+  document.getElementById('vax-section').style.display='block';
   document.getElementById('timer-box').style.display='none';
   document.getElementById('slbl3').textContent='VACCIN';
   document.getElementById('s-third').style.color='var(--red)';
   document.getElementById('ch-wrap').style.display='block';
+  document.getElementById('sr-records-box').style.display='none';
+  document.getElementById('abandon-btn').style.display='inline-block';
+  document.querySelector('.stats-row').style.display='flex';
+  document.getElementById('game-tabs').style.display='flex';
+  document.getElementById('active-event-banner').style.display='flex';
   vaccineSlowMult = permanentState.vaccineBonus || 1;
+  storyStarted = true; // partie déjà en cours → vaccin reprend immédiatement
 
   switchTab('virus');
   initClickZone();
@@ -5677,9 +5841,20 @@ setInterval(()=>{
   const skinB = getEquippedBonus();
   const tb = getTreeBonus();
   const effective = Math.floor(passive * skinB.auto * tb.autoMult * eventAutoMult);
-  infected=Math.min(infected+effective,runTarget);
-  if(infected>=runTarget) endRun(true);
-  else updateUI();
+  if(currentMode==='speedrun' && currentSrType==='full'){
+    // Any% : valeur brute du passive sans multiplicateurs virus/arbre
+    const rawPassive = passive;
+    srClicksCount = Math.min(srClicksCount + rawPassive, currentSpeedrunTarget);
+    const pct = Math.min((srClicksCount/currentSpeedrunTarget)*100, 100);
+    const bg = document.getElementById('bar-green'); if(bg) bg.style.width=pct+'%';
+    const pl = document.getElementById('pct-lbl'); if(pl) pl.textContent=pct.toFixed(2)+'%';
+    const it = document.getElementById('inf-count'); if(it) it.textContent=Math.floor(srClicksCount);
+    if(srClicksCount >= currentSpeedrunTarget) endRun(true);
+  } else {
+    infected=Math.min(infected+effective,runTarget);
+    if(infected>=runTarget) endRun(true);
+    else updateUI();
+  }
 },1000);
 
 // Temps de jeu — tourne en permanence, s'arrête uniquement si app en arrière-plan
@@ -7453,13 +7628,8 @@ function initFirebase(){
           updatedAt: Date.now()
         });
         console.log('[FB] cloud_saves OK:', pseudo);
-        // Indicateur visuel discret de sync réussie
-        var el = document.getElementById('save-indicator');
-        if(el){ el.textContent='☁ sync'; el.style.color='rgba(0,255,136,0.3)'; setTimeout(function(){ if(el) el.textContent=''; }, 2000); }
       }catch(e){
         console.log('[FB] saveFullSave error:', e.message);
-        var el = document.getElementById('save-indicator');
-        if(el){ el.textContent='☁ erreur'; el.style.color='rgba(255,100,100,0.4)'; }
       }
     };
 
