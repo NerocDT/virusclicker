@@ -6,7 +6,7 @@
   <title>☣ PATHOGEN-X</title>
   <script>
   // ══ AUTO-UPDATE — changer ce numéro à chaque mise à jour ══
-  var APP_VERSION = '1.20';
+  var APP_VERSION = '1.21';
   (function(){
     // On met juste à jour le numéro de version
     localStorage.setItem('pathogenx_version', APP_VERSION);
@@ -5378,7 +5378,14 @@ function showScore(win,elapsed,isFinal=false){
   sb.style.color=win?'var(--green)':'var(--red)';
 
   // Bouton principal
-  if(win && !isFinal && currentMode==='story'){
+  if(isSR){
+    // Speedrun — bouton rejouer
+    sb.textContent='↺ REJOUER';
+    sb.onclick=()=>{
+      document.getElementById('scorescreen').className='';
+      selectSpeedrun(currentSpeedrunTarget);
+    };
+  } else if(win && !isFinal && currentMode==='story'){
     const nextCh = CHAPTER_DATA[currentChapter];
     sb.textContent='☣️ CHAPITRE '+(nextCh?nextCh.id:'?')+' →';
     sb.onclick=()=>{
@@ -6593,7 +6600,7 @@ function computeScoreDetails(){
   speedrunScore=Math.min(speedrunScore,5000);
   var collectionScore=(achievementStats.totalSkinsUnlocked||0)*150+(achievementStats.maxSkinLevel||0)*70;
   var achievScore=Math.min(Object.keys(achievementsUnlocked).length*60,2100);
-  var totalWinsAll=(globalStats.totalWinsStory||0)+(globalStats.totalWinsSpeed||0);
+  var totalWinsAll=(globalStats.totalWinsStory||0);
   var winsScore=Math.min(totalWinsAll*50,2500);
   var lootboxStdScore=Math.min((achievementStats.totalLootboxesStd||0)*1,500);
   var lootboxPremiumScore=Math.min((achievementStats.totalLootboxesPremium||0)*5,500);
@@ -6800,7 +6807,7 @@ async function submitScore(){
       score:det.total,
       chapitre:achievementStats.maxChapterCompleted||0,
       skins:achievementStats.totalSkinsUnlocked||0,
-      victoires:(globalStats.totalWinsStory||0)+(globalStats.totalWinsSpeed||0),
+      victoires:(globalStats.totalWinsStory||0),
       succes:Object.keys(achievementsUnlocked).length,
       srBest:bestSR,
       srDiff:bestSRDiff,
@@ -6985,7 +6992,7 @@ async function loadLeaderboard(){
     var bestSR=null,bestSRDiff=null;
     SR_TARGETS.forEach(function(sr){var t=bestTimes[sr.key];if(t&&(!bestSR||t<bestSR)){bestSR=Math.round(t/1000);bestSRDiff=sr.diff;}});
     entries=entries.filter(function(e){return e.pseudo!==playerPseudo;});
-    entries.push({pseudo:playerPseudo,score:det.total,skins:achievementStats.totalSkinsUnlocked||0,victoires:(globalStats.totalWinsStory||0)+(globalStats.totalWinsSpeed||0),chapitre:achievementStats.maxChapterCompleted||0,date:new Date().toISOString().slice(0,10),fake:false,srBest:bestSR,srDiff:bestSRDiff,succes:Object.keys(achievementsUnlocked).length,lootStd:achievementStats.totalLootboxesStd||0,lootPrem:achievementStats.totalLootboxesPremium||0});
+    entries.push({pseudo:playerPseudo,score:det.total,skins:achievementStats.totalSkinsUnlocked||0,victoires:(globalStats.totalWinsStory||0),chapitre:achievementStats.maxChapterCompleted||0,date:new Date().toISOString().slice(0,10),fake:false,srBest:bestSR,srDiff:bestSRDiff,succes:Object.keys(achievementsUnlocked).length,lootStd:achievementStats.totalLootboxesStd||0,lootPrem:achievementStats.totalLootboxesPremium||0});
   }
   entries.sort(function(a,b){return b.score-a.score;});
   window._lbEntries=entries;
