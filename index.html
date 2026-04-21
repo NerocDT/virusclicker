@@ -6,10 +6,37 @@
   <title>☣ PATHOGEN-X</title>
   <script>
   // ══ AUTO-UPDATE — changer ce numéro à chaque mise à jour ══
-  var APP_VERSION = '1.14';
+  var APP_VERSION = '1.15';
   (function(){
-    // On met juste à jour le numéro de version — pas de reload qui risque de perdre des données
+    // On met juste à jour le numéro de version
     localStorage.setItem('pathogenx_version', APP_VERSION);
+
+    // ══ COOKIE BACKUP — survit aux resets de localStorage sur iOS web apps ══
+    function setCookie(name, value, days){
+      var d = new Date(); d.setTime(d.getTime() + days*86400000);
+      document.cookie = name + '=' + encodeURIComponent(value) + ';expires=' + d.toUTCString() + ';path=/;SameSite=Lax';
+    }
+    function getCookie(name){
+      var m = document.cookie.match('(^|;)\\s*' + name + '=([^;]*)');
+      return m ? decodeURIComponent(m[2]) : null;
+    }
+    window._pxSetCookie = setCookie;
+    window._pxGetCookie = getCookie;
+
+    // Si localStorage a perdu le pseudo mais le cookie l'a encore → restaurer
+    var lsPseudo = localStorage.getItem('pathogenx_pseudo');
+    var lsPin    = localStorage.getItem('pathogenx_pin');
+    var ckPseudo = getCookie('px_pseudo');
+    var ckPin    = getCookie('px_pin');
+
+    if(!lsPseudo && ckPseudo){
+      console.log('[RECOVERY] Pseudo restauré depuis cookie:', ckPseudo);
+      localStorage.setItem('pathogenx_pseudo', ckPseudo);
+    }
+    if(!lsPin && ckPin){
+      console.log('[RECOVERY] Pin restauré depuis cookie');
+      localStorage.setItem('pathogenx_pin', ckPin);
+    }
   })();
   </script>
     <style id="fonts">
@@ -831,7 +858,7 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
       </div>
     </div>
 
-    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.14</div>
+    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.15</div>
 
   </div>
 </div>
@@ -1539,6 +1566,7 @@ function resetDefeatBonuses(){
 //  PERSISTANCE — localStorage
 // ══════════════════════════════════════════
 const SAVE_KEY = 'pathogenx_save';
+let gameFullyLoaded = false; // Empêche saveGame d'écraser Firebase tant que le chargement n'est pas fini
 
 function saveGame(){
   try {
@@ -1554,7 +1582,8 @@ function saveGame(){
     localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     const el = document.getElementById('save-indicator');
     if(el){ el.textContent=''; el.style.color='var(--green-dim)'; }
-    // Sync cloud Firebase toutes les 5s max — attend que Firebase soit prêt
+    // Sync cloud Firebase toutes les 5s max — seulement après chargement complet
+    if(!gameFullyLoaded) return; // Ne pas écraser Firebase pendant le chargement initial
     const now = Date.now();
     if(!saveGame._lastCloud || now - saveGame._lastCloud > 5000){
       saveGame._lastCloud = now;
@@ -4185,10 +4214,18 @@ function showPseudoScreen(){
 
 async function checkAndSyncFromFirebase(){
   try{
-    if(!window.fbRestoreFullSave) return;
     var pseudo  = localStorage.getItem('pathogenx_pseudo');
     var pinHash = localStorage.getItem('pathogenx_pin');
     if(!pseudo || !pinHash) return;
+
+    // Attendre Firebase si pas encore prêt (max 8 secondes)
+    if(!window.fbRestoreFullSave){
+      await new Promise(function(resolve){
+        var timeout = setTimeout(resolve, 8000);
+        window.addEventListener('firebaseReady', function(){ clearTimeout(timeout); resolve(); }, {once:true});
+      });
+    }
+    if(!window.fbRestoreFullSave) return;
 
     var cloudData = await window.fbRestoreFullSave(pseudo, pinHash);
     if(!cloudData) return;
@@ -4207,6 +4244,15 @@ async function checkAndSyncFromFirebase(){
       // Local plus récent → garde le local et re-sync Firebase
       console.log('[SYNC] Local plus récent, sync Firebase...');
       if(window.fbSaveFullSave) fbSaveFullSave();
+    }
+
+    // Restaurer la run en cours depuis Firebase si elle n'est pas dans le localStorage
+    if(!hasRunInProgress() && window.fbRestoreRunInProgress){
+      var cloudRun = await window.fbRestoreRunInProgress(pseudo);
+      if(cloudRun && cloudRun.infected > 100){
+        console.log('[SYNC] Run en cours restaurée depuis Firebase');
+        localStorage.setItem(RUN_SAVE_KEY, JSON.stringify(cloudRun));
+      }
     }
   }catch(e){
     console.log('[SYNC] checkAndSyncFromFirebase error:', e.message);
@@ -4274,6 +4320,7 @@ async function confirmPseudo(){
   playerPseudo = val;
   localStorage.setItem('pathogenx_pseudo', val);
   localStorage.setItem('pathogenx_pin', hashPin(pin));
+  if(window._pxSetCookie){ _pxSetCookie('px_pseudo', val, 365); _pxSetCookie('px_pin', hashPin(pin), 365); }
   document.getElementById('pseudo-screen').style.display = 'none';
   goMenu();
   // Sauvegarde initiale sur Firebase — leaderboard + cloud
@@ -4306,6 +4353,7 @@ async function restoreProgress(){
   playerPseudo = pseudo;
   localStorage.setItem('pathogenx_pseudo', pseudo);
   localStorage.setItem('pathogenx_pin', hashPin(pin));
+  if(window._pxSetCookie){ _pxSetCookie('px_pseudo', pseudo, 365); _pxSetCookie('px_pin', hashPin(pin), 365); }
   localStorage.setItem(SAVE_KEY, JSON.stringify(cloudData));
   if(err) err.textContent = '✓ Connecté !';
   setTimeout(function(){
@@ -5522,11 +5570,14 @@ function saveRunInProgress(){
       elapsed: Date.now() - startTime,
     };
     localStorage.setItem(RUN_SAVE_KEY, JSON.stringify(run));
+    // Sync sur Firebase aussi
+    if(window.fbSaveRunInProgress) fbSaveRunInProgress(run);
   } catch(e) { console.warn('Run save failed', e); }
 }
 
 function clearRunInProgress(){
   localStorage.removeItem(RUN_SAVE_KEY);
+  if(window.fbClearRunInProgress) fbClearRunInProgress();
 }
 
 function hasRunInProgress(){
@@ -5747,9 +5798,9 @@ function initLoadingScreen(){
         if(saved){
           playerPseudo = saved;
           loadGame(); // charge le localStorage immédiatement
-          checkAndSyncFromFirebase().then(() => goMenu()); // puis vérifie Firebase
+          checkAndSyncFromFirebase().then(() => { gameFullyLoaded = true; goMenu(); }); // puis vérifie Firebase
         }
-        else { showPseudoScreen(); }
+        else { gameFullyLoaded = true; showPseudoScreen(); }
       },800);
     }
   },6000);
@@ -5918,6 +5969,7 @@ async function saveSettingsPseudo(){
   }
   playerPseudo = val;
   localStorage.setItem('pathogenx_pseudo', val);
+  if(window._pxSetCookie){ _pxSetCookie('px_pseudo', val, 365); }
   showSettingsPopup('✓ Changement de pseudo confirmé');
 }
 
@@ -7436,6 +7488,39 @@ function initFirebase(){
         console.log('[FB] cloud_saves restauré:', pseudo);
         return JSON.parse(data.saveData);
       }catch(e){ console.log('[FB] restoreFullSave error:', e.message); return null; }
+    };
+
+    // ══ cloud_runs — sauvegarde de run en cours sur Firebase ══════════
+    window.fbSaveRunInProgress = async function(runData){
+      try{
+        var pseudo = localStorage.getItem('pathogenx_pseudo');
+        if(!pseudo || !runData) return;
+        await db.collection('cloud_runs').doc(toKey(pseudo)).set({
+          pseudo: pseudo,
+          runData: JSON.stringify(runData),
+          updatedAt: Date.now()
+        });
+        console.log('[FB] cloud_run sauvegardée');
+      }catch(e){ console.log('[FB] saveRun error:', e.message); }
+    };
+
+    window.fbRestoreRunInProgress = async function(pseudo){
+      try{
+        var snap = await db.collection('cloud_runs').doc(toKey(pseudo)).get();
+        if(!snap.exists) return null;
+        var data = snap.data();
+        console.log('[FB] cloud_run restaurée');
+        return JSON.parse(data.runData);
+      }catch(e){ console.log('[FB] restoreRun error:', e.message); return null; }
+    };
+
+    window.fbClearRunInProgress = async function(){
+      try{
+        var pseudo = localStorage.getItem('pathogenx_pseudo');
+        if(!pseudo) return;
+        await db.collection('cloud_runs').doc(toKey(pseudo)).delete();
+        console.log('[FB] cloud_run supprimée');
+      }catch(e){ console.log('[FB] clearRun error:', e.message); }
     };
 
     // ══ speedrun_records ══════════════════════════════════════════════
