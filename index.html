@@ -6,7 +6,7 @@
   <title>☣ PATHOGEN-X</title>
   <script>
   // ══ AUTO-UPDATE — changer ce numéro à chaque mise à jour ══
-  var APP_VERSION = '1.22';
+  var APP_VERSION = '1.23';
   (function(){
     // On met juste à jour le numéro de version
     localStorage.setItem('pathogenx_version', APP_VERSION);
@@ -854,7 +854,7 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
       </div>
     </div>
 
-    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.22</div>
+    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.23</div>
 
   </div>
 </div>
@@ -2131,11 +2131,11 @@ function updateClassement(){
 // ══════════════════════════════════════════
 //  SELECTSPEEDRUN
 // ══════════════════════════════════════════
-let currentSrType = 'no-bonus'; // 'no-bonus' ou 'virus'
+let currentSrType = 'no-bonus'; // 'no-bonus', 'virus' ou 'full'
+window._srType = 'no-bonus'; // synchronisé avec le dropdown
 
 function getSrKey(baseKey){
-  if(currentSrType === 'virus') return 'jv_' + baseKey;
-  if(currentSrType === 'full')  return 'any_' + baseKey;
+  // Plus de préfixes — la collection Firebase fait la distinction
   return baseKey;
 }
 
@@ -2143,7 +2143,7 @@ let menuTouch=false;
 
 function selectSpeedrun(clicks){
   if(menuTouch) return; menuTouch=true; setTimeout(()=>menuTouch=false,600);
-  currentSrType = window._srType || 'no-bonus';
+  // currentSrType déjà mis à jour par selectSrType — pas besoin de window._srType
   currentSpeedrunTarget = clicks;
   srClicksCount = 0;
   currentMode = 'speedrun';
@@ -4346,8 +4346,7 @@ function renderSrCards(){
   ];
   grid.innerHTML = targets.map((t, i) => {
     const c = colors[i] || colors[0];
-    const key = (type === 'full') ? 'any_' + t.key : (type === 'virus') ? 'jv_' + t.key : t.key;
-    const best = bestTimes[key] ? fmtChrono(bestTimes[key]) : '--:--.--';
+    const key = (type === 'full') ? 'any_' + t.key : (type === 'virus') ? 'jv_' + t.key : t.key;    const best = bestTimes[key] ? fmtChrono(bestTimes[key]) : '--:--.--';
     const num = t.label.split(' ')[0] + ' ' + (t.label.split(' ')[1]||'');
     return `<div class="mcard speed sr-card" style="border-color:${c.border}" ontouchend="if(!touchMoved){event.preventDefault();selectSpeedrun(${t.clicks})}" onclick="selectSpeedrun(${t.clicks})">
       <div class="sr-target" style="color:${c.text}">${num}</div>
@@ -4359,6 +4358,7 @@ function renderSrCards(){
 
 function selectSrType(type, label){
   window._srType = type;
+  currentSrType = type; // mise à jour directe pour éviter tout décalage
   const lbl = document.getElementById('sr-selected-label');
   if(lbl) lbl.textContent = label;
   toggleSrDropdown();
@@ -5371,12 +5371,13 @@ function endRun(win){
   const elapsed=Date.now()-startTime;
   if(currentMode==='speedrun'&&win){
     const srK=getActiveSrTargets().find(s=>s.clicks===currentSpeedrunTarget);
-    const srKey = srK ? getSrKey(srK.key) : null;
-    if(srK&&(!bestTimes[srKey]||elapsed<bestTimes[srKey])){ bestTimes[srKey]=elapsed; }
+    const srKeyLocal = srK ? (currentSrType==='virus'?'jv_':currentSrType==='full'?'any_':'') + srK.key : null;
+    const srKeyFb = srK ? srK.key : null;
+    if(srK&&(!bestTimes[srKeyLocal]||elapsed<bestTimes[srKeyLocal])){ bestTimes[srKeyLocal]=elapsed; }
     globalStats.totalWinsSpeed++;
     achievementStats.totalSpeedrunWins=(achievementStats.totalSpeedrunWins||0)+1;
     dailyOnWin(true, elapsed);
-    if(srK) submitSpeedrunRecord(srKey, elapsed);
+    if(srK) submitSpeedrunRecord(srKeyFb, elapsed);
     // Récompense : 10 souches
     setTimeout(()=>{
       addSouches(10, 'speedrun');
@@ -7679,47 +7680,50 @@ function initFirebase(){
     };
 
     // ══ speedrun_records ══════════════════════════════════════════════
-    // Structure : un doc par catégorie contenant le top 3
-    // { top: [ {pseudo, timeMs, date}, {pseudo, timeMs, date}, {pseudo, timeMs, date} ] }
-    // Pour supprimer un joueur depuis la console Firebase : éditer le tableau top[]
+    // 3 collections distinctes : speedrun_skills / speedrun_justvirus / speedrun_any
+    // Chaque doc = une catégorie (1k, 2k...) avec top 3
+    // Pour supprimer : éditer le tableau top[] dans la console Firebase
 
-    // Enregistre un temps et met à jour le top 3
+    function srCollection(){
+      if(currentSrType === 'virus') return 'speedrun_justvirus';
+      if(currentSrType === 'full')  return 'speedrun_any';
+      return 'speedrun_records'; // Skills = ancienne collection, scores préservés
+    }
+
     window.fbSaveSpeedrunRecord = async function(category, pseudo, timeMs){
       try{
-        var docRef = db.collection('speedrun_records').doc(category);
+        // category = clé brute (1k, 2k, 5k...) — la collection fait la distinction
+        var col = srCollection();
+        var docRef = db.collection(col).doc(category);
         var snap   = await docRef.get();
         var top = snap.exists && snap.data().top ? snap.data().top : [];
 
-        // Vérifie si le joueur est déjà dans le top — on garde son meilleur temps
         var existing = top.findIndex(function(e){ return e.pseudo === pseudo; });
         if(existing >= 0){
-          if(timeMs >= top[existing].timeMs) return false; // pas de nouveau record perso
-          top.splice(existing, 1); // retire l'ancienne entrée pour la remplacer
+          if(timeMs >= top[existing].timeMs) return false;
+          top.splice(existing, 1);
         }
 
-        // Ajoute le nouveau temps
         top.push({ pseudo:pseudo, timeMs:timeMs, date:new Date().toISOString().slice(0,10) });
-
-        // Trie par timeMs croissant et garde seulement le top 3
         top.sort(function(a,b){ return a.timeMs - b.timeMs; });
         top = top.slice(0, 3);
 
         await docRef.set({ top: top });
 
         var isRecord = top[0].pseudo === pseudo && top[0].timeMs === timeMs;
-        console.log('[FB] speedrun_records top3 mis à jour:', category, pseudo, timeMs);
-        return isRecord; // true si c'est le nouveau #1
+        console.log('[FB] '+col+' top3 mis à jour:', category, pseudo, timeMs);
+        return isRecord;
       }catch(e){ console.log('[FB] saveSpeedrunRecord error:', e.message); return false; }
     };
 
-    // Récupère le #1 du top 3 pour une catégorie
     window.fbGetSpeedrunRecord = async function(category){
       try{
-        var snap = await db.collection('speedrun_records').doc(category).get();
+        var col = srCollection();
+        var snap = await db.collection(col).doc(category).get();
         if(!snap.exists) return null;
         var top = snap.data().top;
         if(!top || top.length === 0) return null;
-        return top[0]; // retourne le #1
+        return top[0];
       }catch(e){ console.log('[FB] getSpeedrunRecord error:', e.message); return null; }
     };
 
