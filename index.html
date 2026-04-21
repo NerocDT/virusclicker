@@ -6,7 +6,7 @@
   <title>☣ PATHOGEN-X</title>
   <script>
   // ══ AUTO-UPDATE — changer ce numéro à chaque mise à jour ══
-  var APP_VERSION = '1.16';
+  var APP_VERSION = '1.17';
   (function(){
     // On met juste à jour le numéro de version
     localStorage.setItem('pathogenx_version', APP_VERSION);
@@ -858,7 +858,7 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
       </div>
     </div>
 
-    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.16</div>
+    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.17</div>
 
   </div>
 </div>
@@ -910,7 +910,7 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
       <button onclick="openSkinsPanel()" ontouchend="safeTap(()=>openSkinsPanel())" style="padding:5px 14px;background:rgba(204,136,255,0.22);border:2px solid rgba(204,136,255,0.9);color:var(--purple);font-family:'Share Tech Mono','Courier New',monospace;font-size:11px;cursor:pointer;touch-action:manipulation;box-shadow:0 0 14px rgba(204,136,255,0.4);text-shadow:0 0 8px rgba(204,136,255,0.8);font-weight:bold;letter-spacing:2px">LABO</button>
       <button onclick="openLootboxShop()" ontouchend="safeTap(()=>openLootboxShop())" style="padding:5px 20px;background:rgba(136,221,255,0.22);border:2px solid rgba(136,221,255,0.9);color:#88ddff;font-family:'Share Tech Mono','Courier New',monospace;font-size:11px;cursor:pointer;touch-action:manipulation;box-shadow:0 0 14px rgba(136,221,255,0.4);text-shadow:0 0 8px rgba(136,221,255,0.8);font-weight:bold;letter-spacing:2px">SHOP</button>
       <button class="hdr-back" onclick="goMenu()" style="padding:5px 12px">← Menu</button>
-      <button onclick="toggleDev()" ontouchend="event.preventDefault();toggleDev()" style="padding:4px 8px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);color:rgba(255,215,0,0.6);font-family:monospace;font-size:10px;cursor:pointer;touch-action:manipulation">DEV</button>
+      <!-- <button onclick="toggleDev()" ontouchend="event.preventDefault();toggleDev()" style="padding:4px 8px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);color:rgba(255,215,0,0.6);font-family:monospace;font-size:10px;cursor:pointer;touch-action:manipulation">DEV</button> -->
       </div>
     </div>
 
@@ -2421,7 +2421,6 @@ const RANDOM_EVENTS = [
   // ── NOUVEAUX BONUS ──
   { id:'ev17', type:'bonus',  icon:'🧬', name:'Surcharge ARN',         desc:'×5 tap, auto coupé pendant 15s', duration:15, effect:'surchargeARN', value:5 },
   { id:'ev18', type:'bonus',  icon:'⏱️', name:'Gel du Vaccin',         desc:'Vaccin figé pendant 15s',        duration:15, effect:'vaxFreeze',    value:0 },
-  { id:'ev19', type:'bonus',  icon:'💀', name:'Mutation Nécrotique',   desc:'Les 50 prochains clics ×10',     duration:0,  effect:'necroticMult', value:50 },
 ];
 
 let eventInterval = null;     // setInterval pour déclencher les events
@@ -2435,7 +2434,6 @@ let eventAutoMult = 1;        // multiplicateur temporaire d'auto
 let eventVaxMult = 1;         // multiplicateur temporaire de vaccin
 let eventShopFrozen = false;  // shop gelé ?
 let eventVaxFrozen = false;   // vaccin figé ?
-let necroticClicksLeft = 0;   // clics restants pour Mutation Nécrotique
 
 function startEventSystem(){
   stopEventSystem();
@@ -2594,25 +2592,6 @@ function applyEvent(ev){
   if(ev.effect === 'shopFreeze') eventShopFrozen = true;
   if(ev.effect === 'surchargeARN') { eventTapMult = ev.value; eventAutoMult = 0; }
   if(ev.effect === 'vaxFreeze')    { eventVaxFrozen = true; }
-  if(ev.effect === 'necroticMult') {
-    necroticClicksLeft = ev.value;
-    // Afficher dans la bannière avec compteur
-    const banner = document.getElementById('active-event-banner');
-    if(banner){
-      banner.style.borderColor = 'rgba(0,255,136,0.4)';
-      banner.style.background = 'rgba(0,255,136,0.06)';
-      document.getElementById('aeb-icon').textContent = ev.icon;
-      document.getElementById('aeb-name').textContent = ev.name;
-      document.getElementById('aeb-name').style.color = 'var(--green)';
-      document.getElementById('aeb-desc').textContent = ev.desc;
-      document.getElementById('aeb-timer').textContent = necroticClicksLeft + ' clics';
-      document.getElementById('aeb-timer').style.color = 'var(--green)';
-    }
-    showFusionToast('💀 Les 50 prochains clics ×10 !', 'var(--green)');
-    activeEvent = null;
-    if(activeEventTO){ clearTimeout(activeEventTO); activeEventTO = null; }
-    return;
-  }
 
   // Afficher la bannière active
   const banner = document.getElementById('active-event-banner');
@@ -2679,27 +2658,7 @@ function registerClick(x, y){
   if(currentMode==='story' && !storyStarted) storyStarted = true;
   const skinB = getEquippedBonus();
   const tb = getTreeBonus();
-  let necroMult = 1;
-  if(necroticClicksLeft > 0){
-    necroMult = 10;
-    necroticClicksLeft--;
-    const timerEl = document.getElementById('aeb-timer');
-    if(timerEl) timerEl.textContent = necroticClicksLeft + ' clics';
-    if(necroticClicksLeft === 0){
-      showFusionToast('💀 Mutation Nécrotique terminée !', 'var(--text-faint)');
-      const banner = document.getElementById('active-event-banner');
-      if(banner){
-        banner.style.borderColor = 'rgba(255,255,255,0.08)';
-        banner.style.background = 'rgba(255,255,255,0.02)';
-        document.getElementById('aeb-icon').textContent = '—';
-        document.getElementById('aeb-name').textContent = 'Aucun événement actif';
-        document.getElementById('aeb-name').style.color = 'var(--text-faint)';
-        document.getElementById('aeb-desc').textContent = '';
-        document.getElementById('aeb-timer').textContent = '';
-      }
-    }
-  }
-  const effective = clickPower * skinB.tap * tb.tapMult * eventTapMult * necroMult;
+  const effective = clickPower * skinB.tap * tb.tapMult * eventTapMult;
   totalClicks++;
   achievementStats.totalClicks++;
   dailyOnClick(1);
