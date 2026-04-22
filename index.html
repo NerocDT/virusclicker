@@ -6,7 +6,7 @@
   <title>☣ PATHOGEN-X</title>
   <script>
   // ══ AUTO-UPDATE — changer ce numéro à chaque mise à jour ══
-  var APP_VERSION = '1.23';
+  var APP_VERSION = '1.24';
   (function(){
     // On met juste à jour le numéro de version
     localStorage.setItem('pathogenx_version', APP_VERSION);
@@ -854,7 +854,7 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
       </div>
     </div>
 
-    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.23</div>
+    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.24</div>
 
   </div>
 </div>
@@ -2248,9 +2248,7 @@ function startRun(){
     const sbox3 = document.getElementById('sbox3');
     if(sbox3) sbox3.style.display = isAny ? 'none' : '';
     if(isAny){
-      // Initialise les upgrades au niveau chapitre 1
-      currentChapter = 0;
-      shop = makeShop();
+      // currentChapter déjà à 0, shop déjà créé avec valeurs custom Any%
       shopDiscountMult = 1;
     }
     const srKey = getActiveSrTargets().find(s=>s.clicks===currentSpeedrunTarget);
@@ -2398,20 +2396,29 @@ function initClickZone(){
     const t = e.changedTouches[0];
 
     if(currentMode==='speedrun'){
-      // Mode speedrun : clics bruts, pas de bonus
-      srClicksCount += count;
+      const skinB = getEquippedBonus();
+      let clickVal;
+      if(currentSrType === 'full'){
+        clickVal = (clickPower + (skinB.tap - 1)) * count;
+      } else if(currentSrType === 'virus'){
+        clickVal = skinB.tap * count;
+      } else {
+        clickVal = count;
+      }
+      srClicksCount += clickVal;
       totalClicks += count;
       achievementStats.totalClicks += count;
       dailyOnClick(count);
       const pct = Math.min((srClicksCount / currentSpeedrunTarget) * 100, 100);
       const bg = document.getElementById('bar-green'); if(bg) bg.style.width = pct + '%';
       const pl = document.getElementById('pct-lbl'); if(pl) pl.textContent = pct.toFixed(2) + '%';
-      const st = document.getElementById('s-third'); if(st) st.textContent = srClicksCount;
-      const it = document.getElementById('inf-count'); if(it) it.textContent = srClicksCount;
+      const displayVal = (currentSrType === 'no-bonus') ? Math.floor(srClicksCount) : srClicksCount.toFixed(1);
+      const st = document.getElementById('s-third'); if(st) st.textContent = displayVal;
+      const it = document.getElementById('inf-count'); if(it) it.textContent = displayVal;
       const b = document.getElementById('vbtn');
       if(b){ b.classList.add('pressed'); setTimeout(()=>b.classList.remove('pressed'),120); }
       tryVibrate(12);
-      spawnParticleAmount(t.clientX, t.clientY, 1);
+      spawnParticleAmount(t.clientX, t.clientY, clickVal);
       if(srClicksCount >= currentSpeedrunTarget) endRun(true);
       return;
     }
@@ -6620,13 +6627,26 @@ function renderDailyChallenges(){
 // ══════════════════════════════════════════
 //  SPEEDRUN RECORDS — affichage en jeu
 // ══════════════════════════════════════════
-let cachedWorldRecords = {}; // { '5m': { pseudo:'xxx', timeMs:12345 }, ... }
+let cachedWorldRecords = {}; // { 'skills_1k': {...}, 'jv_1k': {...}, 'any_1k': {...} }
+
+function getCachePrefix(){
+  if(currentSrType === 'virus') return 'jv_';
+  if(currentSrType === 'full') return 'any_';
+  return 'skills_';
+}
+
+function getLocalRecordPrefix(){
+  if(currentSrType === 'virus') return 'jv_';
+  if(currentSrType === 'full') return 'any_';
+  return '';
+}
 
 async function loadWorldRecord(srKey){
   if(!window.fbGetSpeedrunRecord) return;
   try {
     const data = await window.fbGetSpeedrunRecord(srKey);
-    if(data) cachedWorldRecords[srKey] = data;
+    const cacheKey = getCachePrefix() + srKey;
+    if(data) cachedWorldRecords[cacheKey] = data;
   } catch(e){}
 }
 
@@ -6636,18 +6656,21 @@ function updateSpeedrunRecordsUI(){
   if(currentMode !== 'speedrun'){ box.style.display = 'none'; return; }
   box.style.display = 'block';
 
-  const srK = SR_TARGETS.find(s => s.clicks === currentSpeedrunTarget);
+  const targets = getActiveSrTargets();
+  const srK = targets.find(s => s.clicks === currentSpeedrunTarget);
   if(!srK) return;
 
-  // Record perso
+  // Record perso — utilise le préfixe local
   const persoEl = document.getElementById('sr-perso-time');
-  const myBest = bestTimes[srK.key];
+  const localKey = getLocalRecordPrefix() + srK.key;
+  const myBest = bestTimes[localKey];
   if(persoEl) persoEl.textContent = myBest ? fmtChrono(myBest) : '--:--.--';
 
-  // Record monde
+  // Record monde — utilise le préfixe cache
   const worldEl = document.getElementById('sr-world-time');
   const worldPseudo = document.getElementById('sr-world-pseudo');
-  const wr = cachedWorldRecords[srK.key];
+  const cacheKey = getCachePrefix() + srK.key;
+  const wr = cachedWorldRecords[cacheKey];
   if(worldEl){
     if(wr){
       if(worldPseudo) worldPseudo.textContent = wr.pseudo || '---';
@@ -6663,8 +6686,9 @@ async function submitSpeedrunRecord(srKey, elapsed){
   if(!playerPseudo || !window.fbSaveSpeedrunRecord) return;
   try {
     const isNewWR = await window.fbSaveSpeedrunRecord(srKey, playerPseudo, elapsed);
+    const cacheKey = getCachePrefix() + srKey;
     if(isNewWR){
-      cachedWorldRecords[srKey] = { pseudo: playerPseudo, timeMs: elapsed };
+      cachedWorldRecords[cacheKey] = { pseudo: playerPseudo, timeMs: elapsed };
       showFusionToast('🌍 NOUVEAU RECORD DU MONDE !', '#ff8800');
     }
     updateSpeedrunRecordsUI();
