@@ -6,7 +6,7 @@
   <title>☣ PATHOGEN-X</title>
   <script>
   // ══ AUTO-UPDATE — changer ce numéro à chaque mise à jour ══
-  var APP_VERSION = '1.24';
+  var APP_VERSION = '1.27';
   (function(){
     // On met juste à jour le numéro de version
     localStorage.setItem('pathogenx_version', APP_VERSION);
@@ -463,6 +463,11 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
 .r-mythic .skin-rarity{color:rgba(255,80,80,0.8);}
 .r-mythic .skin-badge{border-color:rgba(255,40,40,0.7);color:#ff3333;background:rgba(255,0,0,0.1);}
 @keyframes mythicPulse{0%,100%{box-shadow:0 0 18px rgba(255,0,0,0.15),inset 0 0 20px rgba(255,0,0,0.05);}50%{box-shadow:0 0 30px rgba(255,0,0,0.3),inset 0 0 30px rgba(255,0,0,0.1);}}
+.r-secret{border-color:rgba(255,255,255,0.8);background:rgba(255,255,255,0.06);box-shadow:0 0 30px rgba(255,255,255,0.2),inset 0 0 30px rgba(255,255,255,0.06),0 0 60px rgba(255,255,255,0.08);animation:secretPulse 3s ease-in-out infinite;}
+.r-secret .skin-name{color:#ffffff;text-shadow:0 0 20px rgba(255,255,255,1),0 0 40px rgba(255,255,255,0.5);}
+.r-secret .skin-rarity{color:rgba(255,255,255,0.7);text-shadow:0 0 8px rgba(255,255,255,0.5);}
+.r-secret .skin-badge{border-color:rgba(255,255,255,0.6);color:#fff;background:rgba(255,255,255,0.1);box-shadow:0 0 8px rgba(255,255,255,0.3);}
+@keyframes secretPulse{0%,100%{box-shadow:0 0 25px rgba(255,255,255,0.15),inset 0 0 25px rgba(255,255,255,0.05);}50%{box-shadow:0 0 50px rgba(255,255,255,0.35),inset 0 0 40px rgba(255,255,255,0.12);}}
 /* Lootbox reel item */
 .reel-item{width:100px;flex-shrink:0;text-align:center;padding:14px 8px;border-right:1px solid rgba(255,255,255,0.06);}
 .reel-item .ri-emoji{font-size:32px;display:block;margin-bottom:4px;}
@@ -576,6 +581,7 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
     <div style="position:relative;z-index:300">
       <button onclick="toggleBurgerMenu()" id="burger-btn" style="padding:6px 12px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.5);color:rgba(255,255,255,0.9);font-family:'Share Tech Mono',monospace;font-size:16px;cursor:pointer;touch-action:manipulation;line-height:1;box-shadow:0 0 12px rgba(255,255,255,0.15),inset 0 0 8px rgba(255,255,255,0.04)">☰</button>
       <div id="burger-menu" style="display: none; position: fixed; top: 56px; left: 12px; background: rgb(6, 13, 16); border: 1px solid rgba(255, 255, 255, 0.15); z-index: 500; min-width: 180px; flex-direction: column; box-shadow: rgba(0, 0, 0, 0.5) 0px 8px 24px;">
+        <button ontouchend="event.preventDefault();openProfile()" onclick="openProfile()" style="display:block;width:100%;padding:12px 16px;background:rgba(0,255,136,0.05);border:none;border-bottom:2px solid rgba(0,255,136,0.2);color:var(--green);font-family:'Share Tech Mono',monospace;font-size:11px;cursor:pointer;text-align:left;touch-action:manipulation">👤 PROFIL</button>
         <button ontouchend="event.preventDefault();openClassement()" onclick="openClassement()" style="display:block;width:100%;padding:12px 16px;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,0.06);color:var(--yellow);font-family:'Share Tech Mono',monospace;font-size:11px;cursor:pointer;text-align:left;touch-action:manipulation">🏆 CLASSEMENT</button>
         <button ontouchend="event.preventDefault();openDailyChallenges()" onclick="openDailyChallenges()" style="display:block;width:100%;padding:12px 16px;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,0.06);color:#ff8800;font-family:'Share Tech Mono',monospace;font-size:11px;cursor:pointer;text-align:left;touch-action:manipulation">🔥 DÉFI QUOTIDIEN</button>
         <button ontouchend="event.preventDefault();openStats()" onclick="openStats()" style="display:block;width:100%;padding:12px 16px;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,0.06);color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:11px;cursor:pointer;text-align:left;touch-action:manipulation">📊 STATS</button>
@@ -637,6 +643,11 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
         <div id="sr-cards-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px"></div>
       </div>
     </div>
+      <!-- TOP SECRET -->
+      <div class="mcard" onclick="openSecretMode()" ontouchend="event.preventDefault();openSecretMode()" style="padding:16px;border:1px solid rgba(255,0,0,0.25);background:rgba(10,0,0,0.6);cursor:pointer;touch-action:manipulation;position:relative;overflow:hidden;text-align:center;margin-top:12px">
+        <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(255,0,0,0.03) 0px,rgba(255,0,0,0.03) 2px,transparent 2px,transparent 8px)"></div>
+        <div style="position:relative;font-family:'Orbitron',sans-serif;font-size:15px;font-weight:900;color:#cc0000;letter-spacing:4px;text-shadow:0 0 16px rgba(255,0,0,0.5)">TOP SECRET</div>
+      </div>
   </div>
 
   <!-- Tab: Stats -->
@@ -817,6 +828,58 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
   <div id="stats-content-screen" style="flex:1;overflow-y:auto;padding:14px 18px 40px;-webkit-overflow-scrolling:touch"></div>
 </div>
 
+<!-- ══ PROFIL SCREEN ══ -->
+<div id="profile-screen" style="display:none;position:fixed;inset:0;z-index:650;background:#04080e;flex-direction:column;">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid rgba(0,255,136,0.15);background:#04080e;flex-shrink:0">
+    <div style="font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;color:var(--green);letter-spacing:3px;text-shadow:0 0 16px rgba(0,255,136,0.4)">PROFIL</div>
+    <button onclick="closeProfile()" ontouchend="event.preventDefault();closeProfile()" style="padding:7px 16px;background:transparent;border:1px solid rgba(0,255,136,0.3);color:var(--green);font-family:'Share Tech Mono',monospace;font-size:12px;cursor:pointer;touch-action:manipulation">✕ FERMER</button>
+  </div>
+  <div style="flex:1;overflow-y:auto;padding:16px 18px 40px;max-width:440px;margin:0 auto;width:100%">
+    <div style="display:flex;align-items:center;gap:14px;padding:16px;border:1px solid rgba(0,255,136,0.2);background:rgba(0,255,136,0.04);margin-bottom:16px">
+      <div id="profile-virus-icon" style="font-size:36px;line-height:1">🦠</div>
+      <div style="flex:1">
+        <div id="profile-pseudo" style="font-family:'Share Tech Mono',monospace;font-size:16px;color:#fff;font-weight:bold;letter-spacing:1px">—</div>
+        <div id="profile-title" style="font-size:10px;color:var(--yellow);letter-spacing:2px;margin-top:2px">—</div>
+        <div style="font-size:9px;color:var(--text-faint);margin-top:4px">NIVEAU <span id="profile-level-num">1</span> / 50</div>
+      </div>
+    </div>
+    <div style="margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <span style="font-size:9px;color:var(--text-faint);letter-spacing:2px">EXPÉRIENCE</span>
+        <span id="profile-xp-label" style="font-size:9px;color:var(--green);font-family:'Share Tech Mono',monospace">0 / 500 XP</span>
+      </div>
+      <div style="height:6px;background:rgba(255,255,255,0.06);border:1px solid rgba(0,255,136,0.15)">
+        <div id="profile-xp-bar" style="height:100%;background:linear-gradient(to right,#00ff88,#ffaa00,#ff4444);width:0%;transition:width 0.4s ease;box-shadow:0 0 8px rgba(0,255,136,0.5)"></div>
+      </div>
+      <div style="font-size:9px;color:var(--text-faint);margin-top:4px;text-align:right">Prochain niveau dans <span id="profile-xp-remaining">500</span> XP</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px">
+      <div style="border:1px solid rgba(0,255,136,0.12);background:rgba(0,255,136,0.03);padding:12px;text-align:center"><div id="profile-stat-wins" style="font-family:'Orbitron',sans-serif;font-size:20px;color:var(--green);font-weight:900">0</div><div style="font-size:9px;color:var(--text-faint);letter-spacing:1px;margin-top:2px">VICTOIRES HISTOIRE</div></div>
+      <div style="border:1px solid rgba(255,215,0,0.12);background:rgba(255,215,0,0.03);padding:12px;text-align:center"><div id="profile-stat-sr" style="font-family:'Orbitron',sans-serif;font-size:20px;color:var(--yellow);font-weight:900">0</div><div style="font-size:9px;color:var(--text-faint);letter-spacing:1px;margin-top:2px">SPEEDRUNS</div></div>
+      <div style="border:1px solid rgba(204,136,255,0.12);background:rgba(204,136,255,0.03);padding:12px;text-align:center"><div id="profile-stat-skins" style="font-family:'Orbitron',sans-serif;font-size:20px;color:var(--purple);font-weight:900">0</div><div style="font-size:9px;color:var(--text-faint);letter-spacing:1px;margin-top:2px">VIRUS</div></div>
+      <div style="border:1px solid rgba(136,221,255,0.12);background:rgba(136,221,255,0.03);padding:12px;text-align:center"><div id="profile-stat-souches" style="font-family:'Orbitron',sans-serif;font-size:20px;color:#88ddff;font-weight:900">0</div><div style="font-size:9px;color:var(--text-faint);letter-spacing:1px;margin-top:2px">SOUCHES</div></div>
+    </div>
+    <div style="font-size:9px;color:var(--text-faint);letter-spacing:3px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(0,255,136,0.1)">📈 SOURCES D'XP</div>
+    <div id="profile-xp-history" style="display:flex;flex-direction:column;gap:6px;margin-bottom:20px"></div>
+    <div style="font-size:9px;color:var(--text-faint);letter-spacing:3px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(0,255,136,0.1)">🎯 PROCHAINES RÉCOMPENSES</div>
+    <div id="profile-next-rewards" style="display:flex;flex-direction:column;gap:6px"></div>
+  </div>
+</div>
+
+<!-- ══ SECRET MODE SCREEN ══ -->
+<div id="secret-screen" onclick="secretClick()" ontouchend="event.preventDefault();secretClick()" style="display:none;position:fixed;inset:0;z-index:620;background:#000;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;touch-action:none;user-select:none;overflow:hidden">
+  <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(255,0,0,0.02) 0px,rgba(255,0,0,0.02) 1px,transparent 1px,transparent 12px)"></div>
+  <div onclick="event.stopPropagation()" ontouchend="event.stopPropagation()" style="position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid rgba(255,0,0,0.15)">
+    <div style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;color:#cc0000;letter-spacing:4px;text-shadow:0 0 16px rgba(255,0,0,0.5)">TOP SECRET</div>
+    <button onclick="event.stopPropagation();closeSecretMode()" ontouchend="event.stopPropagation();event.preventDefault();closeSecretMode()" style="padding:6px 14px;background:transparent;border:1px solid rgba(255,0,0,0.3);color:rgba(255,0,0,0.6);font-family:'Share Tech Mono',monospace;font-size:11px;cursor:pointer;touch-action:manipulation">✕ QUITTER</button>
+  </div>
+  <div id="secret-msg" style="position:absolute;top:70px;left:0;right:0;text-align:center;font-family:'Share Tech Mono',monospace;font-size:13px;color:rgba(255,60,60,0.8);letter-spacing:3px;padding:0 20px;transition:opacity 0.5s;pointer-events:none;text-shadow:0 0 10px rgba(255,0,0,0.6)"></div>
+  <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:24px;pointer-events:none">
+    <div id="secret-virus-svg" style="width:140px;height:140px;overflow:hidden;filter:drop-shadow(0 0 20px rgba(255,0,0,0.4));transition:transform 0.08s,width 0.3s,height 0.3s"></div>
+    <div id="secret-count" style="font-family:'Orbitron',sans-serif;font-size:36px;font-weight:900;color:#cc0000;text-shadow:0 0 20px rgba(255,0,0,0.6)">0</div>
+  </div>
+</div>
+
 <!-- ══ SETTINGS PANEL ══ -->
 <div id="settings-screen" style="display:none;position:fixed;inset:0;z-index:650;background:#040a06;flex-direction:column;">
   <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid rgba(0,255,136,0.15);background:#040a06;flex-shrink:0">
@@ -854,7 +917,7 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
       </div>
     </div>
 
-    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.24</div>
+    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.27</div>
 
   </div>
 </div>
@@ -906,7 +969,9 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
       <button onclick="openSkinsPanel()" ontouchend="safeTap(()=>openSkinsPanel())" style="padding:5px 14px;background:rgba(204,136,255,0.22);border:2px solid rgba(204,136,255,0.9);color:var(--purple);font-family:'Share Tech Mono','Courier New',monospace;font-size:11px;cursor:pointer;touch-action:manipulation;box-shadow:0 0 14px rgba(204,136,255,0.4);text-shadow:0 0 8px rgba(204,136,255,0.8);font-weight:bold;letter-spacing:2px">LABO</button>
       <button onclick="openLootboxShop()" ontouchend="safeTap(()=>openLootboxShop())" style="padding:5px 20px;background:rgba(136,221,255,0.22);border:2px solid rgba(136,221,255,0.9);color:#88ddff;font-family:'Share Tech Mono','Courier New',monospace;font-size:11px;cursor:pointer;touch-action:manipulation;box-shadow:0 0 14px rgba(136,221,255,0.4);text-shadow:0 0 8px rgba(136,221,255,0.8);font-weight:bold;letter-spacing:2px">SHOP</button>
       <button class="hdr-back" onclick="goMenu()" style="padding:5px 12px">← Menu</button>
-      <!-- <button onclick="toggleDev()" ontouchend="event.preventDefault();toggleDev()" style="padding:4px 8px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);color:rgba(255,215,0,0.6);font-family:monospace;font-size:10px;cursor:pointer;touch-action:manipulation">DEV</button> -->
+      <!-- DEVMOD : bouton DEV pour ouvrir le panel de triche (décommenter pour debugger)
+      <button onclick="toggleDev()" ontouchend="event.preventDefault();toggleDev()" style="padding:4px 8px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);color:rgba(255,215,0,0.6);font-family:monospace;font-size:10px;cursor:pointer;touch-action:manipulation">DEV</button>
+      -->
       </div>
     </div>
 
@@ -1061,8 +1126,14 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
       </div>
       <!-- Chapters toggle -->
       <div id="ch-wrap" style="display:none;margin-top:4px">
-        <button class="ch-toggle" onclick="toggleChapters()">📖 Chapitres &nbsp;<span id="ch-arrow">▼</span></button>
-        <div id="ch-body" style="display:none"><div class="clist" id="ch-list"></div></div>
+        <button class="ch-toggle" onclick="toggleAct(1)" ontouchstart="_chTouchStartY=event.touches[0].clientY" ontouchend="if(Math.abs(event.changedTouches[0].clientY-_chTouchStartY)<8){event.preventDefault();toggleAct(1)}" style="width:100%;display:flex;justify-content:space-between;align-items:center">
+          <span>📖 ACTE I — L'INFECTION DE L'HUMANITÉ</span><span id="ch-arrow-1">▼</span>
+        </button>
+        <div id="ch-body-1" style="display:none"><div class="clist" id="ch-list-1"></div></div>
+        <button class="ch-toggle" id="act2-toggle" onclick="toggleAct(2)" ontouchstart="_chTouchStartY=event.touches[0].clientY" ontouchend="if(Math.abs(event.changedTouches[0].clientY-_chTouchStartY)<8){event.preventDefault();toggleAct(2)}" style="width:100%;display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+          <span>🚀 ACTE II — LE SYSTÈME SOLAIRE</span><span id="ch-arrow-2">▼</span>
+        </button>
+        <div id="ch-body-2" style="display:none"><div class="clist" id="ch-list-2"></div></div>
       </div>
     </div>
 
@@ -1397,61 +1468,78 @@ const FINAL_TARGET = 8_000_000_000; // 8 milliards = victoire finale
 //  CHAPITRES — objectifs + upgrades calibrées ×10 par chapitre
 // ══════════════════════════════════════════
 const CHAPTER_DATA = [
-  {
-    id:1, title:"Patient Zéro",
+  // ══ ACTE I — L'INFECTION DE L'HUMANITÉ ══
+  { id:1, act:1, title:"Patient Zéro",
     desc:"Un virus inconnu est détecté. Tu es seul, invisible, mais déjà en train de te répliquer.",
-    target: 5_000_000,
-    label: "5 000 000 infectés",
-    scale: 1,
-    vaccineSpeed: 0.028,
-    stageMin: [0, 10000, 100000, 1000000, 4000000],
-    tapMult: 1,    autoMult: 1,    shopDiscount: 1,
-    mutationMsg: null,
-  },
-  {
-    id:2, title:"Épidémie Locale",
+    target:5_000_000, label:"5 000 000 infectés", scale:1, vaccineSpeed:0.028,
+    stageMin:[0,10000,100000,1000000,4000000], tapMult:1, autoMult:1, shopDiscount:1, mutationMsg:null },
+  { id:2, act:1, title:"Épidémie Locale",
     desc:"Les hôpitaux signalent une hausse anormale. Les autorités minimisent encore. Tu te propages.",
-    target: 50_000_000,
-    label: "50 000 000 infectés",
-    scale: 10,
-    vaccineSpeed: 0.030,
-    stageMin: [0, 100000, 1000000, 10000000, 40000000],
-    tapMult: 1.5,  autoMult: 1.5,  shopDiscount: 0.9,
-    mutationMsg: "🧬 Mutation Alpha — Propagation ×1.5 · Upgrades -10%",
-  },
-  {
-    id:3, title:"Alerte Nationale",
+    target:50_000_000, label:"50 000 000 infectés", scale:10, vaccineSpeed:0.030,
+    stageMin:[0,100000,1000000,10000000,40000000], tapMult:1.5, autoMult:1.5, shopDiscount:0.9,
+    mutationMsg:"🧬 Mutation Alpha — Propagation ×1.5 · Upgrades -10%" },
+  { id:3, act:1, title:"Alerte Nationale",
     desc:"État d'urgence. Les frontières se ferment. Trop tard — tu es déjà partout.",
-    target: 500_000_000,
-    label: "500 000 000 infectés",
-    scale: 100,
-    vaccineSpeed: 0.032,
-    stageMin: [0, 1000000, 10000000, 100000000, 400000000],
-    tapMult: 2.5,  autoMult: 2.5,  shopDiscount: 0.8,
-    mutationMsg: "🧬 Mutation Beta — Propagation ×2.5 · Upgrades -20%",
-  },
-  {
-    id:4, title:"Pandémie Mondiale",
+    target:500_000_000, label:"500 000 000 infectés", scale:100, vaccineSpeed:0.032,
+    stageMin:[0,1000000,10000000,100000000,400000000], tapMult:2.5, autoMult:2.5, shopDiscount:0.8,
+    mutationMsg:"🧬 Mutation Beta — Propagation ×2.5 · Upgrades -20%" },
+  { id:4, act:1, title:"Pandémie Mondiale",
     desc:"L'OMS déclare la pandémie. Les scientifiques travaillent nuit et jour. La course est lancée.",
-    target: 2_000_000_000,
-    label: "2 000 000 000 infectés",
-    scale: 400,
-    vaccineSpeed: 0.028,
-    stageMin: [0, 5000000, 50000000, 500000000, 1600000000],
-    tapMult: 4,    autoMult: 4,    shopDiscount: 0.7,
-    mutationMsg: "🧬 Mutation Gamma — Propagation ×4 · Upgrades -30%",
-  },
-  {
-    id:5, title:"Extinction",
+    target:2_000_000_000, label:"2 000 000 000 infectés", scale:400, vaccineSpeed:0.028,
+    stageMin:[0,5000000,50000000,500000000,1600000000], tapMult:4, autoMult:4, shopDiscount:0.7,
+    mutationMsg:"🧬 Mutation Gamma — Propagation ×4 · Upgrades -30%" },
+  { id:5, act:1, title:"Extinction",
     desc:"Les derniers bastions résistent. Le vaccin est presque prêt. Termine ce que tu as commencé.",
-    target: 8_000_000_000,
-    label: "8 000 000 000 — VICTOIRE FINALE",
-    scale: 1600,
-    vaccineSpeed: 0.030,
-    stageMin: [0, 20000000, 200000000, 2000000000, 6000000000],
-    tapMult: 6,    autoMult: 6,    shopDiscount: 0.6,
-    mutationMsg: "🧬 Mutation Omega — Propagation ×6 · Upgrades -40%",
-  },
+    target:8_000_000_000, label:"8 000 000 000 — VICTOIRE FINALE", scale:1600, vaccineSpeed:0.030,
+    stageMin:[0,20000000,200000000,2000000000,6000000000], tapMult:6, autoMult:6, shopDiscount:0.6,
+    mutationMsg:"🧬 Mutation Omega — Propagation ×6 · Upgrades -40%" },
+
+  // ══ ACTE II — LE SYSTÈME SOLAIRE ══
+  { id:6, act:2, title:"Lune",
+    desc:"La station lunaire Alpha est le premier relais interplanétaire. Pathogen-X y établit sa tête de pont.",
+    target:600_000_000, label:"600 millions contaminés", unit:"contaminés", scale:600, vaccineSpeed:0.020,
+    stageMin:[0,1e7,1e8,3e8,5e8], tapMult:8, autoMult:8, shopDiscount:0.55,
+    mutationMsg:"🌕 Adaptation Lunaire — Le virus conquiert le premier satellite." },
+  { id:7, act:2, title:"Mercure",
+    desc:"L'avant-poste solaire de Mercure ne résistera pas longtemps.",
+    target:1_000_000_000, label:"1 milliard contaminés", unit:"contaminés", scale:1000, vaccineSpeed:0.018,
+    stageMin:[0,1e8,3e8,6e8,9e8], tapMult:10, autoMult:10, shopDiscount:0.5,
+    mutationMsg:"☿ Mutation Mercurielle — Résistance aux radiations extrêmes." },
+  { id:8, act:2, title:"Mars",
+    desc:"Les colonies martiennes pensaient être à l'abri. Ils avaient tort.",
+    target:2_000_000_000, label:"2 milliards contaminés", unit:"contaminés", scale:2000, vaccineSpeed:0.016,
+    stageMin:[0,2e8,6e8,1.2e9,1.8e9], tapMult:12, autoMult:12, shopDiscount:0.45,
+    mutationMsg:"🔴 Adaptation Martienne — Le virus s'adapte au froid extrême." },
+  { id:9, act:2, title:"Vénus",
+    desc:"Les stations atmosphériques de Vénus flottent dans les nuages. Plus pour longtemps.",
+    target:7_500_000_000, label:"7,5 milliards contaminés", unit:"contaminés", scale:7500, vaccineSpeed:0.014,
+    stageMin:[0,5e8,2e9,4e9,7e9], tapMult:14, autoMult:14, shopDiscount:0.40,
+    mutationMsg:"♀ Adaptation Vénusienne — Résistance aux acides sulfuriques." },
+  { id:10, act:2, title:"Neptune",
+    desc:"Aux confins du système solaire, les derniers avant-postes humains tombent un à un.",
+    target:120_000_000_000, label:"120 milliards contaminés", unit:"contaminés", scale:80000, vaccineSpeed:0.012,
+    stageMin:[0,1e10,4e10,8e10,1.1e11], tapMult:18, autoMult:18, shopDiscount:0.35,
+    mutationMsg:"🔵 Distorsion Magnétique — Le virus défie la physique newtonienne." },
+  { id:11, act:2, title:"Uranus",
+    desc:"La géante de glace. Ses anneaux dissimulaient des milliers de chercheurs.",
+    target:130_000_000_000, label:"130 milliards contaminés", unit:"contaminés", scale:90000, vaccineSpeed:0.010,
+    stageMin:[0,1e10,4e10,8e10,1.2e11], tapMult:22, autoMult:22, shopDiscount:0.30,
+    mutationMsg:"🌀 Mutation Glaciaire — Propagation dans l'azote liquide." },
+  { id:12, act:2, title:"Saturne",
+    desc:"Saturne et ses lunes. Titan, Europa, Encelade — aucune ne sera épargnée.",
+    target:850_000_000_000, label:"850 milliards contaminés", unit:"contaminés", scale:400000, vaccineSpeed:0.008,
+    stageMin:[0,5e10,2e11,5e11,8e11], tapMult:28, autoMult:28, shopDiscount:0.25,
+    mutationMsg:"🪐 Adaptation Titanienne — Fusion avec la vie primitive d'Encelade." },
+  { id:13, act:2, title:"Jupiter",
+    desc:"La plus grande planète du système solaire. Sa Grande Tache Rouge devient l'emblème de Pathogen-X.",
+    target:1_200_000_000_000, label:"1 200 milliards contaminés", unit:"contaminés", scale:600000, vaccineSpeed:0.006,
+    stageMin:[0,1e11,4e11,8e11,1.1e12], tapMult:35, autoMult:35, shopDiscount:0.20,
+    mutationMsg:"♃ Absorption Jovienne — Le virus absorbe les tempêtes atmosphériques." },
+  { id:14, act:2, title:"Soleil",
+    desc:"L'étoile elle-même. Une nova de contagion projetée vers les systèmes voisins.",
+    target:95_000_000_000_000, label:"95 000 milliards — VICTOIRE SOLAIRE", unit:"particules solaires", scale:5000000, vaccineSpeed:0.004,
+    stageMin:[0,1e13,1e14,5e14,8e14], tapMult:40, autoMult:40, shopDiscount:0.15,
+    mutationMsg:"☀️ ÉVEIL SOLAIRE — Pathogen-X devient une force cosmique." },
 ];
 
 // Chapitre actif (index 0-4)
@@ -1494,14 +1582,14 @@ function makeShop(){
   return [
     // AUTO
     { id:'a1', cat:'auto', icon:'🏠', name:'Famille infectée',   descBase:Math.round(2*s),   unit:'/sec', baseCost:Math.floor(100*cs),     basePower:Math.round(2*s),    count:0, unlockAt:0,           cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.70,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(2,'/sec'); } },
-    { id:'a2', cat:'auto', icon:'🏫', name:'École contaminée',   descBase:Math.round(10*s),  unit:'/sec', baseCost:Math.floor(2500*cs),    basePower:Math.round(10*s),   count:0, unlockAt:2500*cs,     cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.72,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(this.basePower,'/sec'); } },
-    { id:'a3', cat:'auto', icon:'🏥', name:'Hôpital infiltré',   descBase:Math.round(42*s),  unit:'/sec', baseCost:Math.floor(25000*cs),   basePower:Math.round(42*s),   count:0, unlockAt:25000*cs,    cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.80,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(this.basePower,'/sec'); } },
+    { id:'a2', cat:'auto', icon:'🏫', name:'École contaminée',   descBase:Math.round(10*s),  unit:'/sec', baseCost:Math.floor(2500*cs),    basePower:Math.round(10*s),   count:0, unlockAt:2500*cs,     cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.72,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(10,'/sec'); } },
+    { id:'a3', cat:'auto', icon:'🏥', name:'Hôpital infiltré',   descBase:Math.round(42*s),  unit:'/sec', baseCost:Math.floor(25000*cs),   basePower:Math.round(42*s),   count:0, unlockAt:25000*cs,    cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.80,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(42,'/sec'); } },
     { id:'a4', cat:'auto', icon:'🚇', name:'Métro contaminé',    descBase:Math.round(140*s), unit:'/sec', baseCost:Math.floor(300000*cs),  basePower:Math.round(140*s),  count:0, unlockAt:300000*cs,   cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.85,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(140,'/sec'); } },
     { id:'a5', cat:'auto', icon:'✈️', name:'Aéroport mondial',   descBase:Math.round(560*s), unit:'/sec', baseCost:Math.floor(2100000*cs), basePower:Math.round(560*s),  count:0, unlockAt:2100000*cs,  cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.90,this.count)); }, effect(){ passive+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(560,'/sec'); } },
     // CLICK
     { id:'c1', cat:'click', icon:'🧬', name:'Mutation ARN',          descBase:1,  unit:'/tap', baseCost:Math.floor(80*cs),      basePower:Math.round(1*s),   count:0, unlockAt:0,           cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.70,this.count)); }, effect(){ clickPower+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(1,'/tap'); } },
-    { id:'c2', cat:'click', icon:'☣️', name:'Nécrose Rapide',        descBase:6,  unit:'/tap', baseCost:Math.floor(1500*cs),    basePower:Math.round(6*s),   count:0, unlockAt:1500*cs,     cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.72,this.count)); }, effect(){ clickPower+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(this.basePower,'/tap'); } },
-    { id:'c3', cat:'click', icon:'🧫', name:'Multiplication Forcée', descBase:21, unit:'/tap', baseCost:Math.floor(15000*cs),   basePower:Math.round(21*s),  count:0, unlockAt:15000*cs,    cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.80,this.count)); }, effect(){ clickPower+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(this.basePower,'/tap'); } },
+    { id:'c2', cat:'click', icon:'☣️', name:'Nécrose Rapide',        descBase:6,  unit:'/tap', baseCost:Math.floor(1500*cs),    basePower:Math.round(6*s),   count:0, unlockAt:1500*cs,     cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.72,this.count)); }, effect(){ clickPower+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(6,'/tap'); } },
+    { id:'c3', cat:'click', icon:'🧫', name:'Multiplication Forcée', descBase:21, unit:'/tap', baseCost:Math.floor(15000*cs),   basePower:Math.round(21*s),  count:0, unlockAt:15000*cs,    cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.80,this.count)); }, effect(){ clickPower+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(21,'/tap'); } },
     { id:'c4', cat:'click', icon:'💀', name:'Souche Xénomorphe',     descBase:84, unit:'/tap', baseCost:Math.floor(200000*cs),  basePower:Math.round(84*s),  count:0, unlockAt:200000*cs,   cost(m){ return Math.floor(this.baseCost*m*Math.pow(1.85,this.count)); }, effect(){ clickPower+=this.basePower*(permanentState.shopPowerMult||1); }, get desc(){ return effDesc(84,'/tap'); } },
     // RESIST — scalent aussi avec le chapitre
     { id:'v1', cat:'resist', icon:'🛡️', name:'Membrane Renforcée',     desc:'Vitesse vaccin -10%', baseCost:Math.floor(20000*cs),    basePower:0, count:0, unlockAt:0,           maxCount:1, cost(m){ return this.count>=1?Infinity:Math.floor(this.baseCost*m); }, effect(){ vaxShopMult*=0.90; } },
@@ -1574,6 +1662,8 @@ function saveGame(){
       bestTimes, globalStats,
       heritageData,
       dailyChallengeState,
+      playerXP, playerLevel, xpHistory,
+      secretClicks, secretMilestonesDone:[...secretMilestonesDone],
     };
     localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     const el = document.getElementById('save-indicator');
@@ -1623,6 +1713,11 @@ function loadGame(){
     if(d.globalStats)     globalStats = { ...globalStats, ...d.globalStats };
     if(d.heritageData)    heritageData = d.heritageData;
     if(d.dailyChallengeState) dailyChallengeState = {...dailyChallengeState, ...d.dailyChallengeState};
+    if(typeof d.playerXP === 'number') playerXP = d.playerXP;
+    if(typeof d.playerLevel === 'number') playerLevel = d.playerLevel;
+    if(d.xpHistory) xpHistory = {...xpHistory, ...d.xpHistory};
+    if(typeof d.secretClicks === 'number') secretClicks = d.secretClicks;
+    if(Array.isArray(d.secretMilestonesDone)) secretMilestonesDone = new Set(d.secretMilestonesDone);
     recalcTreeState();
     updateSouchesDisplay();
     renderVirusDisplay();
@@ -1655,8 +1750,10 @@ function resetSave(){
   achievementStats = {totalInfected:0,totalLootboxesStd:0,totalLootboxesPremium:0,maxChapterCompleted:0,totalSpeedrunWins:0,totalClicks:0,totalLootboxes:0,unlockedMythic:0,totalSkinsUnlocked:0,totalPlayTimeMs:0,skinUsage:{}};
   globalStats = {totalRunsStory:0,totalWinsStory:0,totalRunsSpeed:0,totalWinsSpeed:0,chaptersCompleted:0,totalWins:0,totalClicsAll:0,totalInfectedAll:0,totalLootboxes:0};
   playerPseudo = '';
+  playerXP = 0; playerLevel = 1; xpHistory = {chapitres:0,speedrun:0,skins:0,succes:0,daily:0};
+  secretClicks = 0; secretMilestonesDone = new Set();
   heritageData = null;
-  dailyChallengeState = { date:null, challengeIds:[], progress:{}, claimed:{}, clicksToday:0, winsToday:0, speedrunsToday:0, chaptersToday:0, lootboxToday:0, equipsToday:0, upgradeSkinsToday:0, rerolled:false, jackpotClaimed:false };
+  dailyChallengeState = { date:null, challengeIds:[], progress:{}, claimed:{}, clicksToday:0, winsToday:0, storyWinsToday:0, speedrunWinsToday:0, speedrunsToday:0, chaptersToday:0, lootboxToday:0, equipsToday:0, upgradeSkinsToday:0, rerolled:false, jackpotClaimed:false };
 
   // NE PAS sync Firebase — les données cloud restent intactes pour reconnexion
 }
@@ -1691,20 +1788,20 @@ function importSave(){
 
 // Auto-save toutes les 20s + quand on quitte
 setInterval(saveGame, 20000);
-window.addEventListener('beforeunload', function(){ saveGame(); if(window.fbSaveFullSave && localStorage.getItem('pathogenx_pseudo')) fbSaveFullSave(); if(currentMode==='story'&&!gameOver&&infected>100) saveRunInProgress(); });
-window.addEventListener('pagehide', function(){ saveGame(); if(window.fbSaveFullSave && localStorage.getItem('pathogenx_pseudo')) fbSaveFullSave(); if(currentMode==='story'&&!gameOver&&infected>100) saveRunInProgress(); });
+window.addEventListener('beforeunload', function(){ saveGame(); if(window.fbSaveFullSave && localStorage.getItem('pathogenx_pseudo')) fbSaveFullSave(); if(currentMode==='story'&&!gameOver&&infected>0) saveRunInProgress(); });
+window.addEventListener('pagehide', function(){ saveGame(); if(window.fbSaveFullSave && localStorage.getItem('pathogenx_pseudo')) fbSaveFullSave(); if(currentMode==='story'&&!gameOver&&infected>0) saveRunInProgress(); });
 window.addEventListener('visibilitychange', ()=>{
   if(document.visibilityState==='hidden'){
     pauseActiveEvent();
     saveGame();
-    if(currentMode==='story'&&!gameOver&&infected>100) saveRunInProgress();
+    if(currentMode==='story'&&!gameOver&&infected>0) saveRunInProgress();
     if(window.fbSaveFullSave && localStorage.getItem('pathogenx_pseudo')) fbSaveFullSave();
   } else {
     resumeActiveEvent();
   }
 });
 // Auto-save run toutes les 5 secondes pendant une partie
-setInterval(()=>{ if(currentMode==='story'&&!gameOver&&infected>100) saveRunInProgress(); }, 5000);
+setInterval(()=>{ if(currentMode==='story'&&!gameOver&&infected>0) saveRunInProgress(); }, 5000);
 
 // ══════════════════════════════════════════
 //  STATS GLOBALES
@@ -1800,6 +1897,16 @@ const ACHIEVEMENTS = [
   { id:'r2',  cat:'RICHESSE',    icon:'💰', name:'Laboratoire Riche',    desc:'Accumuler 5 000 Souches au total',    cond:s=>s.totalSouches>=5000,            reward:{frags:2} },
   { id:'r3',  cat:'RICHESSE',    icon:'🏦', name:'Empire Viral',         desc:'Accumuler 50 000 Souches au total',   cond:s=>s.totalSouches>=50000,           reward:{frags:5} },
   { id:'r4',  cat:'RICHESSE',    icon:'💎', name:'Tycoon Pathogène',     desc:'Accumuler 500 000 Souches au total',  cond:s=>s.totalSouches>=500000,          reward:{frags:10} },
+
+  // ── SECRETS — affichés en ??? ──
+  { id:'sec1', cat:'SECRET', icon:'⬛', name:'Ombre X', secret:true,
+    desc:'Débloquer le virus Ombre X',
+    cond:s=>!!(s.skinCollection&&s.skinCollection['secret']>0),
+    reward:{souches:200, frags:10} },
+  { id:'sec2', cat:'SECRET', icon:'⚗', name:'Fusion Interdite', secret:true,
+    desc:'Réaliser la fusion mythique secrète',
+    cond:s=>!!(s.skinCollection&&s.skinCollection['marburgalpha']>0),
+    reward:{souches:300, frags:15} },
 ];
 
 // Suivi des succès déjà débloqués
@@ -1827,6 +1934,7 @@ function checkAchievements(){
   achievementStats.totalSkinsUnlocked = SKINS.filter(s=>(skinCollection[s.id]||0)>0).length;
   achievementStats.maxSkinLevel = Math.max(0, ...Object.values(skinLevels||{}));
   achievementStats.unlockedMythic = SKINS.filter(s=>s.rarity==='mythic'&&(skinCollection[s.id]||0)>0).length;
+  achievementStats.skinCollection = skinCollection; // pour les succès secrets
 
   let newUnlock = false;
   ACHIEVEMENTS.forEach(a => {
@@ -1867,7 +1975,22 @@ function showAchievementToast(a){
 }
 
 function renderAchievements(){
-  var el = document.getElementById('achievements-list'); if(!el) return;
+  var el = document.getElementById('achievements-list');
+  if(!el) return;
+  _renderAchievementsImpl(el);
+
+  /* ── DEVMOD : wrapper d'erreur visuel (décommenter pour debugger un crash de rendu)
+  try {
+    _renderAchievementsImpl(el);
+  } catch(err){
+    el.innerHTML = '<div style="padding:20px;color:#ff6666;font-family:monospace;font-size:11px;word-break:break-word"><strong style="color:#ff9999">⚠ ERREUR RENDU SUCCÈS</strong><br><br>'
+      + (err && err.message ? err.message : String(err))
+      + '<br><br><span style="color:#888;font-size:9px">' + (err && err.stack ? err.stack.split('\n').slice(0,4).join('<br>') : '') + '</span></div>';
+  }
+  */
+}
+
+function _renderAchievementsImpl(el){
   checkAchievements();
   el.innerHTML = '';
 
@@ -1896,11 +2019,24 @@ function renderAchievements(){
 
     catAchs.forEach(function(a){
       var done = !!achievementsUnlocked[a.id];
+
+      // Succès secret non débloqué — affichage simplifié
+      if(a.secret && !done){
+        var sitem = document.createElement('div');
+        sitem.className = 'ach-item ach-locked';
+        sitem.innerHTML = '<div class="ach-icon" style="opacity:0.3">🔒</div>'
+          +'<div class="ach-info"><div class="ach-name" style="color:rgba(255,255,255,0.25)">???</div>'
+          +'<div class="ach-desc">Succès secret</div></div>'
+          +'<div style="font-size:9px;color:rgba(255,255,255,0.15);padding:4px 7px;border:1px solid rgba(255,255,255,0.1)">???</div>';
+        el.appendChild(sitem);
+        return;
+      }
+
       var claimed = achievementsUnlocked[a.id] === 'claimed';
       var isLast = a.id === lastId;
       var rewardParts = [];
-      if(a.reward.souches) rewardParts.push('+'+a.reward.souches+' souches');
-      if(a.reward.frags) rewardParts.push('+'+a.reward.frags+' frags');
+      if(a.reward && a.reward.souches) rewardParts.push('+'+a.reward.souches+' souches');
+      if(a.reward && a.reward.frags) rewardParts.push('+'+a.reward.frags+' frags');
       var rewardTxt = rewardParts.join(' ');
 
       var item = document.createElement('div');
@@ -2283,6 +2419,8 @@ function startRun(){
   renderVirusDisplay();
   renderChapters();
   updateUI();
+  // Sauvegarde immédiate au démarrage pour permettre la reprise dès le 1er infecté
+  if(currentMode==='story') setTimeout(saveRunInProgress, 500);
 }
 
 // ══════════════════════════════════════════
@@ -2341,10 +2479,6 @@ function devSetVaccine(val){
   const br=document.getElementById('bar-red'); if(br) br.style.width=vaccine+'%';
   const vl=document.getElementById('vax-lbl'); if(vl) vl.textContent=vaccine.toFixed(1)+'%';
   const st=document.getElementById('s-third'); if(st) st.textContent=Math.min(99,Math.floor(vaccine))+'%';
-  if(!currentMode||gameOver) return;
-  infected=Math.min(infected+amount, runTarget);
-  if(infected>=runTarget) endRun(true);
-  else updateUI();
 }
 function devWin(){
   if(!currentMode) return;
@@ -2618,7 +2752,7 @@ function applyEvent(ev){
   // Effets instantanés
   if(ev.effect === 'instant'){
     if(ev.value === 'infected'){
-      const amount = Math.floor(500000 * scale);
+      const amount = Math.floor(runTarget * 0.05);
       infected = Math.min(infected + amount, runTarget);
       showFusionToast(ev.icon + ' +' + fmt(amount) + ' infectés !', 'var(--green)');
       updateUI();
@@ -3050,14 +3184,27 @@ const SKINS = [
     bio:`Kronos-1 fut détecté dans les filtres à air de la station Mir lors de la mission EO-10. Les cosmonautes Artsebarsky et Krikalev furent mis en quarantaine 18 mois à leur retour. Les échantillons prélevés ne correspondent à aucune classification biologique connue. Le dossier complet est classifié Niveau Oméga par l'OMS et la NASA depuis 1994.` },
 
   // ── MYTHIQUES (rouge) — ultra rares ──
-  { id:'s11', rarity:'mythic', rarityLabel:'MYTHIQUE', drop:0.1, bonusTap:350, bonusAuto:150, bonusVax:38,
+  { id:'s11', rarity:'mythic', rarityLabel:'MYTHIQUE', drop:0.1, bonusTap:120, bonusAuto:170, bonusVax:38,
     name:'Virus Marburg', species:'Marburg marburgvirus (MARV)', host:'Chauve-souris Rousettus aegyptiacus',
     mortality:'94% — le plus létal des filovirus connus', transmission:'Contact direct / aérosols confinés', discovered:'Marburg, Allemagne, 1967',
     bio:`En 1967, 31 techniciens de laboratoire à Marburg et Francfort contractèrent une fièvre hémorragique fulminante après avoir manipulé des reins de singes verts ougandais. Le virus Marburg provoque une coagulation intravasculaire disséminée : la victime saigne simultanément de tous les orifices. Son génome est si stable qu'il n'a pratiquement pas muté depuis sa découverte.` },
-  { id:'s24', rarity:'mythic', rarityLabel:'MYTHIQUE', drop:0.1, bonusTap:150, bonusAuto:350, bonusVax:42,
+  { id:'s24', rarity:'mythic', rarityLabel:'MYTHIQUE', drop:0.1, bonusTap:170, bonusAuto:120, bonusVax:42,
     name:'Pathogène-X Alpha', species:'[NIVEAU OMEGA — EXISTENCE NON CONFIRMÉE]', host:'[TOUTE FORME DE VIE CARBONÉE]',
     mortality:'[NON CALCULABLE — DONNÉES SUPPRIMÉES]', transmission:'[VECTEUR INCONNU — TRANSMISSION INSTANTANÉE SUSPECTÉE]', discovered:'[CLASSIFIÉ — ACCÈS RESTREINT NIVEAU 6]',
     bio:`Ce fichier ne devrait pas exister. Pathogène-X Alpha est le prédécesseur du Pathogène-X original, isolé 14 mois avant ce dernier dans la même carotte de glace antarctique. Les sept chercheurs qui ont séquencé son génome sont décédés dans les 48h. Le Dr. Irina Volkova, seule survivante, a transmis un unique message avant de disparaître : "Il ne se réplique pas. Il se souvient." Tous les accès ultérieurs à ce dossier ont été révoqués par ordre exécutif international.` },
+
+  // ── SECRET — TOP SECRET mode only ──
+  { id:'secret', rarity:'secret', rarityLabel:'SECRET', drop:0, bonusTap:220, bonusAuto:220, bonusVax:50,
+    name:'Ombre X', species:'[ORIGINE INCONNUE]', host:'[TOUT]',
+    mortality:'[∞]', transmission:'[SILENCE]', discovered:'[JAMAIS]',
+    icon:'⬛', hideBonus:true,
+    bio:`Il ne laisse pas de trace. Il ne fait pas de bruit. Il n'existe que pour ceux qui ont eu le courage d'aller jusqu'au bout. Tu sais ce que tu as fait.` },
+
+  // ── SECRET — fusion Marburg + Pathogène-X Alpha ──
+  { id:'marburgalpha', rarity:'secret', rarityLabel:'SECRET · FUSION', drop:0, bonusTap:300, bonusAuto:300, bonusVax:55,
+    name:'Marburg X Alpha', species:'[HYBRIDE — CLASSIFICATION IMPOSSIBLE]', host:'[TOUT ORGANISME VIVANT]',
+    mortality:'[∞ — EXTINCTION PROBABLE]', transmission:'[AÉROSOLS / CONTACT / PROJECTION]', discovered:'[JAMAIS OFFICIELLEMENT]',
+    bio:`Quand deux souches impossibles fusionnent, quelque chose de nouveau naît. Quelque chose qui n'aurait jamais dû exister. Le Dr. Volkova avait prévenu : "Ne les mettez jamais dans le même hôte." Trop tard.` },
 ];
 
 // Collection du joueur : { skinId: count }
@@ -3067,18 +3214,18 @@ let skinFragments = 0;
 let skinSearchQuery = '';
 let skinRarityFilter = 'all';
 
-function rarityClass(r){ return {common:'r-common',rare:'r-rare',epic:'r-epic',legendary:'r-legendary',mythic:'r-mythic'}[r]; }
+function rarityClass(r){ return {common:'r-common',rare:'r-rare',epic:'r-epic',legendary:'r-legendary',mythic:'r-mythic',secret:'r-secret'}[r]; }
 
 function rollSkin(){
-  // Cumul en virgule flottante — gère correctement les taux à 0.5%
-  const total = SKINS.reduce((sum,s)=>sum+s.drop, 0);
+  const pool = SKINS.filter(s => s.drop > 0 && s.rarity !== 'secret');
+  const total = pool.reduce((sum,s)=>sum+s.drop, 0);
   const r = Math.random() * total;
   let cumul = 0;
-  for(const s of SKINS){
+  for(const s of pool){
     cumul += s.drop;
     if(r < cumul) return s;
   }
-  return SKINS[SKINS.length-1];
+  return pool[pool.length-1];
 }
 
 // ══════════════════════════════════════════
@@ -3382,7 +3529,16 @@ const SKIN_SVG = {
     <circle cx="50" cy="48" r="0.8" fill="#ffffff"/>
     ${[[16,18],[84,16],[94,54],[80,92],[20,92],[8,56]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="2.5" fill="rgba(160,0,220,0.7)" stroke="#7700cc" stroke-width="1"/>`).join('')}
   </svg>`,
+  'secret': '',
+  'marburgalpha': '',
 };
+// Chargement des SVGs secrets depuis les templates HTML (évite le bug de parsing </svg>)
+document.addEventListener('DOMContentLoaded', function(){
+  const ts = document.getElementById('tpl-secret');
+  const tm = document.getElementById('tpl-marburgalpha');
+  if(ts) SKIN_SVG['secret'] = ts.innerHTML;
+  if(tm) SKIN_SVG['marburgalpha'] = tm.innerHTML;
+});
 function renderVirusDisplay(){
   const el = document.getElementById('vemoji'); if(!el) return;
   el.style.overflow = 'hidden';
@@ -3448,7 +3604,7 @@ function rollWithPityPremium(){
 }
 
 function rollFromRarity(rarity){
-  const pool = SKINS.filter(s => s.rarity === rarity);
+  const pool = SKINS.filter(s => s.rarity === rarity && s.drop > 0 && s.rarity !== 'secret');
   if(!pool.length) return rollSkin();
   return pool[Math.floor(Math.random() * pool.length)];
 }
@@ -3529,7 +3685,7 @@ function openLootbox(chapterIndex, onClose){
 
   const reelItems = [];
   for(let i=0;i<40;i++){
-    const s = i===32 ? won : SKINS[Math.floor(Math.random()*SKINS.length)];
+    const s = i===32 ? won : SKINS.filter(s=>s.rarity!=="secret"&&s.drop>0)[Math.floor(Math.random()*SKINS.filter(s=>s.rarity!=="secret"&&s.drop>0).length)];
     reelItems.push(s);
   }
   reelItems.forEach(s=>{
@@ -3682,7 +3838,7 @@ function getEquippedBonus(){
 // Rareté suivante pour fusion
 const RARITY_CHAIN = { common:'rare', rare:'epic', epic:'legendary' };
 
-function skinColor(r){ return r==='mythic'?'#ff3333':r==='legendary'?'var(--yellow)':r==='epic'?'var(--purple)':r==='rare'?'#58aaff':'var(--green)'; }
+function skinColor(r){ return r==='secret'?'#ffffff':r==='mythic'?'#ff3333':r==='legendary'?'var(--yellow)':r==='epic'?'var(--purple)':r==='rare'?'#58aaff':'var(--green)'; }
 function skinBorder(r){ return r==='mythic'?'rgba(255,40,40,0.6)':r==='legendary'?'rgba(255,215,0,0.4)':r==='epic'?'rgba(204,136,255,0.35)':r==='rare'?'rgba(88,170,255,0.3)':'rgba(0,255,136,0.3)'; }
 
 // ── Fusion ──
@@ -3978,7 +4134,7 @@ function renderSkins(){
   if(atlasView){
     // ── VUE ATLAS ──
     html += `<div style="font-size:10px;color:var(--yellow-dim);letter-spacing:3px;margin-bottom:12px">🗺 ATLAS VIRAL — ${SKINS.length} PATHOGÈNES RECENSÉS</div>`;
-    const rarityOrder = ['mythic','legendary','epic','rare','common'];
+    const rarityOrder = ['secret','mythic','legendary','epic','rare','common'];
     rarityOrder.forEach(rarity => {
       const group = SKINS.filter(s => s.rarity === rarity);
       if(!group.length) return;
@@ -3987,20 +4143,27 @@ function renderSkins(){
       html += `<div style="font-size:9px;color:${col};letter-spacing:3px;margin:12px 0 6px;opacity:0.7">${label.toUpperCase()}</div>`;
       group.forEach(s => {
         const owned = (skinCollection[s.id]||0) > 0;
+        const isSecret = s.rarity === 'secret';
         const lvl = getSkinLevel(s.id);
         const bord = skinBorder(s.rarity);
         const svg = (SKIN_SVG[s.id]||SKIN_SVG['default']).replace('<svg ','<svg width="36" height="36" ');
         const mult = skinStatMultiplier(s.id);
         const statsTxt = [
-          s.bonusTap  ? `+${Math.round(s.bonusTap*mult)}% tap`  : '',
-          s.bonusAuto ? `+${Math.round(s.bonusAuto*mult)}% auto` : '',
-          s.bonusVax  ? `-${Math.round(s.bonusVax*mult)}% vaccin` : '',
+          !s.hideBonus && s.bonusTap  ? `+${Math.round(s.bonusTap*mult)}% tap`  : '',
+          !s.hideBonus && s.bonusAuto ? `+${Math.round(s.bonusAuto*mult)}% auto` : '',
+          !s.hideBonus && s.bonusVax  ? `-${Math.round(s.bonusVax*mult)}% vaccin` : '',
         ].filter(Boolean).join(' · ');
+        // Virus secret non possédé → tout en ???
+        const displaySvg = (isSecret && !owned)
+          ? `<div style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:rgba(255,255,255,0.2)">?</div>`
+          : svg;
+        const displayName = (isSecret && !owned) ? '???' : (owned ? s.name : '???');
+        const displayStats = (isSecret && !owned) ? '???' : (owned ? (statsTxt||'—') : 'Non découvert');
         html += `<div style="display:flex;align-items:center;gap:12px;padding:10px 12px;margin-bottom:6px;border:1px solid ${owned?bord:'rgba(255,255,255,0.06)'};background:${owned?'rgba(0,0,0,0.2)':'rgba(0,0,0,0.35)'};${owned?'':'filter:grayscale(0.8);opacity:0.45'}">
-          <div style="flex-shrink:0;width:36px;height:36px">${svg}</div>
+          <div style="flex-shrink:0;width:36px;height:36px">${displaySvg}</div>
           <div style="flex:1">
-            <div style="font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;color:${owned?col:'rgba(255,255,255,0.25)'};margin-bottom:2px">${owned?s.name:'???'}</div>
-            <div style="font-size:9px;color:${owned?'var(--text-faint)':'rgba(255,255,255,0.15)'}">${owned?statsTxt:'Non découvert'}</div>
+            <div style="font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;color:${owned?col:'rgba(255,255,255,0.25)'};margin-bottom:2px">${displayName}</div>
+            <div style="font-size:9px;color:${owned?'var(--text-faint)':'rgba(255,255,255,0.15)'}">${displayStats}</div>
           </div>
           ${owned?`<div style="font-size:9px;color:${col};border:1px solid ${bord};padding:2px 7px">${lvl>1?`LV${lvl}`:'LV1'}</div>`:`<div style="font-size:9px;color:rgba(255,255,255,0.15)">🔒</div>`}
         </div>`;
@@ -4109,6 +4272,28 @@ function renderSkins(){
         </div>`;
       });
     }
+
+    // ── FUSION MYTHIQUE SECRÈTE ──
+    const hasMarburg=(skinCollection['s11']||0)>0, hasAlpha=(skinCollection['s24']||0)>0, hasFusion=(skinCollection['marburgalpha']||0)>0;
+    const svgM=(SKIN_SVG['s11']||SKIN_SVG['default']).replace('<svg ','<svg width="40" height="40" ');
+    const svgA=(SKIN_SVG['s24']||SKIN_SVG['default']).replace('<svg ','<svg width="40" height="40" ');
+    const svgF=(SKIN_SVG['marburgalpha']||SKIN_SVG['default']).replace('<svg ','<svg width="40" height="40" ');
+    html+=`<div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.06)">
+      <div style="font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:3px;margin-bottom:10px">⚗ FUSION MYTHIQUE SECRÈTE</div>
+      <div style="border:1px solid rgba(255,255,255,${hasFusion?'0.15':hasMarburg&&hasAlpha?'0.5':'0.1'});padding:14px;background:rgba(0,0,0,0.4)">
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:12px">
+          <div style="text-align:center;opacity:${hasMarburg?1:0.3}"><div style="width:44px;height:44px;margin:0 auto;overflow:hidden;border:1px solid ${hasMarburg?'rgba(255,40,40,0.5)':'rgba(255,255,255,0.1)'};padding:2px">${svgM}</div><div style="font-size:8px;color:${hasMarburg?'#ff3333':'rgba(255,255,255,0.3)'};margin-top:4px">Virus Marburg</div></div>
+          <div style="font-size:18px;color:rgba(255,255,255,0.4)">+</div>
+          <div style="text-align:center;opacity:${hasAlpha?1:0.3}"><div style="width:44px;height:44px;margin:0 auto;overflow:hidden;border:1px solid ${hasAlpha?'rgba(255,40,40,0.5)':'rgba(255,255,255,0.1)'};padding:2px">${svgA}</div><div style="font-size:8px;color:${hasAlpha?'#ff3333':'rgba(255,255,255,0.3)'};margin-top:4px">Pathogène-X Alpha</div></div>
+          <div style="font-size:18px;color:rgba(255,255,255,0.4)">→</div>
+          <div style="text-align:center"><div style="width:44px;height:44px;margin:0 auto;overflow:hidden;border:1px solid rgba(255,255,255,0.5);padding:2px;box-shadow:0 0 12px rgba(255,255,255,0.15)">${svgF}</div><div style="font-size:8px;color:#fff;margin-top:4px;text-shadow:0 0 8px #fff">Marburg X Alpha</div></div>
+        </div>
+        <div style="font-size:9px;color:rgba(255,255,255,0.35);text-align:center;margin-bottom:10px">+300% tap · +300% auto · -55% vaccin</div>
+        ${hasFusion?'<div style="text-align:center;padding:8px;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.5);font-size:9px;letter-spacing:2px">✓ DÉJÀ OBTENU</div>'
+          :hasMarburg&&hasAlpha?'<button onclick="doMythicFusion()" ontouchend="event.preventDefault();doMythicFusion()" style="width:100%;padding:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.6);color:#fff;font-family:monospace;font-size:11px;cursor:pointer;touch-action:manipulation;letter-spacing:2px;text-shadow:0 0 10px #fff">⚗ FUSIONNER — IRRÉVERSIBLE</button><div style="font-size:8px;color:rgba(255,100,100,0.6);text-align:center;margin-top:6px">⚠️ Les deux virus mythiques seront détruits</div>'
+          :'<div style="text-align:center;padding:8px;border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.2);font-size:9px;letter-spacing:1px">Requiert : Virus Marburg + Pathogène-X Alpha</div>'}
+      </div>
+    </div>`;
   }
 
   html += '</div>';
@@ -4140,9 +4325,9 @@ function showSkinBio(id){
     </div>
 
     <div style="display:flex;gap:10px;margin-bottom:14px;padding:10px;border:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.2)">
-      ${s.bonusTap ?`<div style="flex:1;text-align:center"><div style="font-size:9px;color:var(--text-faint);margin-bottom:3px">TAP</div><div style="font-family:'Orbitron','Futura','Century Gothic','Trebuchet MS',sans-serif;font-size:13px;color:${col}">+${Math.round(s.bonusTap*mult)}%</div></div>`:''}
-      ${s.bonusAuto?`<div style="flex:1;text-align:center"><div style="font-size:9px;color:var(--text-faint);margin-bottom:3px">AUTO</div><div style="font-family:'Orbitron','Futura','Century Gothic','Trebuchet MS',sans-serif;font-size:13px;color:${col}">+${Math.round(s.bonusAuto*mult)}%</div></div>`:''}
-      ${s.bonusVax ?`<div style="flex:1;text-align:center"><div style="font-size:9px;color:var(--text-faint);margin-bottom:3px">VIT. VACCIN</div><div style="font-family:'Orbitron','Futura','Century Gothic','Trebuchet MS',sans-serif;font-size:13px;color:var(--red)">-${Math.round(s.bonusVax*mult)}%</div></div>`:''}
+      ${!s.hideBonus && s.bonusTap ?`<div style="flex:1;text-align:center"><div style="font-size:9px;color:var(--text-faint);margin-bottom:3px">TAP</div><div style="font-family:'Orbitron','Futura','Century Gothic','Trebuchet MS',sans-serif;font-size:13px;color:${col}">+${Math.round(s.bonusTap*mult)}%</div></div>`:''}
+      ${!s.hideBonus && s.bonusAuto?`<div style="flex:1;text-align:center"><div style="font-size:9px;color:var(--text-faint);margin-bottom:3px">AUTO</div><div style="font-family:'Orbitron','Futura','Century Gothic','Trebuchet MS',sans-serif;font-size:13px;color:${col}">+${Math.round(s.bonusAuto*mult)}%</div></div>`:''}
+      ${!s.hideBonus && s.bonusVax ?`<div style="flex:1;text-align:center"><div style="font-size:9px;color:var(--text-faint);margin-bottom:3px">VIT. VACCIN</div><div style="font-family:'Orbitron','Futura','Century Gothic','Trebuchet MS',sans-serif;font-size:13px;color:var(--red)">-${Math.round(s.bonusVax*mult)}%</div></div>`:''}
     </div>
 
     ${s.bio?`<div style="font-size:11px;color:var(--text-dim);line-height:1.75;margin-bottom:16px;padding:12px;border:1px solid rgba(255,255,255,0.07);background:rgba(0,0,0,0.2)">${s.bio}</div>`:''}
@@ -4297,7 +4482,7 @@ async function checkAndSyncFromFirebase(){
     // Restaurer la run en cours depuis Firebase si elle n'est pas dans le localStorage
     if(!hasRunInProgress() && window.fbRestoreRunInProgress){
       var cloudRun = await window.fbRestoreRunInProgress(pseudo);
-      if(cloudRun && cloudRun.infected > 100){
+      if(cloudRun && cloudRun.infected > 0){
         console.log('[SYNC] Run en cours restaurée depuis Firebase');
         localStorage.setItem(RUN_SAVE_KEY, JSON.stringify(cloudRun));
       }
@@ -4383,6 +4568,187 @@ document.addEventListener('click', function(e){
   }
 });
 
+// ══════════════════════════════════════════
+//  SYSTÈME XP / NIVEAUX
+// ══════════════════════════════════════════
+const LEVEL_TITLES = [
+  '','Patient Zéro','Porteur Sain','Propagateur','Infecteur','Contaminateur',
+  'Agent Pathogène','Vecteur Viral','Épidémiste','Pandémiste','Fléau Local',
+  'Souche Active','Mutant Émergent','Bio-Menace','Disséminator','Pathogène Avancé',
+  'Épidémiologiste','Vecteur Mondial','Hôte Maître','Virus Endémique','Contagion',
+  'Fléau Régional','Pandémie Naissante','Bioterroriste','Agent Extrême','Mutation Rare',
+  'Souche Légendaire','Pathogène Elite','Extinction Proche','Virus Fantôme','Fléau Continental',
+  'Pandémie Mondiale','Extinction Lente','Super-Souche','Bioweapon','Virus X',
+  'Mort Silencieuse','Fléau Mondial','Extinction Active','Agent Mythique','Pathogène Divin',
+  'Virus Cosmique','Mort Universelle','Alpha Pathogène','Oméga Viral','Extinction Totale',
+  'Légende Virale','Transcendance','Entité Virale','Dieu Pathogène','PATHOGEN-X'
+];
+const LEVEL_REWARDS = {
+  2:{type:'souches',label:'10 Souches',icon:'🧫'},4:{type:'frags',label:'3 Fragments de virus',icon:'🧩'},
+  6:{type:'souches',label:'15 Souches',icon:'🧫'},8:{type:'frags',label:'5 Fragments de virus',icon:'🧩'},
+  10:{type:'loot',label:'1 Lootbox Standard',icon:'📦'},12:{type:'souches',label:'20 Souches',icon:'🧫'},
+  14:{type:'frags',label:'8 Fragments de virus',icon:'🧩'},16:{type:'souches',label:'25 Souches',icon:'🧫'},
+  18:{type:'frags',label:'10 Fragments de virus',icon:'🧩'},20:{type:'loot',label:'1 Lootbox Premium',icon:'💎'},
+  22:{type:'souches',label:'35 Souches',icon:'🧫'},24:{type:'frags',label:'12 Fragments de virus',icon:'🧩'},
+  26:{type:'souches',label:'50 Souches',icon:'🧫'},28:{type:'frags',label:'15 Fragments de virus',icon:'🧩'},
+  30:{type:'loot',label:'2 Lootboxes Premium',icon:'💎'},32:{type:'souches',label:'60 Souches',icon:'🧫'},
+  34:{type:'frags',label:'20 Fragments de virus',icon:'🧩'},36:{type:'souches',label:'75 Souches',icon:'🧫'},
+  38:{type:'frags',label:'25 Fragments de virus',icon:'🧩'},40:{type:'loot',label:'3 Lootboxes Premium',icon:'💎'},
+  42:{type:'souches',label:'100 Souches',icon:'🧫'},44:{type:'frags',label:'30 Fragments de virus',icon:'🧩'},
+  46:{type:'souches',label:'150 Souches',icon:'🧫'},48:{type:'frags',label:'50 Fragments de virus',icon:'🧩'},
+  50:{type:'loot',label:'5 Lootboxes Premium',icon:'🏆'},
+};
+function xpForLevel(lvl){ return lvl*500; }
+let playerXP=0, playerLevel=1, xpHistory={chapitres:0,speedrun:0,skins:0,succes:0,daily:0};
+
+function gainXP(amount, source){
+  if(!playerPseudo) return;
+  playerXP+=amount; xpHistory[source]=(xpHistory[source]||0)+amount;
+  while(playerLevel<50&&playerXP>=xpForLevel(playerLevel)){ playerXP-=xpForLevel(playerLevel); playerLevel++; onLevelUp(playerLevel); }
+  if(playerLevel>=50) playerXP=0;
+  saveGame();
+  showFusionToast('🎉 Niveau '+playerLevel+' — '+LEVEL_TITLES[playerLevel]+'!','var(--yellow)');
+}
+function onLevelUp(lvl){
+  const r=LEVEL_REWARDS[lvl]; if(!r) return;
+  setTimeout(()=>{
+    if(r.type==='souches'){const n=parseInt(r.label);souches+=n;updateSouchesDisplay();showFusionToast(r.icon+' +'+n+' souches (niv.'+lvl+')!','var(--green)');}
+    if(r.type==='frags'){const n=parseInt(r.label);skinFragments+=n;showFusionToast(r.icon+' +'+n+' fragments (niv.'+lvl+')!','var(--purple)');}
+    if(r.type==='loot'){openLootboxReward(r.label.includes('Premium')?'premium':'standard');showFusionToast(r.icon+' '+r.label+' (niv.'+lvl+')!','#88ddff');}
+    saveGame();
+  },500);
+}
+function openLootboxReward(type){ currentLootboxType=type; const w=rollWithPity(); showLootboxResult(w); }
+
+function openProfile(){
+  closeBurger(true);
+  document.getElementById('profile-screen').style.display='flex';
+  renderProfile();
+}
+function closeProfile(){ document.getElementById('profile-screen').style.display='none'; }
+function renderProfile(){
+  document.getElementById('profile-pseudo').textContent=playerPseudo||'—';
+  document.getElementById('profile-title').textContent=LEVEL_TITLES[Math.min(playerLevel,50)]||'—';
+  document.getElementById('profile-level-num').textContent=playerLevel;
+  const skinB=SKINS.find(s=>s.id===equippedSkin);
+  document.getElementById('profile-virus-icon').textContent=skinB?skinB.icon:'🦠';
+  const needed=playerLevel<50?xpForLevel(playerLevel):0;
+  const pct=playerLevel>=50?100:Math.min((playerXP/needed)*100,100);
+  document.getElementById('profile-xp-bar').style.width=pct+'%';
+  document.getElementById('profile-xp-label').textContent=playerLevel>=50?'MAX':playerXP+' / '+needed+' XP';
+  document.getElementById('profile-xp-remaining').textContent=playerLevel>=50?'—':(needed-playerXP);
+  document.getElementById('profile-stat-wins').textContent=globalStats.totalWinsStory||0;
+  document.getElementById('profile-stat-sr').textContent=achievementStats.totalSpeedrunWins||0;
+  document.getElementById('profile-stat-skins').textContent=achievementStats.totalSkinsUnlocked||0;
+  document.getElementById('profile-stat-souches').textContent=souches||0;
+  const sources=[
+    {key:'chapitres',label:'Chapitres complétés',icon:'📖',color:'var(--green)'},
+    {key:'speedrun',label:'Speedruns',icon:'⚡',color:'var(--yellow)'},
+    {key:'skins',label:'Virus débloqués',icon:'🦠',color:'var(--purple)'},
+    {key:'succes',label:'Succès',icon:'🎖',color:'#88ddff'},
+    {key:'daily',label:'Connexion quotidienne',icon:'📅',color:'var(--green)'},
+  ];
+  document.getElementById('profile-xp-history').innerHTML=sources.map(s=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02)"><span style="font-size:10px;color:var(--text-dim)">${s.icon} ${s.label}</span><span style="font-family:monospace;font-size:10px;color:${s.color}">${xpHistory[s.key]||0} XP</span></div>`).join('');
+  const nextR=Object.entries(LEVEL_REWARDS).filter(([l])=>parseInt(l)>playerLevel).slice(0,3);
+  document.getElementById('profile-next-rewards').innerHTML=nextR.length?nextR.map(([l,r])=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border:1px solid rgba(255,215,0,0.1);background:rgba(255,215,0,0.02)"><span style="font-size:10px;color:var(--text-dim)">${r.icon} ${r.label}</span><span style="font-family:monospace;font-size:9px;color:var(--yellow)">Niv. ${l}</span></div>`).join(''):'<div style="font-size:10px;color:var(--text-faint);text-align:center;padding:12px">Niveau maximum atteint 🏆</div>';
+}
+
+// ══════════════════════════════════════════
+//  MODE TOP SECRET
+// ══════════════════════════════════════════
+let secretClicks=0, secretMilestonesDone=new Set();
+const SECRET_MILESTONES=[
+  {clicks:2000,  action:()=>{addSouches(5,'');return '+5 🧫';}},
+  {clicks:3500,  action:()=>{skinFragments+=3;saveGame();return '+3 🧩';}},
+  {clicks:5000,  action:()=>{skinFragments+=10;saveGame();return '+10 🧩';}},
+  {clicks:7500,  action:()=>{addSouches(8,'');return '+8 🧫';}},
+  {clicks:10000, action:()=>{openLootboxReward('standard');addSouches(15,'');return '+1 📦 +15 🧫';}},
+  {clicks:15000, action:()=>{skinFragments+=5;addSouches(10,'');return '+5 🧩 +10 🧫';}},
+  {clicks:20000, action:()=>{openLootboxReward('premium');addSouches(20,'');return '+1 💎 +20 🧫';}},
+  {clicks:25000, action:()=>{skinFragments+=10;addSouches(10,'');return '+10 🧩 +10 🧫';}},
+  {clicks:30000, action:()=>{addSouches(15,'');return '+15 🧫';}},
+  {clicks:40000, action:()=>{openLootboxReward('premium');openLootboxReward('premium');addSouches(30,'');gainXP(300,'succes');return '+2 💎 +30 🧫 +300 XP';}},
+  {clicks:50000, action:()=>{openLootboxReward('premium');openLootboxReward('premium');openLootboxReward('standard');openLootboxReward('standard');return '+2 💎 +2 📦';}},
+  {clicks:75000, action:()=>{skinFragments+=20;addSouches(50,'');return '+20 🧩 +50 🧫';}},
+  {clicks:100000,action:()=>{
+    if(!(skinCollection['secret']>0)){skinCollection['secret']=1;if(!equippedSkin)equippedSkin='secret';achievementStats.totalSkinsUnlocked=SKINS.filter(s=>(skinCollection[s.id]||0)>0).length;}
+    addSouches(100,'');gainXP(500,'succes');saveGame();return '⬛ OMBRE X DÉBLOQUÉ + 100 🧫 + 500 XP';
+  }},
+];
+const SECRET_MESSAGES=[
+  [500,'Le virus s\'adapte...'],[1000,'Quelque chose observe.'],[2500,'Une mutation se prépare...'],
+  [4000,'L\'obscurité progresse.'],[6000,'Il prend conscience.'],[8000,'Tu ne devrais pas être là.'],
+  [12000,'La résistance est inutile.'],[18000,'Il se souvient de toi.'],[25000,'Chaque clic le nourrit.'],
+  [35000,'Il est presque réel.'],[45000,'Plus que quelques milliers...'],[60000,'Il sent ta détermination.'],
+  [80000,'Presque. Encore un effort.'],[90000,'Il t\'attend.'],
+];
+function openSecretMode(){
+  closeBurger(true);
+  document.getElementById('secret-screen').style.display='flex';
+  const svgEl=document.getElementById('secret-virus-svg');
+  if(svgEl) svgEl.innerHTML=(SKIN_SVG['secret']||SKIN_SVG['default']);
+  updateSecretUI(); checkSecretMessages();
+}
+function closeSecretMode(){ document.getElementById('secret-screen').style.display='none'; saveGame(); }
+function secretClick(){
+  secretClicks++; updateSecretUI(); checkSecretMilestones(); checkSecretMessages();
+  const vz=document.getElementById('secret-virus-svg');
+  if(vz){vz.style.transform='scale(0.88)';setTimeout(()=>vz.style.transform='scale(1)',80);}
+}
+function updateSecretUI(){
+  const el=document.getElementById('secret-count');
+  if(el) el.textContent=secretClicks.toLocaleString('fr-FR');
+  const vz=document.getElementById('secret-virus-svg');
+  if(vz){const sz=Math.round(140+Math.min(secretClicks/100000,1)*140);vz.style.width=sz+'px';vz.style.height=sz+'px';}
+}
+function checkSecretMilestones(){
+  SECRET_MILESTONES.forEach((m,i)=>{
+    if(!secretMilestonesDone.has(i)&&secretClicks>=m.clicks){
+      secretMilestonesDone.add(i);
+      const r=m.action();
+      setTimeout(()=>showFusionToast('⬛ '+r,'#cc0000'),300);
+      saveGame();
+    }
+  });
+}
+let _lastSecretMsg=-1;
+function checkSecretMessages(){
+  for(let i=SECRET_MESSAGES.length-1;i>=0;i--){
+    if(secretClicks>=SECRET_MESSAGES[i][0]&&_lastSecretMsg<i){
+      _lastSecretMsg=i;
+      const msgEl=document.getElementById('secret-msg');
+      if(msgEl){msgEl.style.opacity='0';setTimeout(()=>{msgEl.textContent=SECRET_MESSAGES[i][1];msgEl.style.opacity='1';},300);}
+      break;
+    }
+  }
+}
+
+// ══════════════════════════════════════════
+//  FUSION MYTHIQUE
+// ══════════════════════════════════════════
+function doMythicFusion(){
+  if(!(skinCollection['s11']>0)||!(skinCollection['s24']>0)) return;
+  if(skinCollection['marburgalpha']>0){showFusionToast('Déjà obtenu !','var(--text-faint)');return;}
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;padding:20px';
+  overlay.innerHTML=`<div style="background:#0a0000;border:1px solid rgba(255,255,255,0.3);padding:24px;max-width:320px;width:100%;text-align:center"><div style="font-family:monospace;font-size:14px;color:#fff;margin-bottom:8px;text-shadow:0 0 10px #fff">⚗ FUSION MYTHIQUE</div><div style="font-size:11px;color:rgba(255,255,255,0.6);line-height:1.6;margin-bottom:20px">Virus Marburg + Pathogène-X Alpha<br>→ Marburg X Alpha<br><br><span style="color:rgba(255,100,100,0.8)">Les deux virus mythiques seront<br>définitivement détruits.</span></div><div style="display:flex;gap:10px"><button id="fusion-cancel" style="flex:1;padding:10px;background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.5);font-family:monospace;font-size:11px;cursor:pointer">ANNULER</button><button id="fusion-confirm" style="flex:1;padding:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.6);color:#fff;font-family:monospace;font-size:11px;cursor:pointer;text-shadow:0 0 8px #fff">CONFIRMER</button></div></div>`;
+  document.body.appendChild(overlay);
+  document.getElementById('fusion-cancel').onclick=()=>document.body.removeChild(overlay);
+  document.getElementById('fusion-confirm').onclick=()=>{
+    document.body.removeChild(overlay);
+    skinCollection['s11']=Math.max(0,(skinCollection['s11']||0)-1);
+    if(skinCollection['s11']===0) delete skinCollection['s11'];
+    skinCollection['s24']=Math.max(0,(skinCollection['s24']||0)-1);
+    if(skinCollection['s24']===0) delete skinCollection['s24'];
+    if(equippedSkin==='s11'||equippedSkin==='s24') equippedSkin='marburgalpha';
+    skinCollection['marburgalpha']=1;
+    achievementStats.totalSkinsUnlocked=SKINS.filter(s=>(skinCollection[s.id]||0)>0).length;
+    gainXP(500,'skins'); saveGame();
+    setTimeout(()=>showFusionToast('⚗ Deux souches ne font plus qu\'une...','#ffffff'),300);
+    setTimeout(()=>{showFusionToast('✨ Marburg X Alpha débloqué !','#ffffff');renderSkins();},1500);
+  };
+}
+
 function switchPseudoTab(tab){
   const isNew = tab === 'new';
   document.getElementById('panel-new').style.display = isNew ? 'block' : 'none';
@@ -4462,7 +4828,7 @@ async function restoreProgress(){
   // Restaurer aussi la run en cours depuis Firebase
   if(window.fbRestoreRunInProgress){
     var cloudRun = await window.fbRestoreRunInProgress(pseudo);
-    if(cloudRun && cloudRun.infected > 100){
+    if(cloudRun && cloudRun.infected > 0){
       localStorage.setItem(RUN_SAVE_KEY, JSON.stringify(cloudRun));
       console.log('[RESTORE] Run en cours restaurée depuis Firebase');
     }
@@ -4661,7 +5027,7 @@ function buyLootbox(type, qty){
     const reel=document.getElementById('lb-reel');
     reel.style.transition='none'; reel.style.transform='translateX(0)'; reel.innerHTML='';
     const items=[];
-    for(var i=0;i<40;i++) items.push(i===32?won:SKINS[Math.floor(Math.random()*SKINS.length)]);
+    for(var i=0;i<40;i++) items.push(i===32?won:SKINS.filter(s=>s.rarity!=="secret"&&s.drop>0)[Math.floor(Math.random()*SKINS.filter(s=>s.rarity!=="secret"&&s.drop>0).length)]);
     items.forEach(function(s){
       const d=document.createElement('div'); d.className='reel-item';
       d.style.background=s.rarity==='mythic'?'rgba(255,51,51,0.15)':s.rarity==='legendary'?'rgba(255,215,0,0.13)':s.rarity==='epic'?'rgba(204,136,255,0.12)':s.rarity==='rare'?'rgba(88,170,255,0.11)':'rgba(0,255,136,0.06)';
@@ -4698,7 +5064,7 @@ function runNextSingleReel(){
   var reel=document.getElementById('lb-reel');
   reel.style.transition='none'; reel.style.transform='translateX(0)'; reel.innerHTML='';
   var items=[];
-  for(var i=0;i<40;i++) items.push(i===32?won:SKINS[Math.floor(Math.random()*SKINS.length)]);
+  for(var i=0;i<40;i++) items.push(i===32?won:SKINS.filter(s=>s.rarity!=="secret"&&s.drop>0)[Math.floor(Math.random()*SKINS.filter(s=>s.rarity!=="secret"&&s.drop>0).length)]);
   items.forEach(function(s){
     var d=document.createElement('div'); d.className='reel-item';
     d.style.background=s.rarity==='mythic'?'rgba(255,51,51,0.15)':s.rarity==='legendary'?'rgba(255,215,0,0.13)':s.rarity==='epic'?'rgba(204,136,255,0.12)':s.rarity==='rare'?'rgba(88,170,255,0.11)':'rgba(0,255,136,0.06)';
@@ -5216,56 +5582,84 @@ function defeatNextRun(){
 // ══════════════════════════════════════════
 //  CHAPTERS
 // ══════════════════════════════════════════
+var _chTouchStartY = 0;
 function toggleChapters(){
-  const body=document.getElementById('ch-body');
-  const arrow=document.getElementById('ch-arrow');
-  if(!body||!arrow) return;
-  const open=body.style.display==='none';
-  body.style.display=open?'block':'none';
-  arrow.textContent=open?'▲':'▼';
+  var wrap = document.getElementById('ch-wrap'); if(!wrap) return;
+  var open = wrap.style.display === 'none';
+  wrap.style.display = open ? 'block' : 'none';
+  var act2btn = document.getElementById('act2-toggle');
+  if(act2btn){ act2btn.style.opacity = '1'; }
   if(open) renderChapters();
 }
+function toggleAct(act){
+  const body = document.getElementById('ch-body-'+act);
+  const arrow = document.getElementById('ch-arrow-'+act);
+  if(!body) return;
+  const open = body.style.display === 'none';
+  body.style.display = open ? 'block' : 'none';
+  if(arrow) arrow.textContent = open ? '▲' : '▼';
+  if(open) renderActChapters(act);
+}
 function renderChapters(){
-  var list=document.getElementById('ch-list'); if(!list) return;
-  list.innerHTML='';
-  CHAPTER_DATA.forEach(function(ch,i){
+  renderActChapters(1);
+  if(maxChapter >= 5) renderActChapters(2);
+}
+function renderActChapters(act){
+  var list = document.getElementById('ch-list-'+act); if(!list) return;
+  list.innerHTML = '';
+  CHAPTER_DATA.filter(ch=>(ch.act||1)===act).forEach(function(ch){
+    var i = CHAPTER_DATA.indexOf(ch);
     var isCompleted = i < maxChapter;
     var isCurrent   = i === currentChapter;
-    var isAvailable = !isCompleted && !isCurrent && i <= maxChapter;
     var isLocked    = i > maxChapter;
+    var isAvailable = !isCompleted && !isCurrent && i <= maxChapter;
     var progressPct = isCurrent ? Math.min((infected/ch.target)*100,100).toFixed(1)+'%' : '';
     var cls = isCompleted?'done': isCurrent?'current': isLocked?'locked':'available';
+    var unit = ch.unit || 'infectés';
     var bonusTxt = ch.tapMult > 1
       ? '🧬 ×'+(ch.tapMult)+' propagation · -'+(Math.round((1-ch.shopDiscount)*100))+'% upgrades'
       : '🧬 Niveau de base';
-    var checkHtml = isCompleted
-      ? '<div class="ccheck">✓</div>'
-      : isCurrent ? '<div class="ccheck" style="color:var(--yellow);animation:breathe 1.5s ease-in-out infinite">▶</div>'
-      : '';
-    var numHtml = '<div class="cnum">CHAPITRE '+ch.id+' '+(isCompleted?'— COMPLÉTÉ':isCurrent?'— EN COURS':'')+'</div>';
+    var checkHtml = isCompleted ? '<div class="ccheck">✓</div>'
+      : isCurrent ? '<div class="ccheck" style="color:var(--yellow);animation:breathe 1.5s ease-in-out infinite">▶</div>' : '';
+    var numHtml = '<div class="cnum">CH.'+ch.id+' '+(isCompleted?'— COMPLÉTÉ':isCurrent?'— EN COURS':'')+'</div>';
     var descHtml = isLocked ? '[ VERROUILLÉ ]' : ch.desc;
-    var goalHtml = isCompleted
-      ? '&#x2713; Complété'
-      : isCurrent
-      ? '&#x25B6; '+progressPct+' — Objectif : '+fmt(ch.target)
-      : isAvailable
-      ? 'Objectif : '+fmt(ch.target)+' infectés'
-      : '🔒 '+fmt(ch.target)+' infectés';
+    var goalHtml = isCompleted ? '&#x2713; Complété'
+      : isCurrent ? '&#x25B6; '+progressPct+' — Objectif : '+fmt(ch.target)+' '+unit
+      : isAvailable ? 'Objectif : '+fmt(ch.target)+' '+unit
+      : '🔒 '+fmt(ch.target)+' '+unit;
     var replayBtn = (isCompleted || isAvailable)
       ? '<button ontouchend="event.preventDefault();replayChapter('+i+')" onclick="replayChapter('+i+')"'
         +' style="margin-top:8px;padding:5px 14px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.3);'
         +'color:var(--green);font-family:monospace;font-size:10px;cursor:pointer;touch-action:manipulation;letter-spacing:1px">'
-        +'&#x21BA; REJOUER</button>'
-      : '';
-    var d=document.createElement('div'); d.className='citem '+cls;
-    d.innerHTML=checkHtml+numHtml
+        +'&#x21BA; REJOUER</button>' : '';
+    var d = document.createElement('div'); d.className='citem '+cls;
+    d.innerHTML = checkHtml+numHtml
       +'<div class="ctitle">'+ch.title+'</div>'
       +'<div class="cdesc">'+descHtml+'</div>'
       +'<div style="font-size:9px;color:var(--yellow);margin:3px 0;letter-spacing:1px">'+(isLocked?'':bonusTxt)+'</div>'
-      +'<div class="cgoal">'+goalHtml+'</div>'
-      +replayBtn;
+      +'<div class="cgoal">'+goalHtml+'</div>'+replayBtn;
     list.appendChild(d);
   });
+}
+
+function showActTransition(callback){
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center';
+  overlay.innerHTML = `<div style="font-family:'Orbitron',sans-serif;font-size:11px;color:rgba(0,255,136,0.4);letter-spacing:4px;margin-bottom:20px">ACTE I TERMINÉ</div>
+    <div style="font-family:'Orbitron',sans-serif;font-size:28px;font-weight:900;color:var(--green);letter-spacing:4px;text-shadow:0 0 30px rgba(0,255,136,0.5);margin-bottom:24px">ACTE II</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.7);line-height:1.9;max-width:320px;font-family:'Share Tech Mono',monospace;margin-bottom:30px">
+      8 milliards d'humains infectés.<br>Pathogen-X n'est pas d'ici.<br><br>
+      <span style="color:rgba(0,255,136,0.6)">La station spatiale ISS-X est tombée.</span><br>
+      Le virus franchit l'atmosphère.<br><br>
+      <span style="color:rgba(255,215,0,0.8)">Le système solaire attend.</span>
+    </div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.25);letter-spacing:3px;margin-bottom:20px">🚀 LE VOYAGE COMMENCE</div>
+    <button id="act-transition-btn" style="padding:14px 40px;background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.5);color:var(--green);font-family:'Share Tech Mono',monospace;font-size:13px;cursor:pointer;touch-action:manipulation;letter-spacing:3px">CONTINUER →</button>`;
+  document.body.appendChild(overlay);
+  document.getElementById('act-transition-btn').onclick = ()=>{
+    document.body.removeChild(overlay);
+    if(callback) callback();
+  };
 }
 
 function replayChapter(chapterIndex){
@@ -5395,6 +5789,7 @@ function endRun(win){
 
   // Check if it's the FINAL win (chapitre 5 = 8 milliards)
   var maxChapterId=CHAPTER_DATA.reduce(function(m,x){return x.id>m?x.id:m;},0);
+  const isActIFinal = win && currentMode==='story' && CHAPTER_DATA[currentChapter]?.id === 5;
   const isFinalWin = win && (currentChapter >= CHAPTER_DATA.length - 1);
 
   // Défaite en mode histoire
@@ -5421,7 +5816,11 @@ function endRun(win){
       if(skinsPanelOpen) renderSkins();
       renderTree();
     },300);
-    setTimeout(()=>{ showVictoryThenLootbox(currentChapter-1, ()=>showScore(win,elapsed,isFinalWin)); }, 450);
+    if(isActIFinal){
+      setTimeout(()=>showActTransition(()=>showVictoryThenLootbox(currentChapter-1, ()=>showScore(win,elapsed,false))), 450);
+    } else {
+      setTimeout(()=>{ showVictoryThenLootbox(currentChapter-1, ()=>showScore(win,elapsed,isFinalWin)); }, 450);
+    }
     return;
   }
   if(win && isFinalWin && currentMode==='story'){
@@ -5565,7 +5964,7 @@ function updateUI(){
     } else {
       lbl.style.display = '';
       var chap=getChapter();
-      lbl.textContent = (chap&&chap.title) ? chap.title.toUpperCase() : s.label;
+      lbl.textContent = (chap&&chap.title) ? 'ACTE '+(chap.act||1)+' : '+chap.title.toUpperCase() : s.label;
     }
   }
 
@@ -5581,7 +5980,9 @@ function updateUI(){
     if(currentMode==='speedrun'){
       itTarget.textContent='Objectif : '+(currentSpeedrunTarget.toLocaleString())+' clics';
     } else {
-      itTarget.textContent='Chapitre '+(getChapter().id)+' — Objectif : '+(fmt(runTarget));
+      const ch = getChapter();
+      const unit = ch.unit || 'infectés';
+      itTarget.textContent='Objectif : '+(fmt(runTarget))+' '+unit;
     }
   }
   const vssup=document.getElementById('vs-sup');
@@ -5651,7 +6052,7 @@ function goMenu(){
   if(timerInterval){ clearInterval(timerInterval); timerInterval=null; }
   showMenuTab('play');
   // Sauvegarde l'état de la run en cours si c'est une partie histoire non terminée avec progression réelle
-  if(currentMode==='story' && !gameOver && infected > 100){
+  if(currentMode==='story' && !gameOver && infected > 0){
     saveRunInProgress();
     // Force sync Firebase immédiat
     if(window.fbSaveRunInProgress){
@@ -5733,7 +6134,7 @@ function hasRunInProgress(){
     const raw = localStorage.getItem(RUN_SAVE_KEY);
     if(!raw) return false;
     const d = JSON.parse(raw);
-    return d && typeof d.infected === 'number' && d.infected > 100;
+    return d && typeof d.infected === 'number' && d.infected > 0;
   } catch(e){ return false; }
 }
 
@@ -5975,36 +6376,36 @@ function initLoadingScreen(){
 }
 
 const LOADING_TIPS=[
-  "Tu n'es pas un joueur. Tu es le patient zero.",
+  "Tu n'es pas un joueur. Tu es le patient zéro.",
   "Chaque tap est une vie. Continue.",
-  "Un seul porteur. Un seul aeroport. Le reste est mathematiques.",
-  "Ils ont ferme les frontieres. Pathogen-X etait deja de l'autre cote.",
-  "La question n'est pas si tu reussiras. C'est combien de temps ils resisteront.",
+  "Un seul porteur. Un seul aéroport. Le reste est mathématiques.",
+  "Ils ont fermé les frontières. Pathogen-X était déjà de l'autre côté.",
+  "La question n'est pas si tu réussiras. C'est combien de temps ils résisteront.",
   "Rapport CDC confidentiel : Nous ne comprenons pas comment il se propage aussi vite.",
-  "Les OMS ont declenche le niveau d'alerte maximal. Trop tard.",
-  "Pathogen-X a une periode d'incubation silencieuse de 72h. Largement suffisant pour un continent.",
-  "Les frontieres sont fermees. Les vols sont annules. Pathogen-X etait deja a bord.",
-  "Sequence ADN de Pathogen-X inconnue. Origine inconnue. Taux de mortalite en cours de calcul.",
-  "Les virus sont les entites les plus abondantes sur Terre.",
-  "Une seule particule virale suffit a declencher une infection chez un hote susceptible.",
-  "Les chauves-souris hebergent plus de 60 virus differents sans jamais developper de symptomes.",
-  "Le virus Ebola peut reduire un organe a l'etat liquide en moins de 48 heures.",
-  "En 1918, la grippe espagnole a tue 50 millions de personnes en 18 mois.",
-  "Certains virus modifient le cerveau de leur hote pour favoriser leur propagation.",
+  "L'OMS a déclenché le niveau d'alerte maximal. Trop tard.",
+  "Pathogen-X a une période d'incubation silencieuse de 72h. Largement suffisant pour un continent.",
+  "Les frontières sont fermées. Les vols sont annulés. Pathogen-X était déjà à bord.",
+  "Séquence ADN de Pathogen-X inconnue. Origine inconnue. Taux de mortalité en cours de calcul.",
+  "Les virus sont les entités les plus abondantes sur Terre.",
+  "Une seule particule virale suffit à déclencher une infection chez un hôte susceptible.",
+  "Les chauves-souris hébergent plus de 60 virus différents sans jamais développer de symptômes.",
+  "Le virus Ebola peut réduire un organe à l'état liquide en moins de 48 heures.",
+  "En 1918, la grippe espagnole a tué 50 millions de personnes en 18 mois.",
+  "Certains virus modifient le cerveau de leur hôte pour favoriser leur propagation.",
   "Un coronavirus peut rester en suspension dans l'air pendant plus de 3 heures.",
-  "Les virus evoluent un million de fois plus rapidement que tout organisme vivant.",
-  "Certains virus remontent a 800 000 ans, pieges dans les glaces polaires.",
+  "Les virus évoluent un million de fois plus rapidement que tout organisme vivant.",
+  "Certains virus remontent à 800 000 ans, piégés dans les glaces polaires.",
   "80% des maladies infectieuses humaines viennent des animaux sauvages.",
-  "Les oceans contiennent plus de virus que d'etoiles dans l'univers observable.",
-  "Le VIH peut developper une resistance a un medicament en moins de 48 heures.",
-  "En 1347, la Peste Noire a tue 60% de la population europeenne en 7 ans.",
-  "Les scientifiques l'appellent un evenement de debordement. Tu l'appelles le debut.",
-  "Il ne se replique pas. Il se souvient. Dr. Irina Volkova, 2019",
-  "Stade 1 : detection. Stade 2 : panique. Stade 3 : trop tard.",
+  "Les océans contiennent plus de virus que d'étoiles dans l'univers observable.",
+  "Le VIH peut développer une résistance à un médicament en moins de 48 heures.",
+  "En 1347, la Peste Noire a tué 60% de la population européenne en 7 ans.",
+  "Les scientifiques l'appellent un événement de débordement. Tu l'appelles le début.",
+  "Il ne se réplique pas. Il se souvient. Dr. Irina Volkova, 2019",
+  "Stade 1 : détection. Stade 2 : panique. Stade 3 : trop tard.",
   "Pathogen-X n'a pas d'antidote. Pas de vaccin. Pas de seconde chance.",
-  "Les hopitaux signalent une hausse anormale. Les autorites minimisent. Tu te propages.",
+  "Les hôpitaux signalent une hausse anormale. Les autorités minimisent. Tu te propages.",
   "Ce que vous tenez entre vos mains n'existe pas officiellement.",
-  "Niveau d'alerte biologique maximal declenche. Population non informee.",
+  "Niveau d'alerte biologique maximal déclenché. Population non informée.",
 ];
 
 // ══════════════════════════════════════════
@@ -6217,9 +6618,9 @@ const DAILY_CHALLENGES = [
   { id:'dc8',  icon:'💀', name:'Apocalypse',         desc:'Infecter 100 000 000 en une run',        type:'infected_run',    target:100000000,reward:{souches:80, frags:5} },
 
   // ── VICTOIRES ──
-  { id:'dc9',  icon:'✅', name:'Première Victoire',   desc:'Gagner 1 run (histoire ou speedrun)',    type:'wins_today',      target:1,        reward:{souches:20, frags:1} },
-  { id:'dc10', icon:'✅', name:'Doublé',              desc:'Gagner 2 runs aujourd\'hui',             type:'wins_today',      target:2,        reward:{souches:40, frags:2} },
-  { id:'dc11', icon:'✅', name:'Hat-trick',           desc:'Gagner 3 runs aujourd\'hui',             type:'wins_today',      target:3,        reward:{souches:70, frags:4} },
+  { id:'dc9',  icon:'✅', name:'Première Victoire Histoire', desc:'Gagner 1 run en mode Histoire',   type:'story_wins_today', target:1, reward:{souches:20, frags:1} },
+  { id:'dc10', icon:'✅', name:'Doublé Histoire',            desc:'Gagner 2 runs en mode Histoire',  type:'story_wins_today', target:2, reward:{souches:40, frags:2} },
+  { id:'dc11', icon:'✅', name:'Hat-trick Histoire',         desc:'Gagner 3 runs en mode Histoire',  type:'story_wins_today', target:3, reward:{souches:70, frags:4} },
 
   // ── SPEEDRUN ──
   { id:'dc12', icon:'⚡', name:'Speedrunner',         desc:'Terminer un speedrun',                       type:'speedrun_today',  target:1,        reward:{souches:25, frags:2} },
@@ -6266,6 +6667,8 @@ let dailyChallengeState = {
   // Compteurs du jour
   clicksToday: 0,
   winsToday: 0,
+  storyWinsToday: 0,
+  speedrunWinsToday: 0,
   speedrunsToday: 0,
   chaptersToday: 0,
   lootboxToday: 0,
@@ -6311,6 +6714,8 @@ function initDailyChallenges(){
     dailyChallengeState.claimed = {};
     dailyChallengeState.clicksToday = 0;
     dailyChallengeState.winsToday = 0;
+    dailyChallengeState.storyWinsToday = 0;
+    dailyChallengeState.speedrunWinsToday = 0;
     dailyChallengeState.speedrunsToday = 0;
     dailyChallengeState.chaptersToday = 0;
     dailyChallengeState.lootboxToday = 0;
@@ -6329,6 +6734,7 @@ function getDailyChallengeProgress(ch){
     case 'clicks_today':      return s.clicksToday;
     case 'infected_run':      return infected || 0;
     case 'wins_today':        return s.winsToday;
+    case 'story_wins_today':  return s.storyWinsToday || 0;
     case 'speedrun_today':    return s.speedrunsToday;
     case 'speedrun_time':     return -1; // spécial: vérifié à la fin du speedrun
     case 'chapter_today':     return s.chaptersToday;
@@ -6409,10 +6815,13 @@ function dailyOnWin(isSpeedrun, elapsed){
   dailyChallengeState.winsToday++;
   if(isSpeedrun){
     dailyChallengeState.speedrunsToday++;
+    dailyChallengeState.speedrunWinsToday = (dailyChallengeState.speedrunWinsToday||0) + 1;
     updateDailyChallenges('speedrun_win', elapsed);
   } else {
     dailyChallengeState.chaptersToday++;
+    dailyChallengeState.storyWinsToday = (dailyChallengeState.storyWinsToday||0) + 1;
     updateDailyChallenges('chapter_win', vaccine);
+    updateDailyChallenges('story_wins_today', dailyChallengeState.storyWinsToday);
   }
   saveGame();
 }
@@ -7766,4 +8175,7 @@ window.addEventListener('load', function(){ if(!window.firebaseReady) initFireba
 
   </script>
 
+<!-- SVGs secrets stockés en HTML pour éviter le bug de parsing </svg> dans les scripts JS -->
+<div id="tpl-secret" style="display:none"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="sg1" cx="50%" cy="40%" r="55%"><stop offset="0%" stop-color="#2a0000"/><stop offset="60%" stop-color="#0d0d0d"/><stop offset="100%" stop-color="#000000"/></radialGradient><radialGradient id="sg2" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#ff0000" stop-opacity="0.8"/><stop offset="100%" stop-color="#330000" stop-opacity="0"/></radialGradient></defs><circle cx="50" cy="50" r="32" fill="url(#sg1)" stroke="#550000" stroke-width="2"/><circle cx="50" cy="50" r="22" fill="url(#sg2)" opacity="0.5"/><line x1="50" y1="50" x2="50" y2="18" stroke="#330000" stroke-width="2.5"/><circle cx="50" cy="18" r="5" fill="#1a0000" stroke="#cc0000" stroke-width="1.5"/><circle cx="50" cy="18" r="2" fill="#ff2200"/><line x1="50" y1="50" x2="78" y2="34" stroke="#330000" stroke-width="2.5"/><circle cx="78" cy="34" r="5" fill="#1a0000" stroke="#cc0000" stroke-width="1.5"/><circle cx="78" cy="34" r="2" fill="#ff2200"/><line x1="50" y1="50" x2="78" y2="66" stroke="#330000" stroke-width="2.5"/><circle cx="78" cy="66" r="5" fill="#1a0000" stroke="#cc0000" stroke-width="1.5"/><circle cx="78" cy="66" r="2" fill="#ff2200"/><line x1="50" y1="50" x2="50" y2="82" stroke="#330000" stroke-width="2.5"/><circle cx="50" cy="82" r="5" fill="#1a0000" stroke="#cc0000" stroke-width="1.5"/><circle cx="50" cy="82" r="2" fill="#ff2200"/><line x1="50" y1="50" x2="22" y2="66" stroke="#330000" stroke-width="2.5"/><circle cx="22" cy="66" r="5" fill="#1a0000" stroke="#cc0000" stroke-width="1.5"/><circle cx="22" cy="66" r="2" fill="#ff2200"/><line x1="50" y1="50" x2="22" y2="34" stroke="#330000" stroke-width="2.5"/><circle cx="22" cy="34" r="5" fill="#1a0000" stroke="#cc0000" stroke-width="1.5"/><circle cx="22" cy="34" r="2" fill="#ff2200"/><circle cx="50" cy="50" r="11" fill="#0d0d0d" stroke="#880000" stroke-width="1.5"/><ellipse cx="50" cy="50" rx="2.5" ry="4" fill="#ff0000" opacity="0.9"/><circle cx="50" cy="47" r="1.5" fill="#ff4400" opacity="0.8"/><circle cx="50" cy="47" r="0.6" fill="#ffffff" opacity="0.5"/><circle cx="30" cy="30" r="1.5" fill="#cc0000" opacity="0.6"/><circle cx="70" cy="28" r="1.5" fill="#cc0000" opacity="0.6"/><circle cx="72" cy="70" r="1.5" fill="#cc0000" opacity="0.6"/><circle cx="30" cy="72" r="1.5" fill="#cc0000" opacity="0.6"/><circle cx="18" cy="50" r="1.5" fill="#cc0000" opacity="0.6"/><circle cx="82" cy="50" r="1.5" fill="#cc0000" opacity="0.6"/></svg></div>
+<div id="tpl-marburgalpha" style="display:none"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="mag1" cx="40%" cy="40%" r="55%"><stop offset="0%" stop-color="#1a0000"/><stop offset="50%" stop-color="#0d0505"/><stop offset="100%" stop-color="#000"/></radialGradient><radialGradient id="mag2" cx="60%" cy="60%" r="50%"><stop offset="0%" stop-color="#ff2200" stop-opacity="0.6"/><stop offset="100%" stop-color="#000" stop-opacity="0"/></radialGradient></defs><circle cx="50" cy="50" r="30" fill="url(#mag1)" stroke="#880000" stroke-width="1.5"/><circle cx="50" cy="50" r="22" fill="url(#mag2)" opacity="0.4"/><line x1="50" y1="50" x2="50" y2="20" stroke="#660000" stroke-width="2"/><circle cx="50" cy="20" r="6" fill="#0d0000" stroke="#ff2200" stroke-width="1.5"/><circle cx="50" cy="20" r="2.5" fill="#ff4400"/><line x1="50" y1="50" x2="78" y2="35" stroke="#440000" stroke-width="2"/><circle cx="78" cy="35" r="5" fill="#0d0000" stroke="#cc0000" stroke-width="1.5"/><circle cx="78" cy="35" r="2" fill="#cc2200"/><line x1="50" y1="50" x2="78" y2="65" stroke="#660000" stroke-width="2"/><circle cx="78" cy="65" r="6" fill="#0d0000" stroke="#ff2200" stroke-width="1.5"/><circle cx="78" cy="65" r="2.5" fill="#ff4400"/><line x1="50" y1="50" x2="50" y2="80" stroke="#440000" stroke-width="2"/><circle cx="50" cy="80" r="5" fill="#0d0000" stroke="#cc0000" stroke-width="1.5"/><circle cx="50" cy="80" r="2" fill="#cc2200"/><line x1="50" y1="50" x2="22" y2="65" stroke="#660000" stroke-width="2"/><circle cx="22" cy="65" r="6" fill="#0d0000" stroke="#ff2200" stroke-width="1.5"/><circle cx="22" cy="65" r="2.5" fill="#ff4400"/><line x1="50" y1="50" x2="22" y2="35" stroke="#440000" stroke-width="2"/><circle cx="22" cy="35" r="5" fill="#0d0000" stroke="#cc0000" stroke-width="1.5"/><circle cx="22" cy="35" r="2" fill="#cc2200"/><circle cx="50" cy="50" r="10" fill="#0d0000" stroke="#aa0000" stroke-width="1.5"/><ellipse cx="50" cy="50" rx="3" ry="5" fill="#ff0000" opacity="0.9"/><circle cx="50" cy="47" r="1.8" fill="#ff6600" opacity="0.9"/><circle cx="50" cy="47" r="0.7" fill="#ffffff" opacity="0.6"/><circle cx="30" cy="28" r="3" fill="#0d0000" stroke="#ff4400" stroke-width="1"/><circle cx="30" cy="28" r="1" fill="#ff4400"/><circle cx="70" cy="26" r="2.5" fill="#0d0000" stroke="#dd2200" stroke-width="1"/><circle cx="70" cy="26" r="1" fill="#cc0000"/><circle cx="74" cy="68" r="3" fill="#0d0000" stroke="#ff4400" stroke-width="1"/><circle cx="74" cy="68" r="1" fill="#ff4400"/><circle cx="30" cy="74" r="2.5" fill="#0d0000" stroke="#dd2200" stroke-width="1"/><circle cx="30" cy="74" r="1" fill="#cc0000"/><circle cx="16" cy="50" r="3" fill="#0d0000" stroke="#ff4400" stroke-width="1"/><circle cx="16" cy="50" r="1" fill="#ff4400"/><circle cx="84" cy="50" r="2.5" fill="#0d0000" stroke="#dd2200" stroke-width="1"/><circle cx="84" cy="50" r="1" fill="#cc0000"/><circle cx="50" cy="50" r="30" fill="none" stroke="#330000" stroke-width="0.5" stroke-dasharray="3,4"/></svg></div>
 </body></html>
