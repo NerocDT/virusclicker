@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.nerocdt.twa",
+        "sha256_cert_fingerprints": ["26:44:57:2A:9A:1E:07:D8:33:A2:24:48:BB:F1:E6:CD:CF:DE:33:39:4F:9F:E0:12:7A:95:FA:2F:3F:41:D4:33"]
+      }
+    }]
