@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <!-- saved from url=(0112)http://localhost:63342/pythonProject1/Pathogene-x.html?_ijt=7n7lb389hg3rcglghtt8c2fk3v&_ij_reload=RELOAD_ON_SAVE -->
 <html lang="fr" style="--bg: #060d08; --text: #d4fce5; --text-dim: rgba(212,252,229,0.65); --text-faint: rgba(212,252,229,0.4); --green-ghost: rgba(0,255,136,0.06); --border: rgba(0,255,136,0.18); --border-dim: rgba(0,255,136,0.08);"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="manifest" href="/virusclicker/manifest.json">
+<meta name="theme-color" content="#00ff88">
+<script>if('serviceWorker' in navigator) navigator.serviceWorker.register('/virusclicker/sw.js');</script>
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>☣ PATHOGEN-X</title>
   <script>
   // ══ AUTO-UPDATE — changer ce numéro à chaque mise à jour ══
-  var APP_VERSION = '1.27';
+  var APP_VERSION = '1.30';
   (function(){
     // On met juste à jour le numéro de version
     localStorage.setItem('pathogenx_version', APP_VERSION);
@@ -917,7 +920,7 @@ body{background:var(--bg);font-family:'Share Tech Mono','Courier New',monospace;
       </div>
     </div>
 
-    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.27</div>
+    <div id="settings-version" style="text-align:center;padding:28px 0 8px;color:rgba(0,255,136,0.25);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px">V 1.30</div>
 
   </div>
 </div>
@@ -1654,6 +1657,8 @@ let gameFullyLoaded = false; // Empêche saveGame d'écraser Firebase tant que l
 
 function saveGame(){
   try {
+    // Bloquer les écritures localStorage pendant le loading screen
+    if(!gameFullyLoaded && !window._saveUnlocked) return;
     const data = {
       v: 5,
       updatedAt: Date.now(),
@@ -4474,9 +4479,23 @@ async function checkAndSyncFromFirebase(){
       localStorage.setItem(SAVE_KEY, JSON.stringify(cloudData));
       loadGame();
     } else {
-      // Local plus récent → garde le local et re-sync Firebase
-      console.log('[SYNC] Local plus récent, sync Firebase...');
-      if(window.fbSaveFullSave) fbSaveFullSave();
+      // Local plus récent — vérifie qu'il a du vrai contenu avant d'écraser Firebase
+      const localIsReal = localData &&
+        (localData.maxChapter > 0 ||
+         localData.totalWins > 0 ||
+         (localData.skinCollection && Object.keys(localData.skinCollection).length > 0) ||
+         (localData.souches && localData.souches > 50));
+
+      if(localIsReal){
+        // Local a du vrai contenu → garde le local et re-sync Firebase
+        console.log('[SYNC] Local plus récent avec contenu réel, sync Firebase...');
+        if(window.fbSaveFullSave) fbSaveFullSave();
+      } else {
+        // Local vide ou quasi-vide → Firebase gagne toujours
+        console.log('[SYNC] Local vide/insuffisant, Firebase protégé');
+        localStorage.setItem(SAVE_KEY, JSON.stringify(cloudData));
+        loadGame();
+      }
     }
 
     // Restaurer la run en cours depuis Firebase si elle n'est pas dans le localStorage
@@ -6367,9 +6386,21 @@ function initLoadingScreen(){
         if(saved){
           playerPseudo = saved;
           loadGame(); // charge le localStorage immédiatement
-          checkAndSyncFromFirebase().then(() => { gameFullyLoaded = true; goMenu(); }); // puis vérifie Firebase
+          checkAndSyncFromFirebase().then(() => {
+            window._saveUnlocked = true; // débloque les écritures localStorage
+            gameFullyLoaded = true;
+            goMenu();
+          }).catch(() => {
+            window._saveUnlocked = true; // débloque même si Firebase échoue
+            gameFullyLoaded = true;
+            goMenu();
+          });
         }
-        else { gameFullyLoaded = true; showPseudoScreen(); }
+        else {
+          window._saveUnlocked = true;
+          gameFullyLoaded = true;
+          showPseudoScreen();
+        }
       },800);
     }
   },6000);
